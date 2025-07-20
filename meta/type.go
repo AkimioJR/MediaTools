@@ -42,7 +42,7 @@ var (
 	audioEncodeRe = regexp.MustCompile(`(?i)^DTS\d?$|^DTSHD$|^DTSHDMA$|^Atmos$|^TrueHD\d?$|^AC3$|^\dAudios?$|^DDP\d?$|^DD\+\d?$|^DD\d?$|^LPCM\d?$|^AAC\d?$|^FLAC\d?$|^HD\d?$|^MA\d?$|^HR\d?$|^Opus\d?$|^Vorbis\d?$|^AV[3S]A$`)
 
 	// 干扰词过滤正则
-	noStringRe = regexp.MustCompile(`(?i)^PTS|^JADE|^AOD|^CHC|^[A-Z]{1,4}TV[\-0-9UVHDK]*` +
+	noStringRe = regexp.MustCompile(`(?i)^PTS|^AOD|^CHC|^[A-Z]{1,4}TV[\-0-9UVHDK]*` +
 		`|HBO$|\s+HBO|\d{1,2}th|\d{1,2}bit|NETFLIX|AMAZON|IMAX|^3D|\s+3D|^BBC\s+|\s+BBC|BBC$|DISNEY\+?|XXX|\s+DC$` +
 		`|[第\s共]+[0-9一二三四五六七八九十\-\s]+季` +
 		`|[第\s共]+[0-9一二三四五六七八九十百零\-\s]+[集话話]` +
