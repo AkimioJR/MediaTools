@@ -908,8 +908,8 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 		s.lastType == lastTokenTypeVideoEncode {
 		prevToken := ""
 		currentIndex := s.tokens.GetCurrentIndex()
-		if currentIndex >= 2 {
-			prevToken = s.tokens.GetByIndex(currentIndex - 2)
+		if currentIndex >= 1 {
+			prevToken = s.tokens.GetByIndex(currentIndex - 1)
 		}
 		prevTokenUpper := strings.ToUpper(prevToken)
 
@@ -926,8 +926,8 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 	if utils.IsDigits(token) && s.lastType == lastTokenTypeVideoEncode {
 		prevToken := ""
 		currentIndex := s.tokens.GetCurrentIndex()
-		if currentIndex >= 2 {
-			prevToken = s.tokens.GetByIndex(currentIndex - 2)
+		if currentIndex >= 1 {
+			prevToken = s.tokens.GetByIndex(currentIndex - 1)
 		}
 		prevTokenUpper := strings.ToUpper(prevToken)
 
