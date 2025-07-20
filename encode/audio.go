@@ -87,9 +87,9 @@ func ParseAudioEncode(s string) AudioEncode {
 	switch s {
 	case "AAC", "AAC2.0", "AAC5.1":
 		return AudioEncodeAAC
-	case "AC3", "AC-3":
+	case "AC3", "AC-3", "DD5.1":
 		return AudioEncodeAC3
-	case "EAC3", "E-AC-3", "DD+", "DD+7.1", "DDP", "DDP5.1", "DDP5":
+	case "EAC3", "E-AC-3", "DD+", "DD+7.1", "DDP", "DDP5.1", "DDP5", "DDP2.0":
 		return AudioEncodeEAC3
 	case "DTS":
 		return AudioEncodeDTS
