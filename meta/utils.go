@@ -10,7 +10,7 @@ var (
 	version1Re     = regexp.MustCompile(`(\d{1,2})[vV](\d+)`)                  // 匹配 03v2 这种格式
 	version2Re     = regexp.MustCompile(`\[(\d{1,2}[AaBbVv]\d*)\]`)            // 匹配 [12A] 或 [03v2] 这种格式
 	version3Re     = regexp.MustCompile(`(\d{1,2}[AaBb])(?:\s|\]|\[|$|\.|\-)`) // 匹配 12A 或 12B 这种格式，后面跟分隔符
-	versionDigitRe = regexp.MustCompile(`[AaBb]|[vV](\d+)`)                        // 提取字母或v后的数字
+	versionDigitRe = regexp.MustCompile(`[AaBb]|[vV](\d+)`)                    // 提取字母或v后的数字
 )
 
 // 解析版本号，返回 uint8 类型版本号（0-255）

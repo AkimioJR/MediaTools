@@ -30,6 +30,7 @@ type MetaVideo struct {
 	platform       StreamingPlatform           // 流媒体平台
 	releaseGroups  []string                    // 发布组
 	part           string                      // 分段
+	version        uint8                       // 版本号
 	// customization  string                      // 自定义词
 
 	// 电视剧相关·
@@ -53,6 +54,7 @@ func (meta *MetaVideo) GetAudioEncode() encode.AudioEncode             { return 
 func (meta *MetaVideo) GetStreamingPlatform() StreamingPlatform        { return meta.platform }       // GetWebSource 获取网络来源
 func (meta *MetaVideo) GetReleaseGroups() []string                     { return meta.releaseGroups }  // GetResourceTeam 获取资源组
 func (meta *MetaVideo) GetPart() string                                { return meta.part }           // GetPart 获取分集信息
+func (meta *MetaVideo) GetVersion() uint8                              { return meta.version }        // GetVersion 获取版本号，若未识别到版本号，则返回1
 
 // 获取标题
 // 有中文标题优先返回中文标题
@@ -140,6 +142,7 @@ func ParseMetaVideo(title string, isFile bool) *MetaVideo {
 		resourceEffect: make(map[ResourceEffect]struct{}),
 		releaseGroups:  findReleaseGroups(title), // 解析发布组
 		platform:       UnknownStreamingPlatform,
+		version:        ParseVersion(title), // 解析版本号
 	}
 
 	loc := nameNoBeginRe.FindStringIndex(title) // 去掉名称中第1个[]的内容（一般是发布组）
