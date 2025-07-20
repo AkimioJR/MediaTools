@@ -22,6 +22,7 @@ func TestParseMetaVideo(t *testing.T) {
 		resourceEffect map[meta.ResourceEffect]struct{}
 		videoEncode    encode.VideoEncode
 		audioEncode    encode.AudioEncode
+		version        uint8
 	}
 	testCases := []struct {
 		input    string
@@ -42,6 +43,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeH265,
 				audioEncode:    encode.AudioEncodeAAC,
+				version:        1,
 			},
 		},
 		{
@@ -59,6 +61,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeH265,
 				audioEncode:    encode.AudioEncodeAAC,
+				version:        1,
 			},
 		},
 		{
@@ -76,6 +79,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeH265,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -95,6 +99,25 @@ func TestParseMetaVideo(t *testing.T) {
 				},
 				videoEncode: encode.VideoEncodeH264,
 				audioEncode: encode.AudioEncodeTrueHD,
+				version:     1,
+			},
+		},
+		{
+			input: "[秋叶原冥途战争][Akiba Maid Sensou][2022][WEB-DL][1080][TV Series][第01话][LeagueWEB]",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Akiba Maid Sensou",
+				year:           2022,
+				part:           "",
+				season:         "S01",
+				episode:        "E01",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -112,6 +135,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeUnknown,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -129,6 +153,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeUnknown,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -146,6 +171,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeUnknown,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -163,6 +189,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeH264,
 				audioEncode:    encode.AudioEncodeAAC,
+				version:        1,
 			},
 		},
 		{
@@ -180,6 +207,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeH264,
 				audioEncode:    encode.AudioEncodeAAC,
+				version:        1,
 			},
 		},
 		{
@@ -197,6 +225,25 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeUnknown,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			input: "[Animations(动画片)][[诛仙][Jade Dynasty][2022][WEB-DL][2160][TV Series][TV 08][LeagueWEB]][诛仙/诛仙动画 第一季 第08集 | 类型:动画 [国语中字]][680.12 MB]",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "诛仙",
+				entitle:        "Jade Dynasty",
+				year:           2022,
+				part:           "",
+				season:         "S01",
+				episode:        "E08",
+				resourcePix:    meta.ResourcePix2160p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -214,6 +261,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeUnknown,
 				audioEncode:    encode.AudioEncodeAC3,
+				version:        1,
 			},
 		},
 		{
@@ -231,6 +279,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeH264,
 				audioEncode:    encode.AudioEncodeAtmos,
+				version:        1,
 			},
 		},
 		{
@@ -248,6 +297,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeUnknown,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -265,6 +315,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeUnknown,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -282,6 +333,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeH265,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -299,6 +351,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeH264,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -316,6 +369,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeUnknown,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
 			},
 		},
 		{
@@ -333,6 +387,7 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeH264,
 				audioEncode:    encode.AudioEncodeLPCM,
+				version:        1,
 			},
 		},
 		{
@@ -350,6 +405,115 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeH264,
 				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			input: "Test.S01E01v2.1080p.WEB-DL.H264.AAC-XXX",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Test",
+				year:           0,
+				part:           "",
+				season:         "S01",
+				episode:        "E01",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAAC,
+				version:        2,
+			},
+		},
+		{
+			input: "Test.S01E12A.1080p.WEB-DL.H264.AAC-XXX",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Test",
+				year:           0,
+				part:           "",
+				season:         "S01",
+				episode:        "E12",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAAC,
+				version:        1,
+			},
+		},
+		{
+			input: "S02E1000.mkv",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "",
+				year:           0,
+				part:           "",
+				season:         "S02",
+				episode:        "E1000",
+				resourcePix:    meta.ResourcePixUnknown,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			input: "西部世界 12.mkv",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "西部世界",
+				entitle:        "",
+				year:           0,
+				part:           "",
+				season:         "S01",
+				episode:        "E12",
+				resourcePix:    meta.ResourcePixUnknown,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			input: "[ANi] OVERLORD 第四季 - 04 [1080P][Baha][WEB-DL][AAC AVC][CHT].mp4",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "OVERLORD",
+				year:           0,
+				part:           "",
+				season:         "S04",
+				episode:        "E04",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAAC,
+				version:        1,
+			},
+		},
+		{
+			input: "[SweetSub&LoliHouse] Made in Abyss S2 - 03v2 [WebRip 1080p HEVC-10bit AAC ASSx2].mkv",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Made in Abyss",
+				year:           0,
+				part:           "",
+				season:         "S02",
+				episode:        "E03",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebRip,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH265_10bit,
+				audioEncode:    encode.AudioEncodeAAC,
+				version:        2,
 			},
 		},
 	}
@@ -369,6 +533,7 @@ func TestParseMetaVideo(t *testing.T) {
 			require.Equal(t, tc.expected.resourceEffect, meta.GetResourceEffect(), "资源效果不匹配")
 			require.Equal(t, tc.expected.videoEncode, meta.GetVideoEncode(), "视频编码不匹配")
 			require.Equal(t, tc.expected.audioEncode, meta.GetAudioEncode(), "音频编码不匹配")
+			require.Equal(t, tc.expected.version, meta.GetVersion(), "版本号不匹配")
 		})
 
 	}
