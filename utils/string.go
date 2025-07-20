@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"MediaTools/extensions"
 	"regexp"
 	"slices"
 	"strings"
@@ -32,28 +33,7 @@ func IsRomanNumeral(s string) bool {
 	return romanNumeralsRe.MatchString(strings.ToUpper(s))
 }
 
-// 媒体文件扩展名
-var MediaExtensions = []string{
-	".mp4",
-	".mkv",
-	".avi",
-	".mov",
-	".wmv",
-	".flv",
-	".webm",
-	".m4v",
-	".mpg",
-	".mpeg",
-	".3gp",
-	".asf",
-	".rm",
-	".rmvb",
-	".vob",
-	".ts",
-	".strm",
-}
-
 // IsMediaExtension 判断是否为媒体文件扩展名
 func IsMediaExtension(s string) bool {
-	return slices.Contains(MediaExtensions, strings.ToLower(s))
+	return slices.Contains(extensions.MediaExtensions, strings.ToLower(s))
 }
