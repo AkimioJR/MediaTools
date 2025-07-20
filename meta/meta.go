@@ -632,6 +632,18 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 			s.continueFlag = false
 			s.stopNameFlag = true
 			meta.mediaType = MediaTypeTV
+		} else if meta.beginEpisode == nil && // 情况2a：数字较小且已有季信息，可能是集数
+			length <= 3 &&
+			tokenInt <= 99 && // 集数通常不会超过99
+			s.lastType == lastTokenTypeYear &&
+			meta.beginSeason != nil { // 已有季信息
+
+			meta.beginEpisode = &tokenInt
+			meta.totalEpisode = 1
+			s.lastType = lastTokenTypeEpisode
+			s.continueFlag = false
+			s.stopNameFlag = true
+			meta.mediaType = MediaTypeTV
 		} else if s.lastType == lastTokenTypeEpisode && // 情况3：前一个token是EPISODE关键词
 			meta.beginEpisode == nil &&
 			length < 5 {
