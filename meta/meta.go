@@ -1304,13 +1304,18 @@ func (meta *MetaVideo) isInEpisode(episode int) bool {
 }
 
 func ParseMetaVideoByPath(p string) *MetaVideo {
-	names := strings.Split(p, "/")
-	var name string
-	for i := len(names) - 1; i >= 0; i-- {
-		name = nameMovieWordsRe.ReplaceAllString(names[i], "") + " " + name
-		if i == len(names)-3 {
+	idx := 3
+	parts := strings.Split(p, "/")
+	names := make([]string, idx)
+	for i := len(parts) - 1; i >= 0; i-- {
+		name := strings.TrimSpace(nameMovieWordsRe.ReplaceAllString(parts[i], ""))
+		if name != "" {
+			idx--
+			names[idx] = name
+		}
+		if idx == 0 { // 只取最后三个部分作为名称
 			break
 		}
 	}
-	return ParseMetaVideo(name)
+	return ParseMetaVideo(strings.Join(names, " "))
 }
