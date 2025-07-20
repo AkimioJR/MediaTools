@@ -24,7 +24,7 @@ var (
 	seasonRe = regexp.MustCompile(`(?i)S(\d{3})|^S(\d{1,3})$|S(\d{1,3})E|S(\d{1,3})$`)
 	// seasonFullRe = regexp.MustCompile(`^Season\s+(\d{1,3})$|^S(\d{1,3})$`)
 	episodeRe = regexp.MustCompile(`(?i)EP?(\d{2,4})$|^EP?(\d{1,4})$|^S\d{1,2}EP?(\d{1,4})$|S\d{2}EP?(\d{2,4})|S\d{2}E(\d{2,4})`)
-	sxxexxRe  = regexp.MustCompile(`(?i)^S(\d{1,3})E(\d{1,4})$`)
+	sxxexxRe  = regexp.MustCompile(`(?i)^S(\d{1,3})E(\d{1,4})([AaBb]|[Vv]\d)?$`)
 
 	// Part识别正则
 	partRe = regexp.MustCompile(`(?i)(^PART[0-9ABI]{0,2}$|^CD[0-9]{0,2}$|^DVD[0-9]{0,2}$|^DISK[0-9]{0,2}$|^DISC[0-9]{0,2}$)`)
