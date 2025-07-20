@@ -548,86 +548,73 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 func (meta *MetaVideo) parseEpisode(s *parseState) {
 	token := s.tokens.Current()
 
-	sxxexxMatches := sxxexxRe.FindStringSubmatch(token) // 特殊处理 SxxExx 格式
-	if len(sxxexxMatches) > 0 {                         // 同时解析季度和集数
+	// 特殊处理 SxxExx 格式
+	if sxxexxMatches := sxxexxRe.FindStringSubmatch(token); len(sxxexxMatches) > 0 {
 		seasonStr := sxxexxMatches[1]
 		episodeStr := sxxexxMatches[2]
 
-		if seasonNum, err := strconv.Atoi(seasonStr); err == nil && seasonNum > 0 {
-			if meta.beginSeason == nil {
-				meta.beginSeason = &seasonNum
-				meta.totalSeason = 1
-			}
+		if seasonNum, err := strconv.Atoi(seasonStr); err == nil && seasonNum > 0 && meta.beginSeason == nil {
+			meta.beginSeason = &seasonNum
+			meta.totalSeason = 1
 		}
 
-		if episodeNum, err := strconv.Atoi(episodeStr); err == nil && episodeNum > 0 {
-			if meta.beginEpisode == nil {
-				meta.beginEpisode = &episodeNum
-				meta.totalEpisode = 1
-			}
+		if episodeNum, err := strconv.Atoi(episodeStr); err == nil && episodeNum > 0 && meta.beginEpisode == nil {
+			meta.beginEpisode = &episodeNum
+			meta.totalEpisode = 1
 		}
 
-		s.lastType = lastTokenTypeEpisode
-		s.continueFlag = false
-		s.stopNameFlag = true
-		meta.mediaType = MediaTypeTV
-		return
+		goto setEpisodeFlags
 	}
 
-	// 检查中文集信息格式 "第X集"、"第X话"、"第X話"等
-	if strings.HasPrefix(token, "第") && (strings.HasSuffix(token, "集") || strings.HasSuffix(token, "话") || strings.HasSuffix(token, "話")) {
-		// 提取中间的数字
+	// 处理中文集信息格式
+	if strings.HasPrefix(token, "第") {
 		var episodeStr string
-		episodeuft8str := []rune(token)
-		switch episodeuft8str[len(episodeuft8str)-1] {
-		case '集':
+		switch {
+		case strings.HasSuffix(token, "集"):
 			episodeStr = strings.TrimSuffix(strings.TrimPrefix(token, "第"), "集")
-		case '话':
+		case strings.HasSuffix(token, "话"):
 			episodeStr = strings.TrimSuffix(strings.TrimPrefix(token, "第"), "话")
-		case '話':
+		case strings.HasSuffix(token, "話"):
 			episodeStr = strings.TrimSuffix(strings.TrimPrefix(token, "第"), "話")
+		default:
+			goto checkEpisodeRegex
 		}
 
-		var episodeNum int = -1
+		var episodeNum int
 		switch {
 		case utils.IsDigits(episodeStr):
-			episodeNum, _ = strconv.Atoi(episodeStr)
-		case utils.IsAllChinese(episodeStr):
-			episodeNum, _ = utils.ChineseToInt(episodeStr)
-		}
-
-		if episodeNum > -1 {
-			s.lastType = lastTokenTypeEpisode
-			meta.mediaType = MediaTypeTV
-			s.stopcntitleFlag = true // 只停止中文名的处理
-			s.continueFlag = false
-
-			if meta.beginEpisode == nil {
-				meta.beginEpisode = &episodeNum
-				meta.totalEpisode = 1
+			if num, err := strconv.Atoi(episodeStr); err == nil && num > 0 {
+				episodeNum = num
+			} else {
+				goto checkEpisodeRegex
 			}
-			return
+		case utils.IsAllChinese(episodeStr):
+			if num, err := utils.ChineseToInt(episodeStr); err == nil && num > 0 {
+				episodeNum = num
+			} else {
+				goto checkEpisodeRegex
+			}
+		default:
+			goto checkEpisodeRegex
 		}
+
+		if meta.beginEpisode == nil {
+			meta.beginEpisode = &episodeNum
+			meta.totalEpisode = 1
+		}
+		goto setEpisodeFlags
 	}
 
+checkEpisodeRegex:
 	// 使用集识别正则匹配
-	matches := episodeRe.FindStringSubmatch(token)
-	if len(matches) > 0 {
-		s.lastType = lastTokenTypeEpisode
-		s.continueFlag = false
-		s.stopNameFlag = true
-		meta.mediaType = MediaTypeTV
-
-		// 从正则匹配结果中提取集数
+	if matches := episodeRe.FindStringSubmatch(token); len(matches) > 0 {
 		var episodeNum int
-		var err error
 		for i := 1; i < len(matches); i++ {
 			if matches[i] != "" && utils.IsDigits(matches[i]) {
-				episodeNum, err = strconv.Atoi(matches[i])
-				if err != nil {
-					return
+				if num, err := strconv.Atoi(matches[i]); err == nil && num > 0 {
+					episodeNum = num
+					break
 				}
-				break
 			}
 		}
 
@@ -635,28 +622,21 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 			if meta.beginEpisode == nil {
 				meta.beginEpisode = &episodeNum
 				meta.totalEpisode = 1
-			} else {
-				if episodeNum > *meta.beginEpisode {
-					meta.endEpisode = &episodeNum
-					meta.totalEpisode = (episodeNum - *meta.beginEpisode) + 1
-					// 如果是文件且总集数大于2，重置结束集
-					if meta.isFile && meta.totalEpisode > 2 {
-						meta.endEpisode = nil
-						meta.totalEpisode = 1
-					}
+			} else if episodeNum > *meta.beginEpisode {
+				meta.endEpisode = &episodeNum
+				meta.totalEpisode = (episodeNum - *meta.beginEpisode) + 1
+				if meta.isFile && meta.totalEpisode > 2 {
+					meta.endEpisode = nil
+					meta.totalEpisode = 1
 				}
 			}
 		}
-	} else if utils.IsDigits(token) {
-		// 检查是否为数字token
-		tokenInt, err := strconv.Atoi(token)
-		if err != nil {
-			return
-		}
+		goto setEpisodeFlags
+	} else if utils.IsDigits(token) { // 处理纯数字token
+		tokenInt, _ := strconv.Atoi(token) // 前面已检查过数字，不会出错
 		length := len([]rune(token))
 
 		switch {
-		// 情况1：已有起始集，没有结束集，且前一个token是episode
 		case meta.beginEpisode != nil && meta.endEpisode == nil &&
 			length < 5 && tokenInt > *meta.beginEpisode &&
 			s.lastType == lastTokenTypeEpisode:
@@ -666,42 +646,38 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 				meta.endEpisode = nil
 				meta.totalEpisode = 1
 			}
-			s.continueFlag = false
-			meta.mediaType = MediaTypeTV
+			goto setEpisodeFlags
 
-		// 情况2：没有起始集，数字长度在1-4之间，且不是年份或其他特殊token
 		case meta.beginEpisode == nil && length > 1 && length < 4 &&
 			s.lastType != lastTokenTypeYear && s.lastType != lastTokenTypePix &&
 			s.lastType != lastTokenTypeVideoEncode && token != s.unknownNameStr:
 			meta.beginEpisode = &tokenInt
 			meta.totalEpisode = 1
-			s.lastType = lastTokenTypeEpisode
-			s.continueFlag = false
-			s.stopNameFlag = true
-			meta.mediaType = MediaTypeTV
+			goto setEpisodeFlags
 
-		// 情况3：没有起始集，数字较小且已有季信息，可能是集数
 		case meta.beginEpisode == nil && length <= 3 && tokenInt <= 99 &&
 			s.lastType == lastTokenTypeYear && meta.beginSeason != nil:
 			meta.beginEpisode = &tokenInt
 			meta.totalEpisode = 1
-			s.lastType = lastTokenTypeEpisode
-			s.continueFlag = false
-			s.stopNameFlag = true
-			meta.mediaType = MediaTypeTV
+			goto setEpisodeFlags
 
-		// 情况4：前一个token是EPISODE关键词
 		case s.lastType == lastTokenTypeEpisode && meta.beginEpisode == nil && length < 5:
 			meta.beginEpisode = &tokenInt
 			meta.totalEpisode = 1
-			s.lastType = lastTokenTypeEpisode
-			s.continueFlag = false
-			s.stopNameFlag = true
-			meta.mediaType = MediaTypeTV
+			goto setEpisodeFlags
 		}
-	} else if strings.ToUpper(token) == "EPISODE" { // 遇到EPISODE关键词
+	} else if strings.ToUpper(token) == "EPISODE" { // 处理EPISODE关键词
 		s.lastType = lastTokenTypeEpisode
+		return
 	}
+
+	return
+
+setEpisodeFlags:
+	s.lastType = lastTokenTypeEpisode
+	s.continueFlag = false
+	s.stopNameFlag = true
+	meta.mediaType = MediaTypeTV
 }
 
 // 识别资源类型
