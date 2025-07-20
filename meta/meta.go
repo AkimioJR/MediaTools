@@ -1051,7 +1051,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 	}
 
 	// 处理 10bit 编码
-	if tokenUpper == "10BIT" {
+	if tokenUpper == "10BIT" || strings.Contains(tokenUpper, "YUV420P10") {
 		s.lastType = lastTokenTypeVideoEncode
 		if meta.videoEncode == encode.VideoEncodeUnknown { // 如果没有其他编码信息，设置为纯10bit编码
 			meta.videoEncode = encode.VideoEncode10bit
