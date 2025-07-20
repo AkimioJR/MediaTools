@@ -1043,17 +1043,6 @@ func (meta *MetaVideo) postProcess() {
 	meta.cntitle = meta.fixName(meta.cntitle)
 	meta.entitle = meta.fixName(meta.entitle)
 
-	// 英文名首字母大写
-	// if meta.entitle != "" {
-	// 	words := strings.Fields(meta.entitle)
-	// 	for i, word := range words {
-	// 		if len(word) > 0 {
-	// 			words[i] = strings.ToUpper(string(word[0])) + strings.ToLower(word[1:])
-	// 		}
-	// 	}
-	// 	meta.entitle = strings.Join(words, " ")
-	// }
-
 	// 处理BluRay DIY标记
 	if meta.resourceType != ResourceTypeUnknown &&
 		(meta.resourceType == ResourceTypeBluRay ||
