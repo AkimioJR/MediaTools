@@ -339,7 +339,7 @@ func (meta *MetaVideo) parseName(s *parseState) {
 		} else if episodeRe.MatchString(token) ||
 			sourceRe.MatchString(token) ||
 			effectRe.MatchString(token) ||
-			resourcePixRe.MatchString(token) {
+			resourcePixBaseRe.MatchString(token) {
 			s.stopNameFlag = true // 集、来源、版本等不要
 			return
 		} else {
@@ -400,14 +400,22 @@ func (meta *MetaVideo) parseResourcePix(s *parseState) {
 	}
 
 	token := s.tokens.Current()
+	var r ResourcePix = ResourcePixUnknown
 
-	// 使用第一个正则表达式匹配分辨率
-	matches := resourcePixRe.FindStringSubmatch(token)
+	// 先使用更精确的2K/4K/8K匹配
+	matches := resourcePixStandardRe.FindStringSubmatch(token)
+	if len(matches) > 1 {
+		if meta.resourcePix == ResourcePixUnknown {
+			r = ParseResourcePix(matches[1])
+			if r != ResourcePixUnknown {
+				goto match // 如果匹配到有效的分辨率
+			}
+		}
+	}
+
+	// 再使用通用分辨率匹配
+	matches = resourcePixBaseRe.FindStringSubmatch(token)
 	if len(matches) > 0 {
-		s.lastType = lastTokenTypePix
-		s.continueFlag = false
-		s.stopNameFlag = true
-
 		for i := 1; i < len(matches); i++ {
 			if matches[i] != "" {
 				resourcePixStr := matches[i]
@@ -418,10 +426,9 @@ func (meta *MetaVideo) parseResourcePix(s *parseState) {
 							resourcePixStr = resourcePixStr + "p"
 						}
 					}
-					r := ParseResourcePix(resourcePixStr)
+					r = ParseResourcePix(resourcePixStr)
 					if r != ResourcePixUnknown {
-						meta.resourcePix = r
-						return
+						goto match // 如果匹配到有效的分辨率
 					}
 				}
 			}
@@ -429,17 +436,13 @@ func (meta *MetaVideo) parseResourcePix(s *parseState) {
 
 	}
 
-	// 使用第二个正则表达式匹配分辨率
-	matches2 := resourcePix2Re.FindStringSubmatch(token)
-	if len(matches2) > 1 {
-		s.lastType = lastTokenTypePix
-		s.continueFlag = false
-		s.stopNameFlag = true
+	return // 没有匹配到有效的分辨率
 
-		if meta.resourcePix == ResourcePixUnknown {
-			meta.resourcePix = ParseResourcePix(strings.ToLower(matches2[1]))
-		}
-	}
+match: // 如果匹配到有效的分辨率
+	s.lastType = lastTokenTypePix
+	s.continueFlag = false
+	s.stopNameFlag = true
+	meta.resourcePix = r
 }
 
 // 识别季
