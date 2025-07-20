@@ -1,6 +1,7 @@
 package meta_test
 
 import (
+	"MediaTools/encode"
 	"MediaTools/meta"
 	"testing"
 
@@ -19,8 +20,8 @@ func TestParseMetaVideo(t *testing.T) {
 		resourcePix    meta.ResourcePix
 		resourceType   meta.ResourceType
 		resourceEffect map[meta.ResourceEffect]struct{}
-		videoEncode    meta.VideoEncode
-		audioEncode    meta.AudioEncode
+		videoEncode    encode.VideoEncode
+		audioEncode    encode.AudioEncode
 	}
 	testCases := []struct {
 		input    string
@@ -39,8 +40,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix2160p,
 				resourceType:   meta.ResourceTypeWebDL,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeH265,
-				audioEncode:    meta.AudioEncodeAAC,
+				videoEncode:    encode.VideoEncodeH265,
+				audioEncode:    encode.AudioEncodeAAC,
 			},
 		},
 		{
@@ -56,8 +57,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix2160p,
 				resourceType:   meta.ResourceTypeWebDL,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeH265,
-				audioEncode:    meta.AudioEncodeAAC,
+				videoEncode:    encode.VideoEncodeH265,
+				audioEncode:    encode.AudioEncodeAAC,
 			},
 		},
 		{
@@ -73,8 +74,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeUnknown,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeH265,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeH265,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 		{
@@ -92,8 +93,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourceEffect: map[meta.ResourceEffect]struct{}{
 					meta.ResourceEffect3D: {},
 				},
-				videoEncode: meta.VideoEncodeH264,
-				audioEncode: meta.AudioEncodeTrueHD,
+				videoEncode: encode.VideoEncodeH264,
+				audioEncode: encode.AudioEncodeTrueHD,
 			},
 		},
 		{
@@ -109,8 +110,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeUnknown,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeUnknown,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 		{
@@ -126,8 +127,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePixUnknown,
 				resourceType:   meta.ResourceTypeUnknown,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeUnknown,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 		{
@@ -143,8 +144,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeWebDL,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeUnknown,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 		{
@@ -160,8 +161,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeWebDL,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeH264,
-				audioEncode:    meta.AudioEncodeAAC,
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAAC,
 			},
 		},
 		{
@@ -177,8 +178,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeWebDL,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeH264,
-				audioEncode:    meta.AudioEncodeAAC,
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAAC,
 			},
 		},
 		{
@@ -194,8 +195,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeWebRip,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeUnknown,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 		{
@@ -211,8 +212,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeUnknown,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeUnknown,
-				audioEncode:    meta.AudioEncodeAC3,
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeAC3,
 			},
 		},
 		{
@@ -228,8 +229,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeBluRay,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeH264,
-				audioEncode:    meta.AudioEncodeAtmos,
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAtmos,
 			},
 		},
 		{
@@ -245,8 +246,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeWebDL,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeUnknown,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 		{
@@ -262,8 +263,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeUnknown,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeUnknown,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 		{
@@ -279,8 +280,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeUnknown,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeH265,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeH265,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 		{
@@ -296,8 +297,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeUnknown,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeH264,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 		{
@@ -313,8 +314,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeUnknown,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeUnknown,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 		{
@@ -330,8 +331,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeBluRayRemux,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeH264,
-				audioEncode:    meta.AudioEncodeLPCM,
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeLPCM,
 			},
 		},
 		{
@@ -347,8 +348,8 @@ func TestParseMetaVideo(t *testing.T) {
 				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeUHDBluRay,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
-				videoEncode:    meta.VideoEncodeH264,
-				audioEncode:    meta.AudioEncodeUnknown,
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeUnknown,
 			},
 		},
 	}

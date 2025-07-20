@@ -1,6 +1,7 @@
 package meta
 
 import (
+	"MediaTools/encode"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -22,8 +23,8 @@ type MetaVideo struct {
 	resourceType   ResourceType                // 来源/介质
 	resourceEffect map[ResourceEffect]struct{} // 资源效果
 	resourcePix    ResourcePix                 // 分辨率
-	videoEncode    VideoEncode                 // 视频编码
-	audioEncode    AudioEncode                 // 音频编码
+	videoEncode    encode.VideoEncode          // 视频编码
+	audioEncode    encode.AudioEncode          // 音频编码
 	platform       StreamingPlatform           // 流媒体平台
 	releaseGroups  []string                    // 发布组
 	part           string                      // 分段
@@ -46,8 +47,8 @@ func (meta *MetaVideo) GetType() MediaType                             { return 
 func (meta *MetaVideo) GetResourceType() ResourceType                  { return meta.resourceType }   // GetResourceType 获取资源类型
 func (meta *MetaVideo) GetResourceEffect() map[ResourceEffect]struct{} { return meta.resourceEffect } // GetResourceEffect 获取资源效果
 func (meta *MetaVideo) GetResourcePix() ResourcePix                    { return meta.resourcePix }    // GetResourcePix 获取资源分辨率
-func (meta *MetaVideo) GetVideoEncode() VideoEncode                    { return meta.videoEncode }    // GetVideoEncode 获取视频编码
-func (meta *MetaVideo) GetAudioEncode() AudioEncode                    { return meta.audioEncode }    // GetAudioEncode 获取音频编码
+func (meta *MetaVideo) GetVideoEncode() encode.VideoEncode             { return meta.videoEncode }    // GetVideoEncode 获取视频编码
+func (meta *MetaVideo) GetAudioEncode() encode.AudioEncode             { return meta.audioEncode }    // GetAudioEncode 获取音频编码
 func (meta *MetaVideo) GetStreamingPlatform() StreamingPlatform        { return meta.platform }       // GetWebSource 获取网络来源
 func (meta *MetaVideo) GetReleaseGroups() []string                     { return meta.releaseGroups }  // GetResourceTeam 获取资源组
 func (meta *MetaVideo) GetPart() string                                { return meta.part }           // GetPart 获取分集信息
@@ -849,7 +850,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 		s.stopNameFlag = true
 		s.lastType = lastTokenTypeVideoEncode
 
-		if meta.videoEncode == VideoEncodeUnknown {
+		if meta.videoEncode == encode.VideoEncodeUnknown {
 			// 从正则匹配结果中提取编码信息
 			var encodeStr string
 			for i := 1; i < len(matches); i++ {
@@ -862,7 +863,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 				encodeStr = matches[0]
 			}
 
-			meta.videoEncode = ParseVideoEncode(encodeStr)
+			meta.videoEncode = encode.ParseVideoEncode(encodeStr)
 		}
 		return
 	}
@@ -887,7 +888,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 
 		if prevTokenUpper == "H" || prevTokenUpper == "X" {
 			encodeStr := prevTokenUpper + token
-			meta.videoEncode = ParseVideoEncode(encodeStr)
+			meta.videoEncode = encode.ParseVideoEncode(encodeStr)
 			s.continueFlag = false
 			s.stopNameFlag = true
 		}
@@ -905,7 +906,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 
 		if prevTokenUpper == "VC" || prevTokenUpper == "MPEG" {
 			encodeStr := prevTokenUpper + token
-			meta.videoEncode = ParseVideoEncode(encodeStr)
+			meta.videoEncode = encode.ParseVideoEncode(encodeStr)
 			s.continueFlag = false
 			s.stopNameFlag = true
 		}
@@ -915,8 +916,8 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 	// 处理 10bit 编码
 	if tokenUpper == "10BIT" {
 		s.lastType = lastTokenTypeVideoEncode
-		if meta.videoEncode == VideoEncodeUnknown { // 如果没有其他编码信息，设置为纯10bit编码
-			meta.videoEncode = VideoEncode10bit
+		if meta.videoEncode == encode.VideoEncodeUnknown { // 如果没有其他编码信息，设置为纯10bit编码
+			meta.videoEncode = encode.VideoEncode10bit
 		} else { // 使用辅助方法升级为对应的10bit版本
 			meta.videoEncode = meta.videoEncode.CombineWith10bit()
 		}
@@ -952,16 +953,16 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 		s.lastType = lastTokenTypeAudioEncode
 
 		matchedStr := matches[0]
-		if meta.audioEncode == AudioEncodeUnknown {
-			meta.audioEncode = ParseAudioEncode(matchedStr)
+		if meta.audioEncode == encode.AudioEncodeUnknown {
+			meta.audioEncode = encode.ParseAudioEncode(matchedStr)
 		} else {
 			// 如果已有音频编码，进行组合处理
 			currentEncode := meta.audioEncode
-			newEncode := ParseAudioEncode(matchedStr)
+			newEncode := encode.ParseAudioEncode(matchedStr)
 
 			// 如果任一编码是Atmos，优先保留Atmos
-			if currentEncode == AudioEncodeAtmos || newEncode == AudioEncodeAtmos {
-				meta.audioEncode = AudioEncodeAtmos
+			if currentEncode == encode.AudioEncodeAtmos || newEncode == encode.AudioEncodeAtmos {
+				meta.audioEncode = encode.AudioEncodeAtmos
 			} else {
 				// 其他情况尝试组合
 				currentEncodeStr := currentEncode.String()
@@ -971,15 +972,15 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 					// DTS相关编码使用 "-" 连接
 					if strings.ToUpper(currentEncodeStr) == "DTS" {
 						combinedStr := currentEncodeStr + "-" + newEncodeStr
-						combined := ParseAudioEncode(combinedStr)
-						if combined != AudioEncodeUnknown {
+						combined := encode.ParseAudioEncode(combinedStr)
+						if combined != encode.AudioEncodeUnknown {
 							meta.audioEncode = combined
 						}
 					} else {
 						// 其他编码使用空格连接
 						combinedStr := currentEncodeStr + " " + newEncodeStr
-						combined := ParseAudioEncode(combinedStr)
-						if combined != AudioEncodeUnknown {
+						combined := encode.ParseAudioEncode(combinedStr)
+						if combined != encode.AudioEncodeUnknown {
 							meta.audioEncode = combined
 						}
 					}
@@ -991,7 +992,7 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 
 	// 处理数字token（用于音频编码的版本号等）
 	if isDigits(token) && s.lastType == lastTokenTypeAudioEncode {
-		if meta.audioEncode != AudioEncodeUnknown {
+		if meta.audioEncode != encode.AudioEncodeUnknown {
 			currentStr := meta.audioEncode.String()
 			if currentStr != "" {
 				// 获取前一个token作为参考
@@ -1016,8 +1017,8 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 				}
 
 				// 尝试解析新的组合编码
-				newEncode := ParseAudioEncode(newEncodeStr)
-				if newEncode != AudioEncodeUnknown {
+				newEncode := encode.ParseAudioEncode(newEncodeStr)
+				if newEncode != encode.AudioEncodeUnknown {
 					meta.audioEncode = newEncode
 				}
 				// 注：如果解析失败，保持原有编码不变
@@ -1086,8 +1087,8 @@ func (meta *MetaVideo) fixName(name string) string {
 			meta.beginSeason == nil &&
 			meta.resourcePix == ResourcePixUnknown &&
 			meta.resourceType == ResourceTypeUnknown &&
-			meta.audioEncode == AudioEncodeUnknown &&
-			meta.videoEncode == VideoEncodeUnknown {
+			meta.audioEncode == encode.AudioEncodeUnknown &&
+			meta.videoEncode == encode.VideoEncodeUnknown {
 
 			// 如果还没有起始集，将此数字设为起始集
 			if meta.beginEpisode == nil {

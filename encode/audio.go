@@ -1,0 +1,91 @@
+package encode
+
+import "strings"
+
+// AudioEncode 音频编码类型枚举
+type AudioEncode uint8
+
+const (
+	AudioEncodeUnknown AudioEncode = iota // 未知编码
+	AudioEncodeAAC                        // AAC
+	AudioEncodeAC3                        // AC-3
+	AudioEncodeEAC3                       // E-AC-3/DD+
+	AudioEncodeDTS                        // DTS
+	AudioEncodeDTSHD                      // DTS-HD
+	AudioEncodeDTSHDMA                    // DTS-HD MA
+	AudioEncodeTrueHD                     // TrueHD
+	AudioEncodeAtmos                      // Dolby Atmos
+	AudioEncodeFLAC                       // FLAC
+	AudioEncodeLPCM                       // LPCM
+	AudioEncodeOpus                       // Opus
+	AudioEncodeVorbis                     // Vorbis
+	AudioEncodeMP3                        // MP3
+)
+
+// String 返回音频编码的字符串表示
+func (ae AudioEncode) String() string {
+	switch ae {
+	case AudioEncodeAAC:
+		return "AAC"
+	case AudioEncodeAC3:
+		return "AC-3"
+	case AudioEncodeEAC3:
+		return "E-AC-3"
+	case AudioEncodeDTS:
+		return "DTS"
+	case AudioEncodeDTSHD:
+		return "DTS-HD"
+	case AudioEncodeDTSHDMA:
+		return "DTS-HD MA"
+	case AudioEncodeTrueHD:
+		return "TrueHD"
+	case AudioEncodeAtmos:
+		return "Dolby Atmos"
+	case AudioEncodeFLAC:
+		return "FLAC"
+	case AudioEncodeLPCM:
+		return "LPCM"
+	case AudioEncodeOpus:
+		return "Opus"
+	case AudioEncodeVorbis:
+		return "Vorbis"
+	case AudioEncodeMP3:
+		return "MP3"
+	default:
+		return ""
+	}
+}
+
+// ParseAudioEncode 从字符串解析音频编码
+func ParseAudioEncode(s string) AudioEncode {
+	switch strings.ToUpper(s) {
+	case "AAC":
+		return AudioEncodeAAC
+	case "AC3", "AC-3":
+		return AudioEncodeAC3
+	case "EAC3", "E-AC-3", "DD+", "DDP":
+		return AudioEncodeEAC3
+	case "DTS":
+		return AudioEncodeDTS
+	case "DTSHD", "DTS-HD":
+		return AudioEncodeDTSHD
+	case "DTSHDMA", "DTS-HD MA", "DTSMA":
+		return AudioEncodeDTSHDMA
+	case "TRUEHD", "TRUE-HD":
+		return AudioEncodeTrueHD
+	case "ATMOS":
+		return AudioEncodeAtmos
+	case "FLAC":
+		return AudioEncodeFLAC
+	case "LPCM":
+		return AudioEncodeLPCM
+	case "OPUS":
+		return AudioEncodeOpus
+	case "VORBIS":
+		return AudioEncodeVorbis
+	case "MP3":
+		return AudioEncodeMP3
+	default:
+		return AudioEncodeUnknown
+	}
+}
