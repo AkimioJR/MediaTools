@@ -2,6 +2,7 @@ package meta
 
 import (
 	"MediaTools/encode"
+	"MediaTools/utils"
 	"fmt"
 	"regexp"
 	"slices"
@@ -231,7 +232,7 @@ func (meta *MetaVideo) parsePart(s *parseState) {
 		utf8Str := []rune(nextToken)
 		length := len(utf8Str)
 		if nextToken != "" {
-			if (isDigits(nextToken) && (length == 1 || (length == 2 && utf8Str[0] == '0'))) ||
+			if (utils.IsDigits(nextToken) && (length == 1 || (length == 2 && utf8Str[0] == '0'))) ||
 				slices.Contains([]string{"A", "B", "C", "I", "II", "III"}, strings.ToUpper(nextToken)) {
 				meta.part += nextToken
 			}
@@ -273,7 +274,7 @@ func (meta *MetaVideo) parseName(s *parseState) {
 		return
 	}
 
-	if isChinese(token) { // 中文处理
+	if utils.IsChinese(token) { // 中文处理
 		// 含有中文，直接做为标题（连着的数字或者英文会保留），且不再取用后面出现的中文
 		s.lastType = lastTokenTypecntitle
 		if meta.cntitle == "" {
@@ -287,7 +288,7 @@ func (meta *MetaVideo) parseName(s *parseState) {
 			s.stopcntitleFlag = true
 		}
 	} else { // 数字或罗马数字处理
-		if isDigits(token) || isRomanNumeral(token) {
+		if utils.IsDigits(token) || utils.IsRomanNumeral(token) {
 			if s.lastType == lastTokenTypeNameSeWords { // 如果前一个token是季集关键词，跳过
 				return
 			}
@@ -298,18 +299,18 @@ func (meta *MetaVideo) parseName(s *parseState) {
 				}
 
 				// 检查是否为数字
-				if isDigits(token) {
+				if utils.IsDigits(token) {
 					tokenInt, err := strconv.Atoi(token)
 					if err != nil {
 						return
 					}
 
-					if !isRomanNumeral(token) && s.lastType == lastTokenTypecntitle && tokenInt < 1900 { // 中文名后面跟的数字不是年份的极有可能是集
+					if !utils.IsRomanNumeral(token) && s.lastType == lastTokenTypecntitle && tokenInt < 1900 { // 中文名后面跟的数字不是年份的极有可能是集
 						return
 					}
 				}
 
-				if (isDigits(token) && len(token) < 4) || isRomanNumeral(token) {
+				if (utils.IsDigits(token) && len(token) < 4) || utils.IsRomanNumeral(token) {
 					// 4位以下的数字或者罗马数字，拼装到已有标题中
 					switch s.lastType {
 					case lastTokenTypecntitle:
@@ -318,7 +319,7 @@ func (meta *MetaVideo) parseName(s *parseState) {
 						meta.entitle += " " + token
 					}
 					s.continueFlag = false
-				} else if isDigits(token) && len(token) == 4 { // 4位数字，可能是年份，也可能是标题的一部分
+				} else if utils.IsDigits(token) && len(token) == 4 { // 4位数字，可能是年份，也可能是标题的一部分
 					if s.unknownNameStr == "" {
 						s.unknownNameStr = token
 					}
@@ -342,7 +343,7 @@ func (meta *MetaVideo) parseName(s *parseState) {
 			s.stopNameFlag = true // 集、来源、版本等不要
 			return
 		} else {
-			if isMediaExtension("." + strings.ToLower(token)) { // 后缀名不要
+			if utils.IsMediaExtension("." + strings.ToLower(token)) { // 后缀名不要
 				return
 			}
 
@@ -418,7 +419,7 @@ func (meta *MetaVideo) parseResourcePix(s *parseState) {
 
 		if resourcePixStr != "" && meta.resourcePix == ResourcePixUnknown {
 			// 如果分辨率是纯数字且不以k、p、i结尾，添加p后缀
-			if isDigits(resourcePixStr) {
+			if utils.IsDigits(resourcePixStr) {
 				lastChar := resourcePixStr[len(resourcePixStr)-1]
 				if lastChar != 'k' && lastChar != 'p' && lastChar != 'i' {
 					resourcePixStr = resourcePixStr + "p"
@@ -481,7 +482,7 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 		var seasonNum int
 		var err error
 		for i := 1; i < len(matches); i++ {
-			if matches[i] != "" && isDigits(matches[i]) {
+			if matches[i] != "" && utils.IsDigits(matches[i]) {
 				seasonNum, err = strconv.Atoi(matches[i])
 				if err != nil {
 					return
@@ -506,7 +507,7 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 				}
 			}
 		}
-	} else if isDigits(token) {
+	} else if utils.IsDigits(token) {
 		// 检查是否为数字token
 		tokenInt, err := strconv.Atoi(token)
 		if err != nil {
@@ -576,7 +577,7 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 		var episodeNum int
 		var err error
 		for i := 1; i < len(matches); i++ {
-			if matches[i] != "" && isDigits(matches[i]) {
+			if matches[i] != "" && utils.IsDigits(matches[i]) {
 				episodeNum, err = strconv.Atoi(matches[i])
 				if err != nil {
 					return
@@ -601,7 +602,7 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 				}
 			}
 		}
-	} else if isDigits(token) {
+	} else if utils.IsDigits(token) {
 		// 检查是否为数字token
 		tokenInt, err := strconv.Atoi(token)
 		if err != nil {
@@ -898,7 +899,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 	}
 
 	// 处理 VC1、MPEG2 等数字组合
-	if isDigits(token) && s.lastType == lastTokenTypeVideoEncode {
+	if utils.IsDigits(token) && s.lastType == lastTokenTypeVideoEncode {
 		prevToken := ""
 		currentIndex := s.tokens.GetCurrentIndex()
 		if currentIndex >= 2 {
@@ -993,7 +994,7 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 	}
 
 	// 处理数字token（用于音频编码的版本号等）
-	if isDigits(token) && s.lastType == lastTokenTypeAudioEncode {
+	if utils.IsDigits(token) && s.lastType == lastTokenTypeAudioEncode {
 		if meta.audioEncode != encode.AudioEncodeUnknown {
 			currentStr := meta.audioEncode.String()
 			if currentStr != "" {
@@ -1005,7 +1006,7 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 				}
 
 				var newEncodeStr string
-				if isDigits(prevToken) {
+				if utils.IsDigits(prevToken) {
 					// 如果前一个token也是数字，用点号连接（如 7.1）
 					newEncodeStr = currentStr + "." + token
 				} else if len(currentStr) > 0 && currentStr[len(currentStr)-1] >= '0' && currentStr[len(currentStr)-1] <= '9' {
@@ -1082,7 +1083,7 @@ func (meta *MetaVideo) fixName(name string) string {
 	name = regexp.MustCompile(`\s+`).ReplaceAllString(name, " ")
 
 	// 如果名称是纯数字且小于1800，可能是误识别的集数
-	if isDigits(name) {
+	if utils.IsDigits(name) {
 		num, err := strconv.Atoi(name)
 		if err == nil && num < 1800 &&
 			meta.year == 0 &&

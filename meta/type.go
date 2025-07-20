@@ -29,9 +29,6 @@ var (
 	// Part识别正则
 	partRe = regexp.MustCompile(`(?i)(^PART[0-9ABI]{0,2}$|^CD[0-9]{0,2}$|^DVD[0-9]{0,2}$|^DISK[0-9]{0,2}$|^DISC[0-9]{0,2}$)`)
 
-	// 罗马数字识别
-	romanNumeralsRe = regexp.MustCompile(`^M*(?:C[MD]|D?C{0,3})(?:X[CL]|L?X{0,3})(?:I[XV]|V?I{0,3})$`)
-
 	// 资源类型识别正则
 	sourceRe = regexp.MustCompile(`(?i)^BLURAY$|^HDTV$|^UHDTV$|^HDDVD$|^WEBRIP$|^DVDRIP$|^BDRIP$|^BLU$|^WEB$|^BD$|^HDRip$|^REMUX$|^UHD$`)
 	effectRe = regexp.MustCompile(`(?i)^SDR$|^HDR\d*$|^DOLBY$|^DOVI$|^DV$|^3D$|^REPACK$|^HLG$|^HDR10(\+|Plus)$|^EDR$|^HQ$`)
