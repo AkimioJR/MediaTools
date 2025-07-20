@@ -452,6 +452,10 @@ func (meta *MetaVideo) parseResourcePix(s *parseState) {
 func (meta *MetaVideo) parseSeason(s *parseState) {
 	token := s.tokens.Current()
 
+	if sxxexxRe.MatchString(token) { // 跳过 SxxExx 格式，让集数解析器处理
+		return
+	}
+
 	// 使用季识别正则匹配
 	matches := seasonRe.FindStringSubmatch(token)
 	if len(matches) > 0 {
@@ -521,6 +525,32 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 func (meta *MetaVideo) parseEpisode(s *parseState) {
 	token := s.tokens.Current()
 
+	sxxexxMatches := sxxexxRe.FindStringSubmatch(token) // 特殊处理 SxxExx 格式
+	if len(sxxexxMatches) > 0 {                         // 同时解析季度和集数
+		seasonStr := sxxexxMatches[1]
+		episodeStr := sxxexxMatches[2]
+
+		if seasonNum, err := strconv.Atoi(seasonStr); err == nil && seasonNum > 0 {
+			if meta.beginSeason == nil {
+				meta.beginSeason = &seasonNum
+				meta.totalSeason = 1
+			}
+		}
+
+		if episodeNum, err := strconv.Atoi(episodeStr); err == nil && episodeNum > 0 {
+			if meta.beginEpisode == nil {
+				meta.beginEpisode = &episodeNum
+				meta.totalEpisode = 1
+			}
+		}
+
+		s.lastType = lastTokenTypeEpisode
+		s.continueFlag = false
+		s.stopNameFlag = true
+		meta.mediaType = MediaTypeTV
+		return
+	}
+
 	// 使用集识别正则匹配
 	matches := episodeRe.FindStringSubmatch(token)
 	if len(matches) > 0 {
@@ -583,6 +613,7 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 			length > 1 && length < 4 &&
 			s.lastType != lastTokenTypeYear &&
 			s.lastType != lastTokenTypePix &&
+			s.lastType != lastTokenTypeVideoEncode && // 避免将视频编码中的数字识别为集数
 			token != s.unknownNameStr {
 
 			meta.beginEpisode = &tokenInt
