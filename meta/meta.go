@@ -689,6 +689,23 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 	}
 
 checkEpisodeRegex:
+	// 先检查集数范围格式 (如: 01-26)
+	if rangeMatches := episodeRangeRe.FindStringSubmatch(token); len(rangeMatches) > 0 {
+		startEpisodeStr := rangeMatches[1]
+		endEpisodeStr := rangeMatches[2]
+
+		if startEpisode, err := strconv.Atoi(startEpisodeStr); err == nil && startEpisode > 0 {
+			if endEpisode, err := strconv.Atoi(endEpisodeStr); err == nil && endEpisode > startEpisode {
+				if meta.beginEpisode == nil {
+					meta.beginEpisode = &startEpisode
+					meta.endEpisode = &endEpisode
+					meta.totalEpisode = (endEpisode - startEpisode) + 1
+				}
+				goto setEpisodeFlags
+			}
+		}
+	}
+
 	// 使用集识别正则匹配
 	if matches := episodeRe.FindStringSubmatch(token); len(matches) > 0 {
 		var episodeNum int
@@ -718,6 +735,19 @@ checkEpisodeRegex:
 	} else if utils.IsDigits(token) { // 处理纯数字token
 		tokenInt, _ := strconv.Atoi(token) // 前面已检查过数字，不会出错
 		length := len([]rune(token))
+
+		// 检查是否为集数范围格式（当前数字 + 下一个数字）
+		nextToken := s.tokens.Peek()
+		if utils.IsDigits(nextToken) && len([]rune(nextToken)) >= 1 && len([]rune(nextToken)) <= 4 {
+			if nextInt, err := strconv.Atoi(nextToken); err == nil && nextInt > tokenInt && meta.beginEpisode == nil {
+				// 这是一个集数范围
+				meta.beginEpisode = &tokenInt
+				meta.endEpisode = &nextInt
+				meta.totalEpisode = (nextInt - tokenInt) + 1
+				s.tokens.GetNext() // 跳过下一个 token，因为我们已经处理了
+				goto setEpisodeFlags
+			}
+		}
 
 		switch {
 		case meta.beginEpisode != nil && meta.endEpisode == nil &&
