@@ -606,11 +606,11 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 		}
 		length := len([]rune(token))
 
-		if meta.beginEpisode != nil && // 情况1：已有起始集，没有结束集，且前一个token是episode
-			meta.endEpisode == nil &&
-			length < 5 &&
-			tokenInt > *meta.beginEpisode &&
-			s.lastType == lastTokenTypeEpisode {
+		switch {
+		// 情况1：已有起始集，没有结束集，且前一个token是episode
+		case meta.beginEpisode != nil && meta.endEpisode == nil &&
+			length < 5 && tokenInt > *meta.beginEpisode &&
+			s.lastType == lastTokenTypeEpisode:
 			meta.endEpisode = &tokenInt
 			meta.totalEpisode = (tokenInt - *meta.beginEpisode) + 1
 			if meta.isFile && meta.totalEpisode > 2 {
@@ -619,35 +619,30 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 			}
 			s.continueFlag = false
 			meta.mediaType = MediaTypeTV
-		} else if meta.beginEpisode == nil && // 情况2：没有起始集，数字长度在1-4之间，且不是年份或其他特殊token
-			length > 1 && length < 4 &&
-			s.lastType != lastTokenTypeYear &&
-			s.lastType != lastTokenTypePix &&
-			s.lastType != lastTokenTypeVideoEncode && // 避免将视频编码中的数字识别为集数
-			token != s.unknownNameStr {
 
+		// 情况2：没有起始集，数字长度在1-4之间，且不是年份或其他特殊token
+		case meta.beginEpisode == nil && length > 1 && length < 4 &&
+			s.lastType != lastTokenTypeYear && s.lastType != lastTokenTypePix &&
+			s.lastType != lastTokenTypeVideoEncode && token != s.unknownNameStr:
 			meta.beginEpisode = &tokenInt
 			meta.totalEpisode = 1
 			s.lastType = lastTokenTypeEpisode
 			s.continueFlag = false
 			s.stopNameFlag = true
 			meta.mediaType = MediaTypeTV
-		} else if meta.beginEpisode == nil && // 情况2a：数字较小且已有季信息，可能是集数
-			length <= 3 &&
-			tokenInt <= 99 && // 集数通常不会超过99
-			s.lastType == lastTokenTypeYear &&
-			meta.beginSeason != nil { // 已有季信息
 
+		// 情况3：没有起始集，数字较小且已有季信息，可能是集数
+		case meta.beginEpisode == nil && length <= 3 && tokenInt <= 99 &&
+			s.lastType == lastTokenTypeYear && meta.beginSeason != nil:
 			meta.beginEpisode = &tokenInt
 			meta.totalEpisode = 1
 			s.lastType = lastTokenTypeEpisode
 			s.continueFlag = false
 			s.stopNameFlag = true
 			meta.mediaType = MediaTypeTV
-		} else if s.lastType == lastTokenTypeEpisode && // 情况3：前一个token是EPISODE关键词
-			meta.beginEpisode == nil &&
-			length < 5 {
 
+		// 情况4：前一个token是EPISODE关键词
+		case s.lastType == lastTokenTypeEpisode && meta.beginEpisode == nil && length < 5:
 			meta.beginEpisode = &tokenInt
 			meta.totalEpisode = 1
 			s.lastType = lastTokenTypeEpisode
