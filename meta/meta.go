@@ -141,8 +141,8 @@ func ParseMetaVideo(title string, isFile bool) *MetaVideo {
 		releaseGroups:  findReleaseGroups(title), // 解析发布组
 		platform:       UnknownStreamingPlatform,
 	}
-	title = nameNoBeginRe.ReplaceAllString(title, "") // 去掉名称中第1个[]的内容
-	loc := nameNoBeginRe.FindStringIndex(title)
+
+	loc := nameNoBeginRe.FindStringIndex(title) // 去掉名称中第1个[]的内容（一般是发布组）
 	if loc != nil {
 		title = title[:loc[0]] + title[loc[1]:]
 	}
