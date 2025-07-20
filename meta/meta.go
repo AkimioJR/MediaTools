@@ -1009,15 +1009,15 @@ func (meta *MetaVideo) postProcess() {
 	meta.enName = meta.fixName(meta.enName)
 
 	// 英文名首字母大写
-	if meta.enName != "" {
-		words := strings.Fields(meta.enName)
-		for i, word := range words {
-			if len(word) > 0 {
-				words[i] = strings.ToUpper(string(word[0])) + strings.ToLower(word[1:])
-			}
-		}
-		meta.enName = strings.Join(words, " ")
-	}
+	// if meta.enName != "" {
+	// 	words := strings.Fields(meta.enName)
+	// 	for i, word := range words {
+	// 		if len(word) > 0 {
+	// 			words[i] = strings.ToUpper(string(word[0])) + strings.ToLower(word[1:])
+	// 		}
+	// 	}
+	// 	meta.enName = strings.Join(words, " ")
+	// }
 
 	// 处理BluRay DIY标记
 	if meta.resourceType != ResourceTypeUnknown &&
