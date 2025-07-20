@@ -514,6 +514,27 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 	if sxxexxRe.MatchString(token) { // 跳过 SxxExx 格式，让集数解析器处理
 		return
 	}
+
+	// 检查季数范围格式 "s01-s02"
+	if matches := seasonRangeRe.FindStringSubmatch(token + "-" + s.tokens.Peek()); len(matches) > 2 {
+		startSeasonStr := matches[1]
+		endSeasonStr := matches[2]
+
+		if startSeasonNum, err := strconv.Atoi(startSeasonStr); err == nil && startSeasonNum > 0 {
+			if endSeasonNum, err := strconv.Atoi(endSeasonStr); err == nil && endSeasonNum >= startSeasonNum {
+				meta.beginSeason = &startSeasonNum
+				meta.endSeason = &endSeasonNum
+				meta.totalSeason = (endSeasonNum - startSeasonNum) + 1
+				meta.mediaType = MediaTypeTV
+				s.lastType = lastTokenTypeSeason
+				s.stopNameFlag = true
+				s.continueFlag = false
+				s.tokens.GetNext() // 跳过下一个token（已处理的季数范围）
+				return
+			}
+		}
+	}
+
 	// 检查中文季信息格式 "第X季"
 	if strings.HasPrefix(token, "第") && strings.HasSuffix(token, "季") {
 		// 提取中间的数字

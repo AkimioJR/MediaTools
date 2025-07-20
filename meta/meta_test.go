@@ -824,6 +824,24 @@ func TestParseMetaVideo(t *testing.T) {
 				version:        1,
 			},
 		},
+		{
+			input: "Sense8 s01-s02 2015-2017 1080P WEB-DL X265 AC3￡cXcY@FRDS",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Sense8",
+				year:           2015,
+				part:           "",
+				season:         "S01-S02",
+				episode:        "",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH265,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
 	}
 
 	for _, tc := range testCases {

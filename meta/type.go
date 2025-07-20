@@ -21,7 +21,8 @@ var (
 	dateFmtRe     = regexp.MustCompile(`\d{4}[\s._-]\d{1,2}[\s._-]\d{1,2}`)
 
 	// 季集识别正则
-	seasonRe = regexp.MustCompile(`(?i)S(\d{3})|^S(\d{1,3})$|S(\d{1,3})E|S(\d{1,3})$`)
+	seasonRe      = regexp.MustCompile(`(?i)S(\d{3})|^S(\d{1,3})$|S(\d{1,3})E|S(\d{1,3})$`)
+	seasonRangeRe = regexp.MustCompile(`(?i)^S(\d{1,3})-S(\d{1,3})$`)
 	// seasonFullRe = regexp.MustCompile(`^Season\s+(\d{1,3})$|^S(\d{1,3})$`)
 	episodeRe = regexp.MustCompile(`(?i)EP?(\d{2,4})$|^EP?(\d{1,4})$|^S\d{1,2}EP?(\d{1,4})$|S\d{2}EP?(\d{2,4})|S\d{2}E(\d{2,4})|^(\d{1,4})[vV]\d+$`)
 	sxxexxRe  = regexp.MustCompile(`(?i)^S(\d{1,3})E(\d{1,4})([AaBb]|[Vv]\d)?$`)
