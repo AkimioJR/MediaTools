@@ -327,9 +327,10 @@ func (meta *MetaVideo) parseName(s *parseState) {
 							if len(token) <= 2 && tokenInt >= 1 && tokenInt <= 99 {
 								// 检查标题内容，判断是否更可能是标题的一部分
 								currentTitle := ""
-								if s.lastType == lastTokenTypecntitle {
+								switch s.lastType {
+								case lastTokenTypecntitle:
 									currentTitle = meta.cntitle
-								} else if s.lastType == lastTokenTypeentitle {
+								case lastTokenTypeentitle:
 									currentTitle = meta.entitle
 								}
 
