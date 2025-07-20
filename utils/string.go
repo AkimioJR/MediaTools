@@ -29,6 +29,16 @@ func IsChinese(s string) bool {
 	return false
 }
 
+// IsAllChinese 判断字符串是否全为中文
+func IsAllChinese(s string) bool {
+	for _, r := range s {
+		if r < '\u4e00' || r > '\u9fff' {
+			return false
+		}
+	}
+	return len(s) > 0
+}
+
 var romanNumeralsRe = regexp.MustCompile(`^M*(?:C[MD]|D?C{0,3})(?:X[CL]|L?X{0,3})(?:I[XV]|V?I{0,3})$`) // 罗马数字识别
 // IsRomanNumeral 判断是否为罗马数字
 func IsRomanNumeral(s string) bool {
