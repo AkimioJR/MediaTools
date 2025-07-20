@@ -4,6 +4,7 @@ import (
 	"MediaTools/encode"
 	"MediaTools/utils"
 	"fmt"
+	"path"
 	"regexp"
 	"slices"
 	"strconv"
@@ -1297,4 +1298,16 @@ func (meta *MetaVideo) isInEpisode(episode int) bool {
 	}
 
 	return episode >= *meta.beginEpisode && episode <= *meta.endEpisode
+}
+
+func ParseMetaVideoByPath(p string) *MetaVideo {
+	names := strings.Split(p, "/")
+	var name string
+	for i := len(names) - 1; i >= 0; i-- {
+		name = nameMovieWordsRe.ReplaceAllString(names[i], "") + " " + name
+		if i == len(names)-3 {
+			break
+		}
+	}
+	return ParseMetaVideo(name)
 }

@@ -60,8 +60,8 @@ var (
 		`|CD[\s.]*[1-9]|DVD[\s.]*[1-9]|DISK[\s.]*[1-9]|DISC[\s.]*[1-9]|\s+GB`)
 
 	// 中文名过滤正则
-	nameNoChineseRe = regexp.MustCompile(`.*版|.*字幕`)
-	// nameMovieWordsRe = regexp.MustCompile(`(?i)movie|film|cinema`)
+	nameNoChineseRe  = regexp.MustCompile(`.*版|.*字幕`)
+	nameMovieWordsRe = regexp.MustCompile(`(?i)movies?|film|cinema`)
 	// nameSeWordsRe    = regexp.MustCompile(`(?i)season|series|episode|ep|se`)
 
 	// Token分割正则
