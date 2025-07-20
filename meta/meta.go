@@ -578,11 +578,12 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 	if strings.HasPrefix(token, "第") && (strings.HasSuffix(token, "集") || strings.HasSuffix(token, "话") || strings.HasSuffix(token, "話")) {
 		// 提取中间的数字
 		var episodeStr string
-		if strings.HasSuffix(token, "集") {
+		switch []rune(token)[len(token)-1] {
+		case '集':
 			episodeStr = strings.TrimSuffix(strings.TrimPrefix(token, "第"), "集")
-		} else if strings.HasSuffix(token, "话") {
+		case '话':
 			episodeStr = strings.TrimSuffix(strings.TrimPrefix(token, "第"), "话")
-		} else if strings.HasSuffix(token, "話") {
+		case '話':
 			episodeStr = strings.TrimSuffix(strings.TrimPrefix(token, "第"), "話")
 		}
 
