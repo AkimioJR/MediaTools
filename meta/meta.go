@@ -574,6 +574,40 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 		return
 	}
 
+	// 检查中文集信息格式 "第X集"、"第X话"、"第X話"等
+	if strings.HasPrefix(token, "第") && (strings.HasSuffix(token, "集") || strings.HasSuffix(token, "话") || strings.HasSuffix(token, "話")) {
+		// 提取中间的数字
+		var episodeStr string
+		if strings.HasSuffix(token, "集") {
+			episodeStr = strings.TrimSuffix(strings.TrimPrefix(token, "第"), "集")
+		} else if strings.HasSuffix(token, "话") {
+			episodeStr = strings.TrimSuffix(strings.TrimPrefix(token, "第"), "话")
+		} else if strings.HasSuffix(token, "話") {
+			episodeStr = strings.TrimSuffix(strings.TrimPrefix(token, "第"), "話")
+		}
+
+		var episodeNum int = -1
+		switch {
+		case utils.IsDigits(episodeStr):
+			episodeNum, _ = strconv.Atoi(episodeStr)
+		case utils.IsAllChinese(episodeStr):
+			episodeNum, _ = utils.ChineseToInt(episodeStr)
+		}
+
+		if episodeNum > -1 {
+			s.lastType = lastTokenTypeEpisode
+			meta.mediaType = MediaTypeTV
+			s.stopcntitleFlag = true // 只停止中文名的处理
+			s.continueFlag = false
+
+			if meta.beginEpisode == nil {
+				meta.beginEpisode = &episodeNum
+				meta.totalEpisode = 1
+			}
+			return
+		}
+	}
+
 	// 使用集识别正则匹配
 	matches := episodeRe.FindStringSubmatch(token)
 	if len(matches) > 0 {
