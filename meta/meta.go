@@ -313,7 +313,9 @@ func (meta *MetaVideo) parseName(s *parseState) {
 						return
 					}
 
-					if !utils.IsRomanNumeral(token) && s.lastType == lastTokenTypecntitle && tokenInt < 1900 { // 中文名后面跟的数字不是年份的极有可能是集
+					if !utils.IsRomanNumeral(token) && // 中文名后面跟的数字不是年份的极有可能是集
+						s.lastType == lastTokenTypecntitle &&
+						tokenInt < YearMin {
 						return
 					}
 				}
@@ -441,7 +443,7 @@ func (meta *MetaVideo) parseYear(s *parseState) {
 	if err != nil {
 		return
 	}
-	if num < 1900 || num > 2050 {
+	if num < YearMin || num > YearMax {
 		return
 	}
 

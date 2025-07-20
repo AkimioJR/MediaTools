@@ -4,6 +4,11 @@ import (
 	"regexp"
 )
 
+const (
+	YearMax = 2050 // 年份最大值
+	YearMin = 1900 // 年份最小值
+)
+
 // MediaType 媒体类型枚举
 type MediaType uint8
 
