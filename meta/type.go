@@ -39,7 +39,7 @@ var (
 
 	// 编码识别正则
 	videoEncodeRe = regexp.MustCompile(`(?i)^(H26[45])$|^(x26[45])$|^AVC$|^HEVC$|^VC\d?$|^MPEG\d?$|^Xvid$|^DivX$|^AV1$|^HDR\d*$|^AVS(\+|[23])$`)
-	audioEncodeRe = regexp.MustCompile(`(?i)^DTS\d?$|^DTSHD$|^DTSHDMA$|^Atmos$|^TrueHD\d?$|^AC3$|^\dAudios?$|^DDP\d?$|^DD\+\d?$|^DD\d?$|^LPCM\d?$|^AAC\d?$|^FLAC\d?$|^HD\d?$|^MA\d?$|^HR\d?$|^Opus\d?$|^Vorbis\d?$|^AV[3S]A$`)
+	audioEncodeRe = regexp.MustCompile(`(?i)^DTS\d?$|^DTSHD$|^DTSHDMA$|^Atmos$|^TrueHD\d?$|^AC3$|^\dAudios?$|^DDP\d?$|^DD\+\d?$|^DD\d?$|^LPCM\d?$|^AAC[\d\.]*$|^EAC3$|^FLAC\d?$|^HD\d?$|^MA\d?$|^HR\d?$|^Opus\d?$|^Vorbis\d?$|^AV[3S]A$`)
 
 	// 干扰词过滤正则
 	noStringRe = regexp.MustCompile(`(?i)^PTS|^AOD|^CHC|^[A-Z]{1,4}TV[\-0-9UVHDK]*` +

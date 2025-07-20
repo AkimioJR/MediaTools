@@ -59,11 +59,11 @@ func (ae AudioEncode) String() string {
 // ParseAudioEncode 从字符串解析音频编码
 func ParseAudioEncode(s string) AudioEncode {
 	switch strings.ToUpper(s) {
-	case "AAC":
+	case "AAC", "AAC2.0", "AAC5.1", "AAC2", "AAC5": // 避免2.0和5.1分词器分割
 		return AudioEncodeAAC
 	case "AC3", "AC-3":
 		return AudioEncodeAC3
-	case "EAC3", "E-AC-3", "DD+", "DDP":
+	case "EAC3", "E-AC-3", "DD+", "DD+7", "DDP", "DDP5.1", "DDP5":
 		return AudioEncodeEAC3
 	case "DTS":
 		return AudioEncodeDTS
