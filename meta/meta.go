@@ -11,13 +11,12 @@ import (
 // MetaVideo 视频媒体信息结构体
 type MetaVideo struct {
 	// 基础信息
-	title         string    // 标题
-	orginalString string    // 原始字符串
-	isFile        bool      // 是否是文件
-	cnName        string    // 中文名
-	enName        string    // 英文名
-	year          uint      // 年份
-	mediaType     MediaType // 媒体类型
+	orginaltitle string    // 原始标题
+	isFile       bool      // 是否是文件
+	cntitle      string    // 中文标题
+	entitle      string    // 英文标题
+	year         uint      // 年份
+	mediaType    MediaType // 媒体类型
 
 	// 资源信息
 	resourceType   ResourceType                // 来源/介质
@@ -39,9 +38,8 @@ type MetaVideo struct {
 	totalEpisode int  // 总集数
 }
 
-func (meta *MetaVideo) GetTitle() string                               { return meta.title }          // GetSubtitle 获取标题
-func (meta *MetaVideo) GetCNName() string                              { return meta.cnName }         // GetENName 获取中文名
-func (meta *MetaVideo) GetENName() string                              { return meta.enName }         // GetENName 获取英文名
+func (meta *MetaVideo) GetCNTitle() string                             { return meta.cntitle }        // GetCNTitle 获取中文标题
+func (meta *MetaVideo) GetENTitle() string                             { return meta.entitle }        // GetENTitle 获取英文标题
 func (meta *MetaVideo) GetYear() uint                                  { return meta.year }           // GetYear 获取年份
 func (meta *MetaVideo) GetType() MediaType                             { return meta.mediaType }      // MediaType
 func (meta *MetaVideo) GetResourceType() ResourceType                  { return meta.resourceType }   // GetResourceType 获取资源类型
@@ -53,13 +51,14 @@ func (meta *MetaVideo) GetStreamingPlatform() StreamingPlatform        { return 
 func (meta *MetaVideo) GetReleaseGroups() []string                     { return meta.releaseGroups }  // GetResourceTeam 获取资源组
 func (meta *MetaVideo) GetPart() string                                { return meta.part }           // GetPart 获取分集信息
 
-// 返回媒体的名字，有中文名优先返回中文名，否则返回英文名
-func (meta *MetaVideo) GetName() string {
-	cnName := meta.GetCNName()
-	if cnName != "" {
-		return cnName
+// 获取标题
+// 有中文标题优先返回中文标题
+// 否则返回英文标题
+func (meta *MetaVideo) GetTitle() string {
+	if meta.cntitle != "" {
+		return meta.cntitle
 	}
-	return meta.GetENName()
+	return meta.entitle
 }
 
 func (meta *MetaVideo) GetResourceEffectStrings() []string {
@@ -129,18 +128,18 @@ func (meta *MetaVideo) GetEpisodeStr() string {
 	}
 }
 
-func ParseMetaVideo(originalString string, isFile bool) *MetaVideo {
+func ParseMetaVideo(orginaltitle string, isFile bool) *MetaVideo {
 	meta := &MetaVideo{
-		orginalString:  originalString,
+		orginaltitle:   orginaltitle,
 		isFile:         isFile,
 		mediaType:      MediaTypeUnknown,
 		resourceType:   ResourceTypeUnknown,
 		resourceEffect: make(map[ResourceEffect]struct{}),
-		releaseGroups:  findReleaseGroups(originalString), // 解析发布组
+		releaseGroups:  findReleaseGroups(orginaltitle), // 解析发布组
 		platform:       UnknownStreamingPlatform,
 	}
 
-	title := nameNoBeginRe.ReplaceAllString(originalString, "") // 去掉名称中第1个[]的内容
+	title := nameNoBeginRe.ReplaceAllString(orginaltitle, "") // 去掉名称中第1个[]的内容
 	loc := nameNoBeginRe.FindStringIndex(title)
 	if loc != nil {
 		title = title[:loc[0]] + title[loc[1]:]
@@ -150,12 +149,12 @@ func ParseMetaVideo(originalString string, isFile bool) *MetaVideo {
 	title = dateFmtRe.ReplaceAllString(title, "")           // 把年月日去掉
 
 	state := &parseState{
-		tokens:         NewTokens(title), // 拆分tokens
-		lastType:       lastTokenTypeUnknown,
-		unknownNameStr: "",
-		continueFlag:   true,
-		stopNameFlag:   false,
-		stopCNNameFlag: false,
+		tokens:          NewTokens(title), // 拆分tokens
+		lastType:        lastTokenTypeUnknown,
+		unknownNameStr:  "",
+		continueFlag:    true,
+		stopNameFlag:    false,
+		stopcntitleFlag: false,
 	}
 	for !state.tokens.isEnd() {
 		state.tokens.GetNext() // 指向下一个
@@ -209,7 +208,7 @@ func ParseMetaVideo(originalString string, isFile bool) *MetaVideo {
 
 // 识别 Part
 func (meta *MetaVideo) parsePart(s *parseState) {
-	if meta.GetName() == "" {
+	if meta.GetTitle() == "" {
 		return
 	}
 	if meta.GetYear() == 0 &&
@@ -240,18 +239,18 @@ func (meta *MetaVideo) parsePart(s *parseState) {
 	}
 }
 
-// 识别 CNName、ENName
+// 识别 cntitle、entitle
 func (meta *MetaVideo) parseName(s *parseState) {
 	token := s.tokens.Current()
 
 	if s.unknownNameStr != "" { // 回收标题
-		if meta.cnName == "" {
-			if meta.enName == "" {
-				meta.enName = s.unknownNameStr
+		if meta.cntitle == "" {
+			if meta.entitle == "" {
+				meta.entitle = s.unknownNameStr
 			} else if s.unknownNameStr != strconv.Itoa(int(meta.year)) {
-				meta.enName += " " + s.unknownNameStr
+				meta.entitle += " " + s.unknownNameStr
 			}
-			s.lastType = lastTokenTypeEnName
+			s.lastType = lastTokenTypeentitle
 		}
 		s.unknownNameStr = ""
 	}
@@ -273,16 +272,16 @@ func (meta *MetaVideo) parseName(s *parseState) {
 
 	if isChinese(token) { // 中文处理
 		// 含有中文，直接做为标题（连着的数字或者英文会保留），且不再取用后面出现的中文
-		s.lastType = lastTokenTypeCnName
-		if meta.cnName == "" {
-			meta.cnName = token
-		} else if !s.stopCNNameFlag {
+		s.lastType = lastTokenTypecntitle
+		if meta.cntitle == "" {
+			meta.cntitle = token
+		} else if !s.stopcntitleFlag {
 			// 含有电影关键词或者不含特殊字符的中文可以继续拼接
 			if contain([]string{"剧场版", "劇場版", "电影版", "電影版"}, token) ||
 				(!nameNoChineseRe.MatchString(token) && !contain([]string{"共", "第", "季", "集", "话", "話", "期"}, token)) {
-				meta.cnName += " " + token
+				meta.cntitle += " " + token
 			}
-			s.stopCNNameFlag = true
+			s.stopcntitleFlag = true
 		}
 	} else { // 数字或罗马数字处理
 		if isDigits(token) || isRomanNumeral(token) {
@@ -290,7 +289,7 @@ func (meta *MetaVideo) parseName(s *parseState) {
 				return
 			}
 
-			if meta.GetName() != "" {
+			if meta.GetTitle() != "" {
 				if strings.HasPrefix(token, "0") { // 名字后面以0开头的不要，极有可能是集
 					return
 				}
@@ -302,7 +301,7 @@ func (meta *MetaVideo) parseName(s *parseState) {
 						return
 					}
 
-					if !isRomanNumeral(token) && s.lastType == lastTokenTypeCnName && tokenInt < 1900 { // 中文名后面跟的数字不是年份的极有可能是集
+					if !isRomanNumeral(token) && s.lastType == lastTokenTypecntitle && tokenInt < 1900 { // 中文名后面跟的数字不是年份的极有可能是集
 						return
 					}
 				}
@@ -310,10 +309,10 @@ func (meta *MetaVideo) parseName(s *parseState) {
 				if (isDigits(token) && len(token) < 4) || isRomanNumeral(token) {
 					// 4位以下的数字或者罗马数字，拼装到已有标题中
 					switch s.lastType {
-					case lastTokenTypeCnName:
-						meta.cnName += " " + token
-					case lastTokenTypeEnName:
-						meta.enName += " " + token
+					case lastTokenTypecntitle:
+						meta.cntitle += " " + token
+					case lastTokenTypeentitle:
+						meta.entitle += " " + token
 					}
 					s.continueFlag = false
 				} else if isDigits(token) && len(token) == 4 { // 4位数字，可能是年份，也可能是标题的一部分
@@ -328,8 +327,8 @@ func (meta *MetaVideo) parseName(s *parseState) {
 				}
 			}
 		} else if seasonRe.MatchString(token) { // 季的处理
-			if meta.enName != "" && strings.HasSuffix(strings.ToUpper(meta.enName), "SEASON") { // 如果匹配到季，英文名结尾为Season，说明Season属于标题，不应在后续作为干扰词去除
-				meta.enName += " "
+			if meta.entitle != "" && strings.HasSuffix(strings.ToUpper(meta.entitle), "SEASON") { // 如果匹配到季，英文名结尾为Season，说明Season属于标题，不应在后续作为干扰词去除
+				meta.entitle += " "
 			}
 			s.stopNameFlag = true
 			return
@@ -345,19 +344,19 @@ func (meta *MetaVideo) parseName(s *parseState) {
 			}
 
 			// 英文或者英文+数字，拼装起来
-			if meta.enName != "" {
-				meta.enName += " " + token
+			if meta.entitle != "" {
+				meta.entitle += " " + token
 			} else {
-				meta.enName = token
+				meta.entitle = token
 			}
-			s.lastType = lastTokenTypeEnName
+			s.lastType = lastTokenTypeentitle
 		}
 	}
 }
 
 // 识别年份
 func (meta *MetaVideo) parseYear(s *parseState) {
-	if meta.GetName() == "" {
+	if meta.GetTitle() == "" {
 		return
 	}
 
@@ -375,13 +374,13 @@ func (meta *MetaVideo) parseYear(s *parseState) {
 	}
 
 	if meta.GetYear() != 0 {
-		if meta.GetENName() != "" {
-			meta.enName = strings.TrimSpace(meta.GetENName()) + " " + strconv.Itoa(int(meta.GetYear()))
-		} else if meta.GetCNName() != "" {
-			meta.cnName += " " + strconv.Itoa(int(meta.GetYear()))
+		if meta.GetENTitle() != "" {
+			meta.entitle = strings.TrimSpace(meta.GetENTitle()) + " " + strconv.Itoa(int(meta.GetYear()))
+		} else if meta.GetCNTitle() != "" {
+			meta.cntitle += " " + strconv.Itoa(int(meta.GetYear()))
 		}
-	} else if meta.GetENName() != "" && strings.HasSuffix(strings.ToLower(meta.GetENName()), "season") { // 如果匹配到年，且英文名结尾为Season，说明Season属于标题，不应在后续作为干扰词去除
-		meta.enName += " "
+	} else if meta.GetENTitle() != "" && strings.HasSuffix(strings.ToLower(meta.GetENTitle()), "season") { // 如果匹配到年，且英文名结尾为Season，说明Season属于标题，不应在后续作为干扰词去除
+		meta.entitle += " "
 	}
 
 	meta.year = uint(num)
@@ -392,7 +391,7 @@ func (meta *MetaVideo) parseYear(s *parseState) {
 
 // 识别分辨率
 func (meta *MetaVideo) parseResourcePix(s *parseState) {
-	if meta.GetName() == "" {
+	if meta.GetTitle() == "" {
 		return
 	}
 
@@ -456,7 +455,7 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 		if seasonNum, err := strconv.Atoi(seasonStr); err == nil && seasonNum > 0 {
 			s.lastType = lastTokenTypeSeason
 			meta.mediaType = MediaTypeTV
-			s.stopCNNameFlag = true // 只停止中文名的处理
+			s.stopcntitleFlag = true // 只停止中文名的处理
 			s.continueFlag = false
 
 			if meta.beginSeason == nil {
@@ -658,7 +657,7 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 
 // 识别资源类型
 func (meta *MetaVideo) parseResourceType(s *parseState) {
-	if meta.GetName() == "" {
+	if meta.GetTitle() == "" {
 		return
 	}
 
@@ -724,7 +723,7 @@ func (meta *MetaVideo) parseResourceType(s *parseState) {
 // 识别流媒体平台
 func (meta *MetaVideo) parsePlatform(s *parseState) {
 	// 检查是否已有名称
-	if meta.GetName() == "" {
+	if meta.GetTitle() == "" {
 		return
 	}
 
@@ -827,7 +826,7 @@ func (meta *MetaVideo) parsePlatform(s *parseState) {
 // 识别视频编码
 func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 	// 检查是否已有名称
-	if meta.GetName() == "" {
+	if meta.GetTitle() == "" {
 		return
 	}
 
@@ -930,7 +929,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 // 识别音频编码
 func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 	// 检查是否已有名称
-	if meta.GetName() == "" {
+	if meta.GetTitle() == "" {
 		return
 	}
 
@@ -1037,18 +1036,18 @@ func (meta *MetaVideo) postProcess() {
 	}
 
 	// 清理名称中的干扰字符
-	meta.cnName = meta.fixName(meta.cnName)
-	meta.enName = meta.fixName(meta.enName)
+	meta.cntitle = meta.fixName(meta.cntitle)
+	meta.entitle = meta.fixName(meta.entitle)
 
 	// 英文名首字母大写
-	// if meta.enName != "" {
-	// 	words := strings.Fields(meta.enName)
+	// if meta.entitle != "" {
+	// 	words := strings.Fields(meta.entitle)
 	// 	for i, word := range words {
 	// 		if len(word) > 0 {
 	// 			words[i] = strings.ToUpper(string(word[0])) + strings.ToLower(word[1:])
 	// 		}
 	// 	}
-	// 	meta.enName = strings.Join(words, " ")
+	// 	meta.entitle = strings.Join(words, " ")
 	// }
 
 	// 处理BluRay DIY标记
@@ -1057,7 +1056,7 @@ func (meta *MetaVideo) postProcess() {
 			meta.resourceType == ResourceTypeUHDBluRay ||
 			meta.resourceType == ResourceTypeBluRayRemux) {
 		// 检查原始字符串中是否包含DIY标记
-		upperOriginal := strings.ToUpper(meta.orginalString)
+		upperOriginal := strings.ToUpper(meta.orginaltitle)
 		if strings.Contains(upperOriginal, "DIY") ||
 			strings.Contains(upperOriginal, "-DIY@") {
 			// 可以添加DIY标记到资源效果中

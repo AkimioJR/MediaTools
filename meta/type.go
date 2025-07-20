@@ -70,8 +70,8 @@ type lastTokenType uint8
 
 const (
 	lastTokenTypeUnknown     lastTokenType = iota // 未知
-	lastTokenTypeCnName                           // 中文名
-	lastTokenTypeEnName                           // 英文名
+	lastTokenTypecntitle                          // 中文名
+	lastTokenTypeentitle                          // 英文名
 	lastTokenTypeYear                             // 年份
 	lastTokenTypeSeason                           // 季
 	lastTokenTypeEpisode                          // 集
@@ -86,10 +86,10 @@ const (
 )
 
 type parseState struct {
-	tokens         *Tokens
-	lastType       lastTokenType
-	unknownNameStr string // 回收标题
-	stopNameFlag   bool
-	stopCNNameFlag bool
-	continueFlag   bool
+	tokens          *Tokens
+	lastType        lastTokenType
+	unknownNameStr  string // 回收标题
+	stopNameFlag    bool
+	stopcntitleFlag bool
+	continueFlag    bool
 }
