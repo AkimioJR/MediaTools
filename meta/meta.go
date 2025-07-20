@@ -932,25 +932,32 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 			meta.audioEncode = ParseAudioEncode(matchedStr)
 		} else {
 			// 如果已有音频编码，进行组合处理
-			currentEncodeStr := meta.audioEncode.String()
-			newEncodeStr := ParseAudioEncode(matchedStr).String()
+			currentEncode := meta.audioEncode
+			newEncode := ParseAudioEncode(matchedStr)
 
-			if currentEncodeStr != "" && newEncodeStr != "" {
-				// DTS相关编码使用 "-" 连接
-				if strings.ToUpper(currentEncodeStr) == "DTS" {
-					combinedStr := currentEncodeStr + "-" + newEncodeStr
-					meta.audioEncode = ParseAudioEncode(combinedStr)
-					if meta.audioEncode == AudioEncodeUnknown {
-						// 如果无法解析组合编码，保持原有编码
-						meta.audioEncode = ParseAudioEncode(currentEncodeStr)
-					}
-				} else {
-					// 其他编码使用空格连接
-					combinedStr := currentEncodeStr + " " + newEncodeStr
-					meta.audioEncode = ParseAudioEncode(combinedStr)
-					if meta.audioEncode == AudioEncodeUnknown {
-						// 如果无法解析组合编码，保持原有编码
-						meta.audioEncode = ParseAudioEncode(currentEncodeStr)
+			// 如果任一编码是Atmos，优先保留Atmos
+			if currentEncode == AudioEncodeAtmos || newEncode == AudioEncodeAtmos {
+				meta.audioEncode = AudioEncodeAtmos
+			} else {
+				// 其他情况尝试组合
+				currentEncodeStr := currentEncode.String()
+				newEncodeStr := newEncode.String()
+
+				if currentEncodeStr != "" && newEncodeStr != "" {
+					// DTS相关编码使用 "-" 连接
+					if strings.ToUpper(currentEncodeStr) == "DTS" {
+						combinedStr := currentEncodeStr + "-" + newEncodeStr
+						combined := ParseAudioEncode(combinedStr)
+						if combined != AudioEncodeUnknown {
+							meta.audioEncode = combined
+						}
+					} else {
+						// 其他编码使用空格连接
+						combinedStr := currentEncodeStr + " " + newEncodeStr
+						combined := ParseAudioEncode(combinedStr)
+						if combined != AudioEncodeUnknown {
+							meta.audioEncode = combined
+						}
 					}
 				}
 			}
