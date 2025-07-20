@@ -25,6 +25,7 @@ func TestParseVersion(t *testing.T) {
 		{"【爪爪字幕组】★7月新番[欢迎来到实力至上主义的教室 第二季/Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2][11][1080p][HEVC][GB][MP4][招募翻译校对]", 1},
 		{"[GM-Team][国漫][寻剑 第1季][Sword Quest Season 1][2022][02][AVC][GB][1080P]", 1},
 		{"[猎户不鸽发布组] 组长女儿与照料专员 / 组长女儿与保姆 Kumichou Musume to Sewagakari [09] [1080p+] [简中内嵌] [2022年7月番]", 1},
+		{"Test.S01E12B.1080p.WEB-DL.H264.AAC-XXX", 2},
 	}
 
 	for _, test := range tests {
