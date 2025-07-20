@@ -314,7 +314,66 @@ func (meta *MetaVideo) parseName(s *parseState) {
 				}
 
 				if (utils.IsDigits(token) && len(token) < 4) || utils.IsRomanNumeral(token) {
-					// 4位以下的数字或者罗马数字，拼装到已有标题中
+					// 4位以下的数字或者罗马数字，需要判断是否应该拼装到标题中
+					if utils.IsDigits(token) {
+						if tokenInt, err := strconv.Atoi(token); err == nil {
+							// 如果数字在标题的合理范围内(如系列编号)，则附加到标题
+							// 但是排除典型的集数范围(1-99)，除非有特殊情况
+							if len(token) <= 2 && tokenInt >= 1 && tokenInt <= 99 {
+								// 检查标题内容，判断是否更可能是标题的一部分
+								currentTitle := ""
+								if s.lastType == lastTokenTypecntitle {
+									currentTitle = meta.cntitle
+								} else if s.lastType == lastTokenTypeentitle {
+									currentTitle = meta.entitle
+								}
+
+								// 如果标题包含"Part", "Season", "第"等关键词，数字更可能是标题的一部分
+								titleLower := strings.ToLower(currentTitle)
+								if strings.Contains(titleLower, "part") ||
+									strings.Contains(titleLower, "season") ||
+									strings.Contains(currentTitle, "第") ||
+									strings.Contains(currentTitle, "系列") {
+									// 附加到标题
+									switch s.lastType {
+									case lastTokenTypecntitle:
+										meta.cntitle += " " + token
+									case lastTokenTypeentitle:
+										meta.entitle += " " + token
+									}
+									s.continueFlag = false
+									return
+								}
+
+								// 如果数字过大（如 >100），不太可能是简单的集数，更可能是标题的一部分
+								if tokenInt > 100 {
+									switch s.lastType {
+									case lastTokenTypecntitle:
+										meta.cntitle += " " + token
+									case lastTokenTypeentitle:
+										meta.entitle += " " + token
+									}
+									s.continueFlag = false
+									return
+								}
+
+								// 否则可能是集数，不附加到标题，让后续处理
+								return
+							}
+							// 3位数字通常是标题的一部分（如电影名称）
+							if len(token) == 3 {
+								switch s.lastType {
+								case lastTokenTypecntitle:
+									meta.cntitle += " " + token
+								case lastTokenTypeentitle:
+									meta.entitle += " " + token
+								}
+								s.continueFlag = false
+								return
+							}
+						}
+					}
+					// 其他情况（罗马数字或其他特殊数字）拼装到已有标题中
 					switch s.lastType {
 					case lastTokenTypecntitle:
 						meta.cntitle += " " + token
