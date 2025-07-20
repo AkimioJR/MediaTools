@@ -8,22 +8,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type expectedMeta struct {
+	mediaType      meta.MediaType
+	cntitle        string
+	entitle        string
+	year           uint
+	part           string
+	season         string
+	episode        string
+	resourcePix    meta.ResourcePix
+	resourceType   meta.ResourceType
+	resourceEffect map[meta.ResourceEffect]struct{}
+	videoEncode    encode.VideoEncode
+	audioEncode    encode.AudioEncode
+	version        uint8
+}
+
 func TestParseMetaVideo(t *testing.T) {
-	type expectedMeta struct {
-		mediaType      meta.MediaType
-		cntitle        string
-		entitle        string
-		year           uint
-		part           string
-		season         string
-		episode        string
-		resourcePix    meta.ResourcePix
-		resourceType   meta.ResourceType
-		resourceEffect map[meta.ResourceEffect]struct{}
-		videoEncode    encode.VideoEncode
-		audioEncode    encode.AudioEncode
-		version        uint8
-	}
+
 	testCases := []struct {
 		input    string
 		expected expectedMeta
@@ -842,6 +844,258 @@ func TestParseMetaVideo(t *testing.T) {
 				version:        1,
 			},
 		},
+		{
+			input: "The Heart of Genius S01 13-14 2022 1080p WEB-DL H264 AAC",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "The Heart of Genius",
+				year:           2022,
+				part:           "",
+				season:         "S01",
+				episode:        "E13-E14",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAAC,
+				version:        1,
+			},
+		},
+		{
+			input: "The Heart of Genius E13-14 2022 1080p WEB-DL H264 AAC",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "The Heart of Genius",
+				year:           2022,
+				part:           "",
+				season:         "S01",
+				episode:        "E13-E14",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAAC,
+				version:        1,
+			},
+		},
+		{
+			input: "2022.8.2.Twelve.Monkeys.1995.GBR.4K.REMASTERED.BluRay.1080p.X264.DTS [3.4 GB]",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeUnknown,
+				cntitle:        "",
+				entitle:        "Twelve Monkeys",
+				year:           1995,
+				part:           "",
+				season:         "",
+				episode:        "",
+				resourcePix:    meta.ResourcePix2160p,
+				resourceType:   meta.ResourceTypeBluRay,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeDTS,
+				version:        1,
+			},
+		},
+		{
+			input: "[NC-Raws] 王者天下 第四季 - 17 (Baha 1920x1080 AVC AAC MP4) [3B1AA7BB].mp4",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "王者天下",
+				entitle:        "",
+				year:           0,
+				part:           "",
+				season:         "S04",
+				episode:        "E17",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAAC,
+				version:        1,
+			},
+		},
+		{
+			input: "Sense8 S2E1 2015-2017 1080P WEB-DL X265 AC3￡cXcY@FRDS",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Sense8",
+				year:           2015,
+				part:           "",
+				season:         "S02",
+				episode:        "E01",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH265,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			input: "[xyx98]传颂之物/Utawarerumono/うたわれるもの[BDrip][1920x1080][TV 01-26 Fin][hevc-yuv420p10 flac_ac3][ENG PGS]",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "传颂之物",
+				entitle:        "Utawarerumono うたわれるもの",
+				year:           0,
+				part:           "",
+				season:         "S01",
+				episode:        "E01-E26",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeBDRip,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH265_10bit,
+				audioEncode:    encode.AudioEncodeAC3,
+				version:        1,
+			},
+		},
+		{
+			input: "[云歌字幕组][7月新番][欢迎来到实力至上主义的教室 第二季][01][X264 10bit][1080p][简体中文].mp4",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "欢迎来到实力至上主义的教室",
+				entitle:        "",
+				year:           0,
+				part:           "",
+				season:         "S02",
+				episode:        "E01",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264_10bit,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			input: "Rick and Morty.S06E06.JuRicksic.Mort.1080p.HMAX.WEBRip.DD5.1.X264-NTb[rartv]",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Rick and Morty",
+				year:           0,
+				part:           "",
+				season:         "S06",
+				episode:        "E06",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebRip,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAC3,
+				version:        1,
+			},
+		},
+		{
+			input: "rick and Morty.S06E05.JuRicksic.Mort.1080p.HMAX.WEBRip.DD5.1.X264-NTb[rartv]",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "rick and Morty",
+				year:           0,
+				part:           "",
+				season:         "S06",
+				episode:        "E05",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebRip,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAC3,
+				version:        1,
+			},
+		},
+		{
+			input: "[Hall_of_C] 诛仙 Zhu Xian (Jade Dynasty) - Episode 19",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "诛仙",
+				entitle:        "Zhu Xian Jade Dynasty",
+				year:           0,
+				part:           "",
+				season:         "S01",
+				episode:        "E19",
+				resourcePix:    meta.ResourcePixUnknown,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			input: "I Woke Up a Vampire S02 2023 2160p NF WEB-DL DDP5.1 Atmos H 265-HHWEB",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "I Woke Up a Vampire",
+				year:           2023,
+				part:           "",
+				season:         "S02",
+				episode:        "",
+				resourcePix:    meta.ResourcePix2160p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH265,
+				audioEncode:    encode.AudioEncodeAtmos,
+				version:        1,
+			},
+		},
+		{
+			input: "Shadows of the Void S01 2024 1080p WEB-DL H264 AAC-HHWEB",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Shadows of the Void",
+				year:           2024,
+				part:           "",
+				season:         "S01",
+				episode:        "",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH264,
+				audioEncode:    encode.AudioEncodeAAC,
+				version:        1,
+			},
+		},
+		{
+			input: "【极影字幕社】★1月新番 Metallic Rouge/金属口红 第13话 GB 1080P MP4（字幕社招人内详）",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "金属口红",
+				entitle:        "Metallic Rouge",
+				year:           0,
+				part:           "",
+				season:         "S01",
+				episode:        "E13",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			input: "Mai Xiang S01 2019 2160p WEB-DL H.265 DDP2.0-HHWEB",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Mai Xiang",
+				year:           2019,
+				part:           "",
+				season:         "S01",
+				episode:        "",
+				resourcePix:    meta.ResourcePix2160p,
+				resourceType:   meta.ResourceTypeWebDL,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeH265,
+				audioEncode:    encode.AudioEncodeEAC3,
+				version:        1,
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -876,11 +1130,101 @@ func TestParseMetaVideoByPath(t *testing.T) {
 				mediaType:      meta.MediaTypeTV,
 				cntitle:        "西部世界",
 				entitle:        "",
-				year:           0,
+				year:           2016,
 				part:           "",
 				season:         "S02",
 				episode:        "E05",
 				resourcePix:    meta.ResourcePixUnknown,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			path: "/movies/The Vampire Diaries (2009) [tmdbid=18165]/The.Vampire.Diaries.S01E01.1080p.mkv",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "The Vampire Diaries",
+				year:           2009,
+				part:           "",
+				season:         "S01",
+				episode:        "E01",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			path: "/movies/Inception (2010) [tmdbid-27205]/Inception.2010.1080p.mkv",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeUnknown,
+				cntitle:        "",
+				entitle:        "Inception 2010",
+				year:           2010,
+				part:           "",
+				season:         "",
+				episode:        "",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			path: "/movies/Breaking Bad (2008) [tmdb=1396]/Season 1/Breaking.Bad.S01E01.1080p.mkv",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Breaking Bad",
+				year:           2008,
+				part:           "",
+				season:         "S01",
+				episode:        "E01",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			path: "/tv/Game of Thrones (2011) {tmdb=1399}/Season 1/Game.of.Thrones.S01E01.1080p.mkv",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "",
+				entitle:        "Game of Thrones",
+				year:           2011,
+				part:           "",
+				season:         "S01",
+				episode:        "E01",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+		{
+			path: "/movies/Avatar (2009) {tmdb-19995}/Avatar.2009.1080p.mkv",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeUnknown,
+				cntitle:        "",
+				entitle:        "Avatar 2009",
+				year:           2009,
+				part:           "",
+				season:         "",
+				episode:        "",
+				resourcePix:    meta.ResourcePix1080p,
 				resourceType:   meta.ResourceTypeUnknown,
 				resourceEffect: make(map[meta.ResourceEffect]struct{}),
 				videoEncode:    encode.VideoEncodeUnknown,
