@@ -139,9 +139,7 @@ func ParseMetaVideo(originalString string, isFile bool) *MetaVideo {
 		platform:       UnknownStreamingPlatform,
 	}
 
-	title := originalString
-
-	title = nameNoBeginRe.ReplaceAllString(title, "") // 去掉名称中第1个[]的内容
+	title := nameNoBeginRe.ReplaceAllString(originalString, "") // 去掉名称中第1个[]的内容
 	loc := nameNoBeginRe.FindStringIndex(title)
 	if loc != nil {
 		title = title[:loc[0]] + title[loc[1]:]
