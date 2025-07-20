@@ -11,12 +11,13 @@ import (
 // MetaVideo 视频媒体信息结构体
 type MetaVideo struct {
 	// 基础信息
-	orginaltitle string    // 原始标题
-	isFile       bool      // 是否是文件
-	cntitle      string    // 中文标题
-	entitle      string    // 英文标题
-	year         uint      // 年份
-	mediaType    MediaType // 媒体类型
+	orginalTitle   string    // 原始标题
+	processedTitle string    // 处理后的标题
+	isFile         bool      // 是否是文件
+	cntitle        string    // 中文标题
+	entitle        string    // 英文标题
+	year           uint      // 年份
+	mediaType      MediaType // 媒体类型
 
 	// 资源信息
 	resourceType   ResourceType                // 来源/介质
@@ -128,18 +129,17 @@ func (meta *MetaVideo) GetEpisodeStr() string {
 	}
 }
 
-func ParseMetaVideo(orginaltitle string, isFile bool) *MetaVideo {
+func ParseMetaVideo(title string, isFile bool) *MetaVideo {
 	meta := &MetaVideo{
-		orginaltitle:   orginaltitle,
+		orginalTitle:   title,
 		isFile:         isFile,
 		mediaType:      MediaTypeUnknown,
 		resourceType:   ResourceTypeUnknown,
 		resourceEffect: make(map[ResourceEffect]struct{}),
-		releaseGroups:  findReleaseGroups(orginaltitle), // 解析发布组
+		releaseGroups:  findReleaseGroups(title), // 解析发布组
 		platform:       UnknownStreamingPlatform,
 	}
-
-	title := nameNoBeginRe.ReplaceAllString(orginaltitle, "") // 去掉名称中第1个[]的内容
+	title = nameNoBeginRe.ReplaceAllString(title, "") // 去掉名称中第1个[]的内容
 	loc := nameNoBeginRe.FindStringIndex(title)
 	if loc != nil {
 		title = title[:loc[0]] + title[loc[1]:]
@@ -147,6 +147,8 @@ func ParseMetaVideo(orginaltitle string, isFile bool) *MetaVideo {
 	title = yearRangeRe.ReplaceAllString(title, "${1}${2}") // 把xxxx-xxxx年份换成前一个年份，常出现在季集上
 	title = fileSizeRe.ReplaceAllString(title, "")          // 把大小去掉
 	title = dateFmtRe.ReplaceAllString(title, "")           // 把年月日去掉
+	title = strings.TrimSpace(title)                        // 去掉首尾空格
+	meta.processedTitle = title
 
 	state := &parseState{
 		tokens:          NewTokens(title), // 拆分tokens
@@ -1056,7 +1058,7 @@ func (meta *MetaVideo) postProcess() {
 			meta.resourceType == ResourceTypeUHDBluRay ||
 			meta.resourceType == ResourceTypeBluRayRemux) {
 		// 检查原始字符串中是否包含DIY标记
-		upperOriginal := strings.ToUpper(meta.orginaltitle)
+		upperOriginal := strings.ToUpper(meta.orginalTitle)
 		if strings.Contains(upperOriginal, "DIY") ||
 			strings.Contains(upperOriginal, "-DIY@") {
 			// 可以添加DIY标记到资源效果中
