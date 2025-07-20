@@ -446,6 +446,25 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 	if sxxexxRe.MatchString(token) { // 跳过 SxxExx 格式，让集数解析器处理
 		return
 	}
+	// 检查中文季信息格式 "第X季"
+	if strings.HasPrefix(token, "第") && strings.HasSuffix(token, "季") {
+		// 提取中间的数字
+		seasonStr := strings.TrimPrefix(token, "第")
+		seasonStr = strings.TrimSuffix(seasonStr, "季")
+
+		if seasonNum, err := strconv.Atoi(seasonStr); err == nil && seasonNum > 0 {
+			s.lastType = lastTokenTypeSeason
+			meta.mediaType = MediaTypeTV
+			s.stopCNNameFlag = true // 只停止中文名的处理
+			s.continueFlag = false
+
+			if meta.beginSeason == nil {
+				meta.beginSeason = &seasonNum
+				meta.totalSeason = 1
+			}
+			return
+		}
+	}
 
 	// 使用季识别正则匹配
 	matches := seasonRe.FindStringSubmatch(token)
