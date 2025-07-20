@@ -846,7 +846,52 @@ func TestParseMetaVideo(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			meta := meta.ParseMetaVideo(tc.input, true)
+			meta := meta.ParseMetaVideo(tc.input)
+			require.Equal(t, tc.expected.mediaType, meta.GetType(), "媒体类型不匹配")
+			require.Equal(t, tc.expected.cntitle, meta.GetCNTitle(), "中文标题不匹配")
+			require.Equal(t, tc.expected.entitle, meta.GetENTitle(), "英文标题不匹配")
+			require.Equal(t, tc.expected.year, meta.GetYear(), "年份不匹配")
+			require.Equal(t, tc.expected.part, meta.GetPart(), "分部信息不匹配")
+			require.Equal(t, tc.expected.season, meta.GetSeasonStr(), "季信息不匹配")
+			require.Equal(t, tc.expected.episode, meta.GetEpisodeStr(), "集信息不匹配")
+			require.Equal(t, tc.expected.resourcePix, meta.GetResourcePix(), "资源像素不匹配")
+			require.Equal(t, tc.expected.resourceType, meta.GetResourceType(), "资源类型不匹配")
+			require.Equal(t, tc.expected.resourceEffect, meta.GetResourceEffect(), "资源效果不匹配")
+			require.Equal(t, tc.expected.videoEncode, meta.GetVideoEncode(), "视频编码不匹配")
+			require.Equal(t, tc.expected.audioEncode, meta.GetAudioEncode(), "音频编码不匹配")
+			require.Equal(t, tc.expected.version, meta.GetVersion(), "版本号不匹配")
+		})
+
+	}
+}
+
+func TestParseMetaVideoByPath(t *testing.T) {
+	testCases := []struct {
+		path     string
+		expected expectedMeta
+	}{
+		{
+			path: "/volume1/电视剧/西部世界 第二季 (2016)/5.mkv",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeTV,
+				cntitle:        "西部世界",
+				entitle:        "",
+				year:           0,
+				part:           "",
+				season:         "S02",
+				episode:        "E05",
+				resourcePix:    meta.ResourcePixUnknown,
+				resourceType:   meta.ResourceTypeUnknown,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.path, func(t *testing.T) {
+			meta := meta.ParseMetaVideoByPath(tc.path)
 			require.Equal(t, tc.expected.mediaType, meta.GetType(), "媒体类型不匹配")
 			require.Equal(t, tc.expected.cntitle, meta.GetCNTitle(), "中文标题不匹配")
 			require.Equal(t, tc.expected.entitle, meta.GetENTitle(), "英文标题不匹配")

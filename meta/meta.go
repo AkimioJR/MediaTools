@@ -15,7 +15,7 @@ type MetaVideo struct {
 	// 基础信息
 	orginalTitle   string    // 原始标题
 	processedTitle string    // 处理后的标题
-	isFile         bool      // 是否是文件
+	isFile         bool      // 是否是媒体文件
 	cntitle        string    // 中文标题
 	entitle        string    // 英文标题
 	year           uint      // 年份
@@ -133,16 +133,20 @@ func (meta *MetaVideo) GetEpisodeStr() string {
 	}
 }
 
-func ParseMetaVideo(title string, isFile bool) *MetaVideo {
+func ParseMetaVideo(title string) *MetaVideo {
 	meta := &MetaVideo{
 		orginalTitle:   title,
-		isFile:         isFile,
 		mediaType:      MediaTypeUnknown,
 		resourceType:   ResourceTypeUnknown,
 		resourceEffect: make(map[ResourceEffect]struct{}),
 		releaseGroups:  findReleaseGroups(title), // 解析发布组
 		platform:       UnknownStreamingPlatform,
 		version:        ParseVersion(title), // 解析版本号
+	}
+
+	if utils.IsMediaExtension(path.Ext(title)) {
+		title = strings.TrimSuffix(title, path.Ext(title)) // 去掉文件扩展名
+		meta.isFile = true
 	}
 
 	loc := nameNoBeginRe.FindStringIndex(title) // 去掉名称中第1个[]的内容（一般是发布组）
