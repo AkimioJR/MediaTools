@@ -43,7 +43,12 @@ func (t *Tokens) GetNext() string {
 
 // Peek 查看下一个token但不移动索引
 func (t *Tokens) Peek() string {
-	nextIndex := t.index + 1
+	return t.PeekN(1)
+}
+
+// PeekN 查看下 n 个token但不移动索引
+func (t *Tokens) PeekN(n int) string {
+	nextIndex := t.index + n
 	if nextIndex >= len(t.tokens) {
 		return ""
 	}
