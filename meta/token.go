@@ -28,14 +28,14 @@ func NewTokens(text string) *Tokens {
 }
 
 // 判断是否结束
-func (t *Tokens) isEnd() bool {
+func (t *Tokens) IsEnd() bool {
 	return t.index >= len(t.tokens)
 }
 
 // GetNext 获取下一个token
 func (t *Tokens) GetNext() string {
 	t.index++
-	if t.isEnd() {
+	if t.IsEnd() {
 		return ""
 	}
 	return t.tokens[t.index]

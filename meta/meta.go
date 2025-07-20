@@ -160,7 +160,7 @@ func ParseMetaVideo(title string, isFile bool) *MetaVideo {
 		stopNameFlag:    false,
 		stopcntitleFlag: false,
 	}
-	for !state.tokens.isEnd() {
+	for !state.tokens.IsEnd() {
 		state.tokens.GetNext() // 指向下一个
 		state.continueFlag = true
 
