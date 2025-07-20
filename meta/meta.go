@@ -124,7 +124,7 @@ func (meta *MetaVideo) GetEpisodeStr() string {
 		if meta.endEpisode == nil {
 			return fmt.Sprintf("E%02d", *meta.beginEpisode)
 		}
-		return fmt.Sprintf("S%02d-S%02d", *meta.beginEpisode, *meta.endEpisode)
+		return fmt.Sprintf("E%02d-E%02d", *meta.beginEpisode, *meta.endEpisode)
 	}
 }
 
