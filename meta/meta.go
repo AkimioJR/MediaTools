@@ -266,13 +266,6 @@ func (meta *MetaVideo) parseName(s *parseState) {
 		return
 	}
 
-	// 遇到AKA停止解析名称
-	if strings.ToUpper(token) == "AKA" {
-		s.continueFlag = false
-		s.stopNameFlag = true
-		return
-	}
-
 	// 遇到季集关键词，暂停处理
 	if contain([]string{"共", "第", "季", "集", "话", "話", "期"}, token) {
 		s.lastType = lastTokenTypeNameSeWords
