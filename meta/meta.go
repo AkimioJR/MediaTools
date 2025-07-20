@@ -972,46 +972,96 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 
 	token := s.tokens.Current()
 
-	// 使用音频编码正则表达式匹配
-	matches := audioEncodeRe.FindStringSubmatch(token)
-	if len(matches) > 0 {
+	// 贪婪匹配：优先匹配更长的token组合
+	separators := []string{"-", " ", ".", ""} // 调整分隔符优先级，DTS-HD MA需要用横杠和空格
+	var bestMatch encode.AudioEncode
+	var consumedTokens int
+	var bestMatchLength int // 记录最佳匹配的长度，用于优先选择更长的匹配
+
+	// 尝试不同长度的token组合（从长到短，贪婪匹配）
+	for tokenCount := 1; tokenCount <= 4; tokenCount++ {
+		// 构建token列表
+		parts := []string{token}
+
+		// 添加后续token
+		if tokenCount > 1 {
+			for k := 1; k < tokenCount; k++ {
+				nextToken := s.tokens.PeekN(k)
+				if nextToken == "" {
+					goto nextTokenCount // 如果没有更多token，跳到下一个长度
+				}
+				parts = append(parts, nextToken)
+			}
+		}
+
+		// 对当前token组合尝试所有分隔符
+		for _, separator := range separators {
+			var combinedStr string
+			if separator == "" {
+				combinedStr = strings.Join(parts, "")
+			} else if separator == "-" && len(parts) >= 3 && parts[0] == "DTS" {
+				// 特殊处理DTS-HD MA格式：DTS-HD MA5.1
+				if len(parts) == 3 && parts[1] == "HD" {
+					combinedStr = "DTS-HD " + parts[2] // DTS-HD MA5
+				} else if len(parts) == 4 && parts[1] == "HD" {
+					combinedStr = "DTS-HD " + parts[2] + "." + parts[3] // DTS-HD MA5.1
+				} else {
+					combinedStr = strings.Join(parts, separator)
+				}
+			} else {
+				combinedStr = strings.Join(parts, separator)
+			}
+
+			var testEncode encode.AudioEncode
+
+			// 先使用正则表达式匹配
+			if matches := audioEncodeRe.FindStringSubmatch(combinedStr); len(matches) > 0 {
+				testEncode = encode.ParseAudioEncode(matches[0])
+			} else {
+				// 如果正则没匹配到，直接尝试解析
+				testEncode = encode.ParseAudioEncode(combinedStr)
+			}
+
+			if testEncode != encode.AudioEncodeUnknown {
+				// 找到匹配，检查是否比当前最佳匹配更好
+				matchLength := len(combinedStr)
+				if bestMatch == encode.AudioEncodeUnknown || matchLength > bestMatchLength ||
+					(matchLength == bestMatchLength && tokenCount > consumedTokens+1) {
+					bestMatch = testEncode
+					consumedTokens = tokenCount - 1 // 消费的token数量
+					bestMatchLength = matchLength
+				}
+			}
+		}
+
+	nextTokenCount:
+		// 如果已经找到匹配且当前长度的组合都尝试完了，可以考虑是否继续
+		// 为了真正贪婪匹配，我们继续尝试更长的组合
+	}
+
+	// 如果找到了匹配的编码
+	if bestMatch != encode.AudioEncodeUnknown {
 		s.continueFlag = false
 		s.stopNameFlag = true
 		s.lastType = lastTokenTypeAudioEncode
 
-		matchedStr := matches[0]
+		// 消费已使用的token
+		for i := 0; i < consumedTokens; i++ {
+			s.tokens.GetNext()
+		}
+
 		if meta.audioEncode == encode.AudioEncodeUnknown {
-			meta.audioEncode = encode.ParseAudioEncode(matchedStr)
+			meta.audioEncode = bestMatch
 		} else {
 			// 如果已有音频编码，进行组合处理
 			currentEncode := meta.audioEncode
-			newEncode := encode.ParseAudioEncode(matchedStr)
 
 			// 如果任一编码是Atmos，优先保留Atmos
-			if currentEncode == encode.AudioEncodeAtmos || newEncode == encode.AudioEncodeAtmos {
+			if currentEncode == encode.AudioEncodeAtmos || bestMatch == encode.AudioEncodeAtmos {
 				meta.audioEncode = encode.AudioEncodeAtmos
 			} else {
-				// 其他情况尝试组合
-				currentEncodeStr := currentEncode.String()
-				newEncodeStr := newEncode.String()
-
-				if currentEncodeStr != "" && newEncodeStr != "" {
-					// DTS相关编码使用 "-" 连接
-					if strings.ToUpper(currentEncodeStr) == "DTS" {
-						combinedStr := currentEncodeStr + "-" + newEncodeStr
-						combined := encode.ParseAudioEncode(combinedStr)
-						if combined != encode.AudioEncodeUnknown {
-							meta.audioEncode = combined
-						}
-					} else {
-						// 其他编码使用空格连接
-						combinedStr := currentEncodeStr + " " + newEncodeStr
-						combined := encode.ParseAudioEncode(combinedStr)
-						if combined != encode.AudioEncodeUnknown {
-							meta.audioEncode = combined
-						}
-					}
-				}
+				// 其他情况使用新匹配的编码（贪婪匹配结果更准确）
+				meta.audioEncode = bestMatch
 			}
 		}
 		return

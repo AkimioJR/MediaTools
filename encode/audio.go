@@ -58,18 +58,44 @@ func (ae AudioEncode) String() string {
 
 // ParseAudioEncode 从字符串解析音频编码
 func ParseAudioEncode(s string) AudioEncode {
-	switch strings.ToUpper(s) {
-	case "AAC", "AAC2.0", "AAC5.1", "AAC2", "AAC5": // 避免2.0和5.1分词器分割
+	s = strings.ToUpper(s)
+
+	// 特殊处理DTS相关编码的复杂模式
+	if strings.HasPrefix(s, "DTS") {
+		// 标准化DTS格式
+		normalized := s
+
+		// 处理各种DTS-HD MA格式变体
+		if strings.Contains(s, "MA") {
+			// 匹配各种DTS-HD MA格式
+			if strings.Contains(s, "HD") && strings.Contains(s, "MA") {
+				return AudioEncodeDTSHDMA
+			}
+		}
+
+		// 处理DTS-HD格式
+		if strings.Contains(s, "HD") {
+			return AudioEncodeDTSHD
+		}
+
+		// 纯DTS
+		if normalized == "DTS" {
+			return AudioEncodeDTS
+		}
+	}
+
+	switch s {
+	case "AAC", "AAC2.0", "AAC5.1":
 		return AudioEncodeAAC
 	case "AC3", "AC-3":
 		return AudioEncodeAC3
-	case "EAC3", "E-AC-3", "DD+", "DD+7", "DDP", "DDP5.1", "DDP5":
+	case "EAC3", "E-AC-3", "DD+", "DD+7.1", "DDP", "DDP5.1", "DDP5":
 		return AudioEncodeEAC3
 	case "DTS":
 		return AudioEncodeDTS
 	case "DTSHD", "DTS-HD":
 		return AudioEncodeDTSHD
-	case "DTSHDMA", "DTS-HD MA", "DTSMA":
+	case "DTSHDMA", "DTS-HD MA", "DTS-HD MA5.1", "DTSMA":
 		return AudioEncodeDTSHDMA
 	case "TRUEHD", "TRUE-HD":
 		return AudioEncodeTrueHD
