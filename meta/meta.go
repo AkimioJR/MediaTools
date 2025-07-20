@@ -455,10 +455,17 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 	// 检查中文季信息格式 "第X季"
 	if strings.HasPrefix(token, "第") && strings.HasSuffix(token, "季") {
 		// 提取中间的数字
-		seasonStr := strings.TrimPrefix(token, "第")
-		seasonStr = strings.TrimSuffix(seasonStr, "季")
+		seasonStr := strings.TrimSuffix(strings.TrimPrefix(token, "第"), "季")
 
-		if seasonNum, err := strconv.Atoi(seasonStr); err == nil && seasonNum > 0 {
+		var seasonNum int = -1
+		switch {
+		case utils.IsDigits(seasonStr):
+			seasonNum, _ = strconv.Atoi(seasonStr)
+		case utils.IsAllChinese(seasonStr):
+			seasonNum, _ = utils.ChineseToInt(seasonStr)
+		}
+
+		if seasonNum > -1 {
 			s.lastType = lastTokenTypeSeason
 			meta.mediaType = MediaTypeTV
 			s.stopcntitleFlag = true // 只停止中文名的处理
