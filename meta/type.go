@@ -34,8 +34,8 @@ var (
 	effectRe = regexp.MustCompile(`(?i)^SDR$|^HDR\d*$|^DOLBY$|^DOVI$|^DV$|^3D$|^REPACK$|^HLG$|^HDR10(\+|Plus)$|^EDR$|^HQ$`)
 
 	// 分辨率识别正则
-	resourcePixRe  = regexp.MustCompile(`(?i)^[SBUHD]*(\d{3,4}[PI]+)|\d{3,4}X(\d{3,4})`)
-	resourcePix2Re = regexp.MustCompile(`(?i)(^[248]+K)`)
+	resourcePixRe  = regexp.MustCompile(`(?i)^[SBUHD]*((480|576|720|1080|1440|2160|2880|4320)[PI]*)|^[SBUHD]*(\d{3,4}[PI]+)|\d{3,4}X(\d{3,4})`)
+	resourcePix2Re = regexp.MustCompile(`(?i)(^[248]+[KPI])`)
 
 	// 编码识别正则
 	videoEncodeRe = regexp.MustCompile(`(?i)^(H26[45])$|^(x26[45])$|^AVC$|^HEVC$|^VC\d?$|^MPEG\d?$|^Xvid$|^DivX$|^AV1$|^HDR\d*$|^AVS(\+|[23])$`)

@@ -408,26 +408,25 @@ func (meta *MetaVideo) parseResourcePix(s *parseState) {
 		s.continueFlag = false
 		s.stopNameFlag = true
 
-		var resourcePixStr string
-		// 遍历匹配的分组，找到非空的分组
 		for i := 1; i < len(matches); i++ {
 			if matches[i] != "" {
-				resourcePixStr = matches[i]
-				break
+				resourcePixStr := matches[i]
+				if resourcePixStr != "" && meta.resourcePix == ResourcePixUnknown {
+					if utils.IsDigits(resourcePixStr) { // 如果分辨率是纯数字且不以k、p、i结尾，添加p后缀
+						lastChar := resourcePixStr[len(resourcePixStr)-1]
+						if lastChar != 'k' && lastChar != 'p' && lastChar != 'i' {
+							resourcePixStr = resourcePixStr + "p"
+						}
+					}
+					r := ParseResourcePix(resourcePixStr)
+					if r != ResourcePixUnknown {
+						meta.resourcePix = r
+						return
+					}
+				}
 			}
 		}
 
-		if resourcePixStr != "" && meta.resourcePix == ResourcePixUnknown {
-			// 如果分辨率是纯数字且不以k、p、i结尾，添加p后缀
-			if utils.IsDigits(resourcePixStr) {
-				lastChar := resourcePixStr[len(resourcePixStr)-1]
-				if lastChar != 'k' && lastChar != 'p' && lastChar != 'i' {
-					resourcePixStr = resourcePixStr + "p"
-				}
-			}
-			meta.resourcePix = ParseResourcePix(strings.ToLower(resourcePixStr))
-		}
-		return
 	}
 
 	// 使用第二个正则表达式匹配分辨率
