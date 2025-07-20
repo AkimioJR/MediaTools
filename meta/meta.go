@@ -4,6 +4,7 @@ import (
 	"MediaTools/encode"
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -231,7 +232,7 @@ func (meta *MetaVideo) parsePart(s *parseState) {
 		length := len(utf8Str)
 		if nextToken != "" {
 			if (isDigits(nextToken) && (length == 1 || (length == 2 && utf8Str[0] == '0'))) ||
-				contain([]string{"A", "B", "C", "I", "II", "III"}, strings.ToUpper(nextToken)) {
+				slices.Contains([]string{"A", "B", "C", "I", "II", "III"}, strings.ToUpper(nextToken)) {
 				meta.part += nextToken
 			}
 		}
@@ -261,13 +262,13 @@ func (meta *MetaVideo) parseName(s *parseState) {
 		return
 	}
 
-	if contain(meta.releaseGroups, token) { // 如果当前token是发布组，直接跳过
+	if slices.Contains(meta.releaseGroups, token) { // 如果当前token是发布组，直接跳过
 		s.continueFlag = false
 		return
 	}
 
 	// 遇到季集关键词，暂停处理
-	if contain([]string{"共", "第", "季", "集", "话", "話", "期"}, token) {
+	if slices.Contains([]string{"共", "第", "季", "集", "话", "話", "期"}, token) {
 		s.lastType = lastTokenTypeNameSeWords
 		return
 	}
@@ -279,8 +280,8 @@ func (meta *MetaVideo) parseName(s *parseState) {
 			meta.cntitle = token
 		} else if !s.stopcntitleFlag {
 			// 含有电影关键词或者不含特殊字符的中文可以继续拼接
-			if contain([]string{"剧场版", "劇場版", "电影版", "電影版"}, token) ||
-				(!nameNoChineseRe.MatchString(token) && !contain([]string{"共", "第", "季", "集", "话", "話", "期"}, token)) {
+			if slices.Contains([]string{"剧场版", "劇場版", "电影版", "電影版"}, token) ||
+				(!nameNoChineseRe.MatchString(token) && !slices.Contains([]string{"共", "第", "季", "集", "话", "話", "期"}, token)) {
 				meta.cntitle += " " + token
 			}
 			s.stopcntitleFlag = true

@@ -1,6 +1,7 @@
 package meta
 
 import (
+	"slices"
 	"strings"
 )
 
@@ -24,15 +25,6 @@ func isChinese(s string) bool {
 	return false
 }
 
-func contain[T comparable](arr []T, ele T) bool {
-	for _, e := range arr {
-		if ele == e {
-			return true
-		}
-	}
-	return false
-}
-
 // isRomanNumeral 判断是否为罗马数字
 func isRomanNumeral(s string) bool {
 	return romanNumeralsRe.MatchString(strings.ToUpper(s))
@@ -40,5 +32,5 @@ func isRomanNumeral(s string) bool {
 
 // isMediaExtension 判断是否为媒体文件扩展名
 func isMediaExtension(s string) bool {
-	return contain(MediaExtensions, strings.ToLower(s))
+	return slices.Contains(MediaExtensions, strings.ToLower(s))
 }
