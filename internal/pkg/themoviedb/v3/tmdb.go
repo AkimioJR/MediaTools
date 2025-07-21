@@ -41,7 +41,7 @@ func CustomHTTPClient(client *http.Client) TMDBOptions {
 
 func NewTMDB(apiKey string, opts ...TMDBOptions) *TMDB {
 	config := &tmdbConfig{
-		baseURL: "https://api.themoviedb.org/3",
+		baseURL: "https://api.themoviedb.org",
 		client:  &http.Client{},
 	}
 	for _, opt := range opts {
@@ -58,7 +58,7 @@ func NewTMDB(apiKey string, opts ...TMDBOptions) *TMDB {
 
 func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body io.Reader, resp any) error {
 	query.Set("api_key", tmdb.apiKey)
-	url := tmdb.baseURL + path + "?" + query.Encode()
+	url := tmdb.baseURL + "/3" + path + "?" + query.Encode()
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return fmt.Errorf("create request failed: %w", err)
