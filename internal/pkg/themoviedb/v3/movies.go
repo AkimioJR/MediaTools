@@ -34,11 +34,14 @@ type MoviesDetails struct {
 
 // 通过ID获取一部电影的顶级详情。
 // Get the top level details of a movie by ID.
+// https://api.themoviedb.org/3/movie/{movie_id}
 // https://developer.themoviedb.org/reference/movie-details
 func (tmdb *TMDB) GetMovieDetails(movieID uint64, language *string) (*MoviesDetails, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
+	} else {
+		params.Set("language", tmdb.language)
 	}
 
 	resp := MoviesDetails{}
@@ -51,12 +54,16 @@ func (tmdb *TMDB) GetMovieDetails(movieID uint64, language *string) (*MoviesDeta
 
 // 获取属于某部电影的图片。
 // Get the images that belong to a movie.
+// https://api.themoviedb.org/3/movie/{movie_id}/images
 // https://developer.themoviedb.org/reference/movie-images
 func (tmdb *TMDB) GetMovieImages(movieID uint64, language *string, IncludeImageLanguage *string) (*Image, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
+	} else {
+		params.Set("language", tmdb.language)
 	}
+
 	if IncludeImageLanguage != nil {
 		params.Set("include_image_language", *IncludeImageLanguage)
 	}
@@ -76,6 +83,7 @@ type MovieKeywordsResponse struct {
 
 // 获取一部电影的关键词列表。
 // Get the keywords for a movie by its ID.
+// https://api.themoviedb.org/3/movie/{movie_id}/keywords
 // https://developer.themoviedb.org/reference/movie-keywords
 func (tmdb *TMDB) GetMovieKeywords(movieID uint64) (*MovieKeywordsResponse, error) {
 	resp := MovieKeywordsResponse{}

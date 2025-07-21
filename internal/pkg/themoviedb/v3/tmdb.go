@@ -14,11 +14,12 @@ import (
 )
 
 type TMDB struct {
-	apiURL  string
-	imgURL  string
-	apiKey  string
-	client  *http.Client
-	limiter *limiter.Limiter
+	apiURL   string
+	imgURL   string
+	apiKey   string
+	language string
+	client   *http.Client
+	limiter  *limiter.Limiter
 }
 
 type tmdbConfig struct {
@@ -48,11 +49,12 @@ func NewTMDB(apiKey string, opts ...TMDBOptions) *TMDB {
 		opt(config)
 	}
 	return &TMDB{
-		apiURL:  config.apiURL,
-		imgURL:  "https://image.tmdb.org",
-		apiKey:  apiKey,
-		client:  config.client,
-		limiter: limiter.NewLimiter(time.Second, 20),
+		apiURL:   config.apiURL,
+		imgURL:   "https://image.tmdb.org",
+		apiKey:   apiKey,
+		language: "zh-CN",
+		client:   config.client,
+		limiter:  limiter.NewLimiter(time.Second, 20),
 	}
 }
 

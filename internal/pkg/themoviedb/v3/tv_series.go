@@ -49,6 +49,8 @@ func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVDeta
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
+	} else {
+		params.Set("language", tmdb.language)
 	}
 
 	resp := TVDetailResponse{}
@@ -67,7 +69,10 @@ func (tmdb *TMDB) GetTVSeriesImages(seriesID uint64, IncludeImageLanguage *strin
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
+	} else {
+		params.Set("language", tmdb.language)
 	}
+
 	if IncludeImageLanguage != nil {
 		params.Set("include_image_language", *IncludeImageLanguage)
 	}

@@ -121,6 +121,9 @@ type SearchPersonResponse struct {
 // https://developer.themoviedb.org/reference/search-collection
 func (tmdb *TMDB) SearchCollection(params SearchCollectionParams) ([]SearchCollectionResponse, error) {
 	var resp SearchResponse[SearchCollectionResponse]
+	if params.Language != nil {
+		params.Language = &tmdb.language
+	}
 	err := tmdb.DoRequest(http.MethodGet, "/search/collection", utils.StructToQuery(params), nil, resp)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索合集「%s」失败：%v", params.Query, err))
@@ -157,6 +160,9 @@ func (tmdb *TMDB) SearchKeyword(params SearchKeywordParams) ([]SearchKeywordResp
 // https://developer.themoviedb.org/reference/search-movie
 func (tmdb *TMDB) SearchMovie(params SearchMovieParams) ([]SearchMovieResponse, error) {
 	var resp SearchResponse[SearchMovieResponse]
+	if params.Language != nil {
+		params.Language = &tmdb.language
+	}
 	err := tmdb.DoRequest(http.MethodGet, "/search/movie", utils.StructToQuery(params), nil, resp)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索电影「%s」失败：%v", params.Query, err))
@@ -169,6 +175,9 @@ func (tmdb *TMDB) SearchMovie(params SearchMovieParams) ([]SearchMovieResponse, 
 // https://developer.themoviedb.org/reference/search-multi
 func (tmdb *TMDB) SearchMulti(params SearchMultiParams) ([]SearchMultiResponse, error) {
 	var resp SearchResponse[SearchMultiResponse]
+	if params.Language != nil {
+		params.Language = &tmdb.language
+	}
 	err := tmdb.DoRequest(http.MethodGet, "/search/multi", utils.StructToQuery(params), nil, resp)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索多种类型「%s」失败：%v", params.Query, err))
@@ -181,6 +190,9 @@ func (tmdb *TMDB) SearchMulti(params SearchMultiParams) ([]SearchMultiResponse, 
 // https://developer.themoviedb.org/reference/search-person
 func (tmdb *TMDB) SearchPerson(params SearchPersonParams) ([]SearchPersonResponse, error) {
 	var resp SearchResponse[SearchPersonResponse]
+	if params.Language != nil {
+		params.Language = &tmdb.language
+	}
 	err := tmdb.DoRequest(http.MethodGet, "/search/person", utils.StructToQuery(params), nil, resp)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索人物「%s」失败：%v", params.Query, err))
@@ -193,6 +205,9 @@ func (tmdb *TMDB) SearchPerson(params SearchPersonParams) ([]SearchPersonRespons
 // https://developer.themoviedb.org/reference/search-tv
 func (tmdb *TMDB) SearchTV(params SearchTVSParams) ([]SearchTVResponse, error) {
 	var resp SearchResponse[SearchTVResponse]
+	if params.Language != nil {
+		params.Language = &tmdb.language
+	}
 	err := tmdb.DoRequest(http.MethodGet, "/search/tv", utils.StructToQuery(params), nil, resp)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索电视剧「%s」失败：%v", params.Query, err))
