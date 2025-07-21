@@ -54,8 +54,8 @@ type Network Company // 播出平台
 // 创作者
 type Creator struct {
 	Keyword
-	CreditID    string `json:"credit_id"`
-	Gender      uint   `json:"gender"`
+	CreditID    string `json:"credit_id"`    // 唯一标识 ID
+	Gender      uint   `json:"gender"`       // 性别 0-> 未知 1-> 女性 2-> 男性
 	ProfilePath string `json:"profile_path"` // 个人资料图片路径
 }
 
@@ -80,4 +80,24 @@ type TVSeason struct {
 	PosterPath   string  `json:"poster_path"`   // 海报图片路径
 	SeasonNumber uint64  `json:"season_number"` // 季数
 	VoteAverage  float64 `json:"vote_average"`  // 平均评分
+}
+
+type Crew struct {
+	Creator
+	Department         string  `json:"department"`           // 部门
+	Job                string  `json:"job"`                  // 职位
+	Adult              bool    `json:"adult"`                // 是否成人内容
+	KnownForDepartment string  `json:"known_for_department"` // 知名领域
+	OriginalName       string  `json:"original_name"`        // 原始姓名
+	Popularity         float64 `json:"popularity"`           // 人气
+}
+
+type GuestStar struct {
+	Creator
+	Charactor          string  `json:"character"`            // 角色名称
+	Order              string  `json:"order"`                // 出场顺序
+	Adult              bool    `json:"adult"`                // 是否成人内容
+	KnownForDepartment string  `json:"known_for_department"` // 知名领域
+	OriginalName       string  `json:"original_name"`        // 原始姓名
+	Popularity         float64 `json:"popularity"`           // 人气
 }
