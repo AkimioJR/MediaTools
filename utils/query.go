@@ -17,11 +17,21 @@ func StructToQuery(param any) url.Values {
 	t := v.Type()
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
+		val := v.Field(i)
+		if field.Anonymous && val.Kind() == reflect.Struct { // 递归处理匿名字段（嵌套结构体）
+			nested := StructToQuery(val.Interface())
+			for k, vs := range nested {
+				for _, v := range vs {
+					values.Add(k, v)
+				}
+			}
+			continue
+		}
+
 		tag := field.Tag.Get("query")
 		if tag == "" {
 			tag = field.Name
 		}
-		val := v.Field(i)
 		if !val.IsValid() || (val.Kind() == reflect.Ptr && val.IsNil()) {
 			continue
 		}
