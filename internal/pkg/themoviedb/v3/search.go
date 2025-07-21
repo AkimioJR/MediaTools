@@ -80,6 +80,7 @@ type SearchCollectionResponse struct {
 }
 
 type BaseMediaResponse struct {
+	Vote
 	Adult            bool     `json:"adult"`             // 是否成人内容
 	BackDropPath     string   `json:"backdrop_path"`     // 背景图片路径
 	GenreIDs         []uint64 `json:"genre_ids"`         // 类型ID列表
@@ -88,8 +89,6 @@ type BaseMediaResponse struct {
 	Overview         string   `json:"overview"`          // 概述
 	Popularity       float64  `json:"popularity"`        // 人气
 	PosterPath       string   `json:"poster_path"`       // 海报图片路径
-	VoteAverage      float64  `json:"vote_average"`      // 平均评分
-	VoteCount        uint64   `json:"vote_count"`        // 评分数量
 }
 
 type SearchMovieResponse struct {
