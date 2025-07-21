@@ -14,22 +14,22 @@ import (
 )
 
 type TMDB struct {
-	baseURL string
-	imgURl  string
+	apiURL  string
+	imgURL  string
 	apiKey  string
 	client  *http.Client
 	limiter *limiter.Limiter
 }
 
 type tmdbConfig struct {
-	baseURL string
-	client  *http.Client
+	apiURL string
+	client *http.Client
 }
 type TMDBOptions func(c *tmdbConfig)
 
-func CustomBaseURL(baseURL string) TMDBOptions {
+func CustomAPIURL(apiURL string) TMDBOptions {
 	return func(c *tmdbConfig) {
-		c.baseURL = baseURL
+		c.apiURL = apiURL
 	}
 }
 
@@ -41,15 +41,15 @@ func CustomHTTPClient(client *http.Client) TMDBOptions {
 
 func NewTMDB(apiKey string, opts ...TMDBOptions) *TMDB {
 	config := &tmdbConfig{
-		baseURL: "https://api.themoviedb.org",
-		client:  &http.Client{},
+		apiURL: "https://api.themoviedb.org",
+		client: &http.Client{},
 	}
 	for _, opt := range opts {
 		opt(config)
 	}
 	return &TMDB{
-		baseURL: config.baseURL,
-		imgURl:  "https://image.tmdb.org",
+		apiURL:  config.apiURL,
+		imgURL:  "https://image.tmdb.org",
 		apiKey:  apiKey,
 		client:  config.client,
 		limiter: limiter.NewLimiter(time.Second, 20),
@@ -58,7 +58,7 @@ func NewTMDB(apiKey string, opts ...TMDBOptions) *TMDB {
 
 func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body io.Reader, resp any) error {
 	query.Set("api_key", tmdb.apiKey)
-	url := tmdb.baseURL + "/3" + path + "?" + query.Encode()
+	url := tmdb.apiURL + "/3" + path + "?" + query.Encode()
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return fmt.Errorf("create request failed: %w", err)
@@ -84,7 +84,7 @@ func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body i
 }
 
 func (tmdb *TMDB) DownloadImage(path string) (image.Image, error) {
-	url := tmdb.imgURl + "/t/p/original" + path
+	url := tmdb.imgURL + "/t/p/original" + path
 	resp, err := tmdb.client.Get(url)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("下载图片「%s」失败", url))
