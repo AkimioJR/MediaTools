@@ -65,6 +65,13 @@ func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body i
 		return fmt.Errorf("do request failed: %w", err)
 	}
 	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		var errResp ErrorResponse
+		if err := json.NewDecoder(res.Body).Decode(&errResp); err != nil {
+			return fmt.Errorf("request failed, status code: %d, message: %s", res.StatusCode, errResp.StatusMessage)
+		}
+		return fmt.Errorf("decode error response failed: %w", err)
+	}
 	if err := json.NewDecoder(res.Body).Decode(resp); err != nil {
 		return fmt.Errorf("decode response failed: %w", err)
 	}
