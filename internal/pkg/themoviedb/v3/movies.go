@@ -52,7 +52,7 @@ func (tmdb *TMDB) GetMovieDetails(movieID uint64, language *string) (*MoviesDeta
 // 获取属于某部电影的图片。
 // Get the images that belong to a movie.
 // https://developer.themoviedb.org/reference/movie-images
-func (tmdb *TMDB) MovieImages(movieID uint64, language *string, IncludeImageLanguage *string) (*Image, error) {
+func (tmdb *TMDB) GetMovieImages(movieID uint64, language *string, IncludeImageLanguage *string) (*Image, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
@@ -77,7 +77,7 @@ type MovieKeywordsResponse struct {
 // 获取一部电影的关键词列表。
 // Get the keywords for a movie by its ID.
 // https://developer.themoviedb.org/reference/movie-keywords
-func (tmdb *TMDB) MovieKeywords(movieID uint64) (*MovieKeywordsResponse, error) {
+func (tmdb *TMDB) GetMovieKeywords(movieID uint64) (*MovieKeywordsResponse, error) {
 	resp := MovieKeywordsResponse{}
 	err := tmdb.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(int(movieID))+"/keywords", url.Values{}, nil, &resp)
 	if err != nil {
