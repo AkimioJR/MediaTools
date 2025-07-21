@@ -1,0 +1,99 @@
+package themoviedb
+
+import (
+	"fmt"
+	"net/http"
+	"net/url"
+	"strconv"
+)
+
+type TVDetailResponse struct {
+	Vote
+	Adult               bool       `json:"adult"`                // 是否成人内容
+	BackDropPath        string     `json:"backdrop_path"`        // 背景图片
+	CreatedBy           []Creator  `json:"created_by"`           // 创作者列表
+	EspisodeRunTime     []uint64   `json:"episode_run_time"`     // 每集时长
+	FirstAirDate        string     `json:"first_air_date"`       // 首播日期
+	Genres              []Genre    `json:"genres"`               // 类型列表
+	Homepage            string     `json:"homepage"`             // 主页
+	ID                  uint64     `json:"id"`                   // ID
+	InProduction        bool       `json:"in_production"`        // 是否在连载中
+	Languages           []string   `json:"languages"`            // 语言列表
+	LastAirDate         string     `json:"last_air_date"`        // 最后播出日期
+	LastEpisodeToAir    TVEpisode  `json:"last_episode_to_air"`  // 最后一集详情
+	Name                string     `json:"name"`                 // 名称
+	NextEpisodeToAir    TVEpisode  `json:"next_episode_to_air"`  // 下一集名称
+	Networks            []Network  `json:"networks"`             // 播出平台
+	NumberOfEpisodes    uint64     `json:"number_of_episodes"`   // 总集
+	NumberOfSeasons     uint64     `json:"number_of_seasons"`    // 总季数
+	OriginCountry       []string   `json:"origin_country"`       // 原始国家列表
+	OriginalLanguage    string     `json:"original_language"`    // 原始语言
+	OriginalName        string     `json:"original_name"`        // 原始名称
+	Overview            string     `json:"overview"`             // 概述
+	Popularity          float64    `json:"popularity"`           // 人气
+	PosterPath          string     `json:"poster_path"`          // 海报图片路径
+	ProductionCompanies []Company  `json:"production_companies"` // 制作公司列表
+	ProductionCountries []Country  `json:"production_countries"` // 制作国家列表
+	Seasons             []TVSeason `json:"seasons"`              // 季列表
+	SpokenLanguages     []Language `json:"spoken_languages"`     // 语言列表
+	Status              string     `json:"status"`               // 状态
+	Tagline             string     `json:"tagline"`              // 标语
+	Type                string     `json:"type"`                 // 类型
+}
+
+// 获取一部电视剧的详细信息。
+// Get the details of a TV show.
+// https://developer.themoviedb.org/reference/tv-series-details
+func (tmdb *TMDB) GetTVDetails(tvID uint64, language *string) (*TVDetailResponse, error) {
+	params := url.Values{}
+	if language != nil {
+		params.Set("language", *language)
+	}
+
+	resp := TVDetailResponse{}
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(tvID)), params, nil, &resp)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧详情失败：%v", err))
+	}
+	return &resp, nil
+}
+
+// 获取属于某部电视剧的图片。
+// Get the images that belong to a TV series.
+// https://developer.themoviedb.org/reference/tv-series-images
+func (tmdb *TMDB) GetTVImages(tvID uint64, IncludeImageLanguage *string, language *string) (*Image, error) {
+	params := url.Values{}
+	if language != nil {
+		params.Set("language", *language)
+	}
+	if IncludeImageLanguage != nil {
+		params.Set("include_image_language", *IncludeImageLanguage)
+	}
+
+	resp := Image{}
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(tvID))+"/images", params, nil, &resp)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d」图片失败：%v", tvID, err))
+	}
+	return &resp, nil
+}
+
+type TVKeywordsResponse struct {
+	ID       uint64    `json:"id"`       // 电视剧ID
+	Keywords []Keyword `json:"keywords"` // 关键词列表
+}
+
+// 获取一部电视剧的关键词列表。
+// Get the keywords for a movie by its ID.
+// https://developer.themoviedb.org/reference/movie-keywords
+func (tmdb *TMDB) TVKeywords(tvID uint64) (*TVKeywordsResponse, error) {
+	resp := TVKeywordsResponse{}
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(tvID))+"/keywords", url.Values{}, nil, &resp)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d」关键词失败：%v", tvID, err))
+	}
+	if resp.ID == 0 {
+		return nil, NewTMDBError(nil, fmt.Sprintf("电视剧「%d」不存在或没有关键词", tvID))
+	}
+	return &resp, nil
+}

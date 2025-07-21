@@ -49,3 +49,35 @@ type Image struct {
 	Logos     []Photo `json:"logos"`     // Logo图片列表
 	Posters   []Photo `json:"posters"`   // 海报图片列表
 }
+type Network Company // 播出平台
+
+// 创作者
+type Creator struct {
+	Keyword
+	CreditID    string `json:"credit_id"`
+	Gender      uint   `json:"gender"`
+	ProfilePath string `json:"profile_path"` // 个人资料图片路径
+}
+
+type TVEpisode struct {
+	Keyword
+	Vote
+	Overview       string `json:"overview"`        // 概述
+	AirDate        string `json:"air_date"`        // 首播日期
+	EpisodeNumber  uint64 `json:"episode_number"`  // 集数
+	ProductionCode string `json:"production_code"` // 制作代码
+	Runtime        uint64 `json:"runtime"`         // 时长
+	SeasonNumber   uint64 `json:"season_number"`   // 季数
+	ShowID         uint64 `json:"show_id"`         // 电视剧ID
+	StillPath      string `json:"still_path"`      // 静态图片路径
+}
+
+type TVSeason struct {
+	Keyword
+	AirDate      string  `json:"air_date"`      // 首播日期
+	EpisodeCount uint64  `json:"episode_count"` // 集数
+	Overview     string  `json:"overview"`      // 概述
+	PosterPath   string  `json:"poster_path"`   // 海报图片路径
+	SeasonNumber uint64  `json:"season_number"` // 季数
+	VoteAverage  float64 `json:"vote_average"`  // 平均评分
+}
