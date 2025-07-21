@@ -95,7 +95,7 @@ type Crew struct {
 type GuestStar struct {
 	Creator
 	Charactor          string  `json:"character"`            // 角色名称
-	Order              string  `json:"order"`                // 出场顺序
+	Order              uint64  `json:"order"`                // 出场顺序
 	Adult              bool    `json:"adult"`                // 是否成人内容
 	KnownForDepartment string  `json:"known_for_department"` // 知名领域
 	OriginalName       string  `json:"original_name"`        // 原始姓名
