@@ -1,17 +1,20 @@
 package themoviedb
 
 import (
+	"MediaTools/pkg/limiter"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 type TMDB struct {
 	baseURL string
 	apiKey  string
 	client  *http.Client
+	limiter *limiter.Limiter
 }
 
 type tmdbConfig struct {
@@ -44,10 +47,11 @@ func NewTMDB(apiKey string, opts ...TMDBOptions) *TMDB {
 		baseURL: config.baseURL,
 		apiKey:  apiKey,
 		client:  config.client,
+		limiter: limiter.NewLimiter(time.Second, 20),
 	}
 }
 
-func (tmdb *TMDB) NewRequest(method, path string, query url.Values, body io.Reader, resp any) error {
+func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body io.Reader, resp any) error {
 	query.Set("api_key", tmdb.apiKey)
 	url := tmdb.baseURL + path + "?" + query.Encode()
 	req, err := http.NewRequest(method, url, body)
