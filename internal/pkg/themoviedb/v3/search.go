@@ -58,10 +58,7 @@ type SearchPersonParams SearchMultiParams
 
 // ========= 响应字段 =========
 
-type SearchKeywordResponse struct {
-	ID   uint64 `json:"id"`   // 关键词ID
-	Name string `json:"name"` // 关键词名称
-}
+type SearchKeywordResponse Keyword
 
 type SearchCompanyResponse struct {
 	SearchKeywordResponse

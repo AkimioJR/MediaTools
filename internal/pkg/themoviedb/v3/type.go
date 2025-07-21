@@ -1,18 +1,19 @@
 package themoviedb
 
+type Keyword struct {
+	ID   uint64 `json:"id"`   // 关键词ID
+	Name string `json:"name"` // 关键词名称
+}
+
 type Vote struct {
 	VoteAverage float64 `json:"vote_average"` // 平均评分
 	VoteCount   uint64  `json:"vote_count"`   // 评分数量
 }
-type Genre struct {
-	ID   uint64 `json:"id"`
-	Name string `json:"name"`
-}
+type Genre Keyword // 类型
 
 type Company struct {
-	ID            uint64 `json:"id"`             // 公司ID
+	Keyword
 	LogoPath      string `json:"logo_path"`      // 公司Logo路径
-	Name          string `json:"name"`           // 公司名称
 	OriginCountry string `json:"origin_country"` // 原始国家
 }
 
@@ -28,8 +29,7 @@ type Language struct {
 }
 
 type Collection struct {
-	ID           uint64 `json:"id"`            // 系列ID
-	Name         string `json:"name"`          // 系列名称
+	Keyword
 	PosterPath   string `json:"poster_path"`   // 海报图片路径
 	BackDropPath string `json:"backdrop_path"` // 背景图片路径
 }
