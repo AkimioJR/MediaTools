@@ -101,3 +101,12 @@ type GuestStar struct {
 	OriginalName       string  `json:"original_name"`        // 原始姓名
 	Popularity         float64 `json:"popularity"`           // 人气
 }
+
+type TVImage struct {
+	Vote
+	AspectRatio float64 `json:"aspect_ratio"` // 图片宽高比
+	Height      uint64  `json:"height"`       // 图片高度
+	ISO         string  `json:"iso_639_1"`    // ISO 639-1 语言代码
+	FilePath    string  `json:"file_path"`    // 图片文件路径
+	Width       uint64  `json:"width"`        // 图片宽度
+}
