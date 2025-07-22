@@ -18,14 +18,14 @@ func (t StorageType) String() string {
 	}
 }
 
-
 type FileSystem interface {
 	Init(config map[string]any) error                            // 初始化文件系统
 	GetType() StorageType                                        // 获取文件系统类型
 	GetRoot() (FileObject, error)                                // 获取根目录文件对象
 	GetTransferType() []TransferType                             // 获取支持的传输类型
 	List(obj FileObject) ([]FileObject, error)                   // 获取目录下的文件列表
-	NewFile(obj FileObject, reader io.Reader) error              // 创建新文件对象
+	NewFile(dir FileObject, name string) FileObject              // 创建新文件对象句柄
+	CreateFile(obj FileObject, reader io.Reader) error           // 创建文件
 	Delete(obj FileObject) error                                 // 删除文件或目录
 	Rename(obj FileObject, newName string) error                 // 重命名文件或目录
 	Exists(obj FileObject) (bool, error)                         // 检查文件或目录是否存在

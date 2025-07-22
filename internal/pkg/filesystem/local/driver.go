@@ -59,7 +59,15 @@ func (s *LocalStorage) List(obj model.FileObject) ([]model.FileObject, error) {
 	return fileObjects, nil
 }
 
-func (s *LocalStorage) NewFile(obj model.FileObject, reader io.Reader) error {
+func (s *LocalStorage) NewFile(dir model.FileObject, name string) model.FileObject {
+	fileObj := &FileObj{
+		path:  pathlib.Join(dir.GetPath(), name),
+		isDir: false,
+	}
+	return fileObj
+}
+
+func (s *LocalStorage) CreateFile(obj model.FileObject, reader io.Reader) error {
 	fileObj, ok := obj.(*FileObj)
 	if !ok {
 		return model.ErrNoSupport
@@ -131,7 +139,7 @@ func (s *LocalStorage) Copy(src model.FileObject, dst model.FileObject, dstFS mo
 		return err
 	}
 	defer reader.Close()
-	return dstFS.NewFile(dst, reader)
+	return dstFS.CreateFile(dst, reader)
 }
 
 func (s *LocalStorage) Move(src model.FileObject, dst model.FileObject, dstFS model.FileSystem) error {
