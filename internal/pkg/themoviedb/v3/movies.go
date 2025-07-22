@@ -119,3 +119,20 @@ func (tmdb *TMDB) GetMovieKeywords(movieID uint64) (*MovieKeyword, error) {
 	}
 	return &keyword, nil
 }
+
+// 获取一部电影的翻译内容。
+// Get the translations for a movie.
+// https://api.themoviedb.org/3/movie/{movie_id}/translations
+// https://developer.themoviedb.org/reference/movie-translations
+func (tmdb *TMDB) GetMovieTranslations(movieID uint64) ([]Translation, error) {
+	params := url.Values{}
+	var response struct {
+		ID           uint64        `json:"id"`           // 电影ID
+		Translations []Translation `json:"translations"` // 翻译列表
+	}
+	err := tmdb.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(int(movieID))+"/translations", params, nil, &response)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电影「%d」翻译失败：%v", movieID, err))
+	}
+	return response.Translations, nil
+}

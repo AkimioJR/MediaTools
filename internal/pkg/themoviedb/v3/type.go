@@ -117,3 +117,16 @@ type Title struct {
 	Type  string `json:"type"`       // 类型
 	ISO   string `json:"iso_3166_1"` // ISO iso_3166_1 国家代码
 }
+
+type Translation struct {
+	ISO3166 string `json:"iso_3166_1"`   // ISO 3166-1 国家代码
+	ISO639  string `json:"iso_639_1"`    // ISO 639-1 语言代码
+	Name    string `json:"name"`         // 名称
+	English string `json:"english_name"` // 英文名称
+	Data    struct {
+		Name     string `json:"name"`     // 名称
+		Overview string `json:"overview"` // 概述
+		Homepage string `json:"homepage"` // 主页
+		Tagline  string `json:"tagline"`  // 标语
+	} `json:"data"` // 翻译数据
+}

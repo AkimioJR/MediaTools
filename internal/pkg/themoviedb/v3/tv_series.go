@@ -156,3 +156,20 @@ func (tmdb *TMDB) TVSeriesKeywords(seriesID uint64) (*TVKeyword, error) {
 	}
 	return &kyword, nil
 }
+
+// 获取已添加到电视剧中的翻译内容。
+// Get the translations that have been added to a TV show.
+// https://api.themoviedb.org/3/tv/{series_id}/translations
+// https://developer.themoviedb.org/reference/tv-series-translations
+func (tmdb *TMDB) GetTVSeriesTranslations(seriesID uint64) ([]Translation, error) {
+	params := url.Values{}
+	var response struct {
+		ID           uint64        `json:"id"`           // 电视剧ID
+		Translations []Translation `json:"translations"` // 翻译列表
+	}
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/translations", params, nil, &response)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d」翻译失败：%v", seriesID, err))
+	}
+	return response.Translations, nil
+}
