@@ -117,9 +117,3 @@ type Title struct {
 	Type  string `json:"type"`       // 类型
 	ISO   string `json:"iso_3166_1"` // ISO iso_3166_1 国家代码
 }
-
-// 别名APi响应
-type AlternativeTitlesResponse struct {
-	ID     uint64  `json:"id"`     //TMDB ID
-	Titles []Title `json:"titles"` // 标题列表
-}

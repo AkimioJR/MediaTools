@@ -67,18 +67,21 @@ func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVSeri
 // https://developer.themoviedb.org/reference/tv-series-alternative-titles
 //
 // country 可选，指定国家(指定一个 ISO-3166-1 值来筛选结果)
-func (tmdb *TMDB) GetTVSeriesAlternativeTitles(seriesID uint64, country *string) (*AlternativeTitlesResponse, error) {
+func (tmdb *TMDB) GetTVSeriesAlternativeTitles(seriesID uint64, country *string) ([]Title, error) {
 	params := url.Values{}
 	if country != nil {
 		params.Set("country", *country)
 	}
 
-	var response AlternativeTitlesResponse
+	var response struct {
+		ID      uint64  `json:"id"`      // 电视剧ID
+		Results []Title `json:"results"` // 结果列表
+	}
 	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/alternative_titles", params, nil, &response)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d」别名失败：%v", seriesID, err))
 	}
-	return &response, nil
+	return response.Results, nil
 }
 
 type TVSeriesGrop struct {

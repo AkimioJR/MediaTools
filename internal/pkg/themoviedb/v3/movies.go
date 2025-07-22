@@ -58,18 +58,21 @@ func (tmdb *TMDB) GetMovieDetails(movieID uint64, language *string) (*MovieDetai
 // https://developer.themoviedb.org/reference/movie-alternative-titles
 //
 // country 可选，指定国家(指定一个 ISO-3166-1 值来筛选结果)
-func (tmdb *TMDB) GetMovieAlternativeTitles(movieID uint64, country *string) (*AlternativeTitlesResponse, error) {
+func (tmdb *TMDB) GetMovieAlternativeTitles(movieID uint64, country *string) ([]Title, error) {
 	params := url.Values{}
 	if country != nil {
 		params.Set("country", *country)
 	}
 
-	var response AlternativeTitlesResponse
+	var response struct {
+		ID     uint64  `json:"id"`     // 电影ID
+		Titles []Title `json:"titles"` // 结果列表
+	}
 	err := tmdb.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(int(movieID))+"/alternative_titles", params, nil, &response)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电影「%d」别名失败：%v", movieID, err))
 	}
-	return &response, nil
+	return response.Titles, nil
 }
 
 // 获取属于某部电影的图片。
