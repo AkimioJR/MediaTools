@@ -79,7 +79,7 @@ func (meta *MetaVideo) GetResourceEffectStrings() []string {
 
 func (meta *MetaVideo) GetSeasons() []int {
 	if meta.mediaType != MediaTypeTV {
-		return []int{}
+		return nil
 	}
 
 	var seasons []int
@@ -109,7 +109,7 @@ func (meta *MetaVideo) GetSeasonStr() string {
 // GetEpisodes 获取集数列表
 func (meta *MetaVideo) GetEpisodes() []int {
 	if meta.mediaType != MediaTypeTV {
-		return []int{}
+		return nil
 	}
 
 	var episodes []int
