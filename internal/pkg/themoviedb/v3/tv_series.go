@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-type TVSeriesDetails struct {
+type TVSeriesDetail struct {
 	Vote
 	Adult               bool       `json:"adult"`                // 是否成人内容
 	BackDropPath        string     `json:"backdrop_path"`        // 背景图片
@@ -45,7 +45,7 @@ type TVSeriesDetails struct {
 // Get the details of a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}
 // https://developer.themoviedb.org/reference/tv-series-details
-func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVSeriesDetails, error) {
+func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVSeriesDetail, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
@@ -53,12 +53,12 @@ func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVSeri
 		params.Set("language", tmdb.language)
 	}
 
-	resp := TVSeriesDetails{}
-	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID)), params, nil, &resp)
+	detail := TVSeriesDetail{}
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID)), params, nil, &detail)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧详情失败：%v", err))
 	}
-	return &resp, nil
+	return &detail, nil
 }
 
 // 获取属于某部电视剧的图片。
@@ -77,15 +77,15 @@ func (tmdb *TMDB) GetTVSeriesImages(seriesID uint64, IncludeImageLanguage *strin
 		params.Set("include_image_language", *IncludeImageLanguage)
 	}
 
-	resp := Image{}
-	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/images", params, nil, &resp)
+	img := Image{}
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/images", params, nil, &img)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d」图片失败：%v", seriesID, err))
 	}
-	return &resp, nil
+	return &img, nil
 }
 
-type TVKeywordsResponse struct {
+type TVKeyword struct {
 	ID       uint64    `json:"id"`       // 电视剧ID
 	Keywords []Keyword `json:"keywords"` // 关键词列表
 }
@@ -94,14 +94,14 @@ type TVKeywordsResponse struct {
 // Get the keywords for a movie by its ID.
 // https://api.themoviedb.org/3/tv/{series_id}/keywords
 // https://developer.themoviedb.org/reference/movie-keywords
-func (tmdb *TMDB) TVSeriesKeywords(seriesID uint64) (*TVKeywordsResponse, error) {
-	resp := TVKeywordsResponse{}
-	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/keywords", url.Values{}, nil, &resp)
+func (tmdb *TMDB) TVSeriesKeywords(seriesID uint64) (*TVKeyword, error) {
+	kyword := TVKeyword{}
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/keywords", url.Values{}, nil, &kyword)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d」关键词失败：%v", seriesID, err))
 	}
-	if resp.ID == 0 {
+	if kyword.ID == 0 {
 		return nil, NewTMDBError(nil, fmt.Sprintf("电视剧「%d」不存在或没有关键词", seriesID))
 	}
-	return &resp, nil
+	return &kyword, nil
 }

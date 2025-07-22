@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-type TVSeasonDetailResponse struct {
+type TVSeasonDetail struct {
 	Keyword
 	// _ID        string      `json:"_id"` // 文档最顶层（整个剧集对象）ID
 	AirDate      string      `json:"air_date"`      // 首播日期
@@ -23,7 +23,7 @@ type TVSeasonDetailResponse struct {
 // Query the details of a TV season.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}
 // https://developer.themoviedb.org/reference/tv-season-details
-func (tmdb *TMDB) GetTVSeasonDetail(seriesID uint64, seasonNumber uint64, language *string) (*TVSeasonDetailResponse, error) {
+func (tmdb *TMDB) GetTVSeasonDetail(seriesID uint64, seasonNumber uint64, language *string) (*TVSeasonDetail, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
@@ -31,7 +31,7 @@ func (tmdb *TMDB) GetTVSeasonDetail(seriesID uint64, seasonNumber uint64, langua
 		params.Set("language", tmdb.language)
 	}
 
-	resp := TVSeasonDetailResponse{}
+	resp := TVSeasonDetail{}
 	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/season/"+strconv.Itoa(int(seasonNumber)), params, nil, &resp)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d 第 %d 季」详情失败：%v", seriesID, seasonNumber, err))

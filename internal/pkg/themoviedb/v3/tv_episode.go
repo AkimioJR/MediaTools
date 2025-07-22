@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-type TVEpisodeDetailResponse struct {
+type TVEpisodeDetail struct {
 	Keyword
 	Vote
 	AirDate        string      `json:"air_date"`        // 首播日期
@@ -25,8 +25,8 @@ type TVEpisodeDetailResponse struct {
 // Query the details of a TV episode.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/episode/{episode_number}
 // https://developer.themoviedb.org/reference/tv-episode-details
-func (tmdb *TMDB) GetTVEpisodeDetail(seriesID uint64, seasonNumber uint64, episodeNumber uint64, language *string) (*TVEpisodeDetailResponse, error) {
-	var resp TVEpisodeDetailResponse
+func (tmdb *TMDB) GetTVEpisodeDetail(seriesID uint64, seasonNumber uint64, episodeNumber uint64, language *string) (*TVEpisodeDetail, error) {
+	var resp TVEpisodeDetail
 
 	params := url.Values{}
 	if language != nil {
@@ -48,7 +48,7 @@ func (tmdb *TMDB) GetTVEpisodeDetail(seriesID uint64, seasonNumber uint64, episo
 	return &resp, nil
 }
 
-type TVEpisodeImageResponse struct {
+type TVEpisodeImage struct {
 	ID     uint64    `json:"id"`
 	Stills []TVImage `json:"stills"`
 }
@@ -57,9 +57,9 @@ type TVEpisodeImageResponse struct {
 // Get the images that belong to a TV episode.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/episode/{episode_number}/images
 // https://developer.themoviedb.org/reference/tv-episode-images
-func (tmdb *TMDB) GetTVEpisodeImage(seriesID uint64, seasonNumber uint64, episodeNumber uint64, language *string) (*TVEpisodeImageResponse, error) {
-	var resp TVEpisodeImageResponse
-	
+func (tmdb *TMDB) GetTVEpisodeImage(seriesID uint64, seasonNumber uint64, episodeNumber uint64, language *string) (*TVEpisodeImage, error) {
+	var img TVEpisodeImage
+
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
@@ -72,10 +72,10 @@ func (tmdb *TMDB) GetTVEpisodeImage(seriesID uint64, seasonNumber uint64, episod
 		"/tv/"+strconv.Itoa(int(seriesID))+"/season/"+strconv.Itoa(int(seasonNumber))+"/episode/"+strconv.Itoa(int(episodeNumber))+"/images",
 		params,
 		nil,
-		&resp,
+		&img,
 	)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d 第 %d 季 第 %d 集」图片失败：%v", seriesID, seasonNumber, episodeNumber, err))
 	}
-	return &resp, nil
+	return &img, nil
 }
