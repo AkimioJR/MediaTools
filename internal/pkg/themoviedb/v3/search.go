@@ -119,7 +119,7 @@ type SearchPersonResponse struct {
 // 按收藏的原名、译名及别名进行搜索。
 // Search for collections by their original, translated and alternative names.
 // https://developer.themoviedb.org/reference/search-collection
-func (tmdb *TMDB) SearchCollection(params SearchCollectionParams) ([]SearchCollectionResponse, error) {
+func (tmdb *TMDB) SearchCollection(params SearchCollectionParams) (*SearchResponse[SearchCollectionResponse], error) {
 	var resp SearchResponse[SearchCollectionResponse]
 	if params.Language != nil {
 		params.Language = &tmdb.language
@@ -128,7 +128,7 @@ func (tmdb *TMDB) SearchCollection(params SearchCollectionParams) ([]SearchColle
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索合集「%s」失败：%v", params.Query, err))
 	}
-	return resp.Result, nil
+	return &resp, nil
 }
 
 // 按公司的原名和别名搜索。
@@ -146,19 +146,19 @@ func (tmdb *TMDB) SearchCompany(params SearchCompanyParams) ([]SearchCompanyResp
 // 按名称搜索关键词。
 // Search for keywords by their name.
 // https://developer.themoviedb.org/reference/search-keyword
-func (tmdb *TMDB) SearchKeyword(params SearchKeywordParams) ([]SearchKeywordResponse, error) {
+func (tmdb *TMDB) SearchKeyword(params SearchKeywordParams) (*SearchResponse[SearchKeywordResponse], error) {
 	var resp SearchResponse[SearchKeywordResponse]
 	err := tmdb.DoRequest(http.MethodGet, "/search/keyword", utils.StructToQuery(params), nil, resp)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索关键词「%s」失败：%v", params.Query, err))
 	}
-	return resp.Result, nil
+	return &resp, nil
 }
 
 // 按电影的原名、译名和别名搜索。
 // Search for movies by their original, translated and alternative titles.
 // https://developer.themoviedb.org/reference/search-movie
-func (tmdb *TMDB) SearchMovie(params SearchMovieParams) ([]SearchMovieResponse, error) {
+func (tmdb *TMDB) SearchMovie(params SearchMovieParams) (*SearchResponse[SearchMovieResponse], error) {
 	var resp SearchResponse[SearchMovieResponse]
 	if params.Language != nil {
 		params.Language = &tmdb.language
@@ -167,13 +167,13 @@ func (tmdb *TMDB) SearchMovie(params SearchMovieParams) ([]SearchMovieResponse, 
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索电影「%s」失败：%v", params.Query, err))
 	}
-	return resp.Result, nil
+	return &resp, nil
 }
 
 // 当你想在一次请求中搜索电影、电视节目和人物时，请使用多重搜索。
 // Use multi search when you want to search for movies, TV shows and people in a single request.
 // https://developer.themoviedb.org/reference/search-multi
-func (tmdb *TMDB) SearchMulti(params SearchMultiParams) ([]SearchMultiResponse, error) {
+func (tmdb *TMDB) SearchMulti(params SearchMultiParams) (*SearchResponse[SearchMultiResponse], error) {
 	var resp SearchResponse[SearchMultiResponse]
 	if params.Language != nil {
 		params.Language = &tmdb.language
@@ -182,13 +182,13 @@ func (tmdb *TMDB) SearchMulti(params SearchMultiParams) ([]SearchMultiResponse, 
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索多种类型「%s」失败：%v", params.Query, err))
 	}
-	return resp.Result, nil
+	return &resp, nil
 }
 
 // 按人名及其曾用名搜索人物。
 // Search for people by their name and also known as names.
 // https://developer.themoviedb.org/reference/search-person
-func (tmdb *TMDB) SearchPerson(params SearchPersonParams) ([]SearchPersonResponse, error) {
+func (tmdb *TMDB) SearchPerson(params SearchPersonParams) (*SearchResponse[SearchPersonResponse], error) {
 	var resp SearchResponse[SearchPersonResponse]
 	if params.Language != nil {
 		params.Language = &tmdb.language
@@ -197,13 +197,13 @@ func (tmdb *TMDB) SearchPerson(params SearchPersonParams) ([]SearchPersonRespons
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索人物「%s」失败：%v", params.Query, err))
 	}
-	return resp.Result, nil
+	return &resp, nil
 }
 
 // 按电视节目的原名、译名及别名搜索。
 // Search for TV shows by their original, translated and also known as names.
 // https://developer.themoviedb.org/reference/search-tv
-func (tmdb *TMDB) SearchTV(params SearchTVSParams) ([]SearchTVResponse, error) {
+func (tmdb *TMDB) SearchTV(params SearchTVSParams) (*SearchResponse[SearchTVResponse], error) {
 	var resp SearchResponse[SearchTVResponse]
 	if params.Language != nil {
 		params.Language = &tmdb.language
@@ -212,5 +212,5 @@ func (tmdb *TMDB) SearchTV(params SearchTVSParams) ([]SearchTVResponse, error) {
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("搜索电视剧「%s」失败：%v", params.Query, err))
 	}
-	return resp.Result, nil
+	return &resp, nil
 }
