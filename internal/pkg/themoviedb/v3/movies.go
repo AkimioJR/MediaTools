@@ -12,8 +12,8 @@ type MoviesDetails struct {
 	Adult               bool       `json:"adult"`                 // 是否为成人内容
 	BackDropPath        string     `json:"backdrop_path"`         // 背景图片路径
 	BelongsToCollection Collection `json:"belongs_to_collection"` // 所属系列
-	Budeget             uint64     `json:"budget"`                // 预算
-	GenreIDs            []Genre    `json:"genre_ids"`             // 类型ID列表
+	Budget              uint64     `json:"budget"`                // 预算
+	Genres              []Genre    `json:"genres"`                // 类型ID列表
 	Homepage            string     `json:"homepage"`              // 主页
 	ID                  uint64     `json:"id"`                    // ID
 	OriginalLanguage    string     `json:"original_language"`     // 原始语言
