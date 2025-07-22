@@ -61,6 +61,34 @@ func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVSeri
 	return &detail, nil
 }
 
+type TVSeriesGrop struct {
+	Description  string    `json:"description"`   // 描述
+	EpisodeCount uint64    `json:"episode_count"` // 集数
+	ID           uint64    `json:"id"`            // ID
+	Name         string    `json:"name"`          // 名称
+	Networks     []Network `json:"networks"`      // 播出平台
+	Type         uint64    `json:"type"`          // 类型
+}
+
+type TVSeriesEpisodeGroupsResponse struct {
+	ID      uint64         `json:"id"`      // 电视剧ID
+	Results []TVSeriesGrop `json:"results"` // 结果列表
+}
+
+// 获取已添加到电视剧中的剧集组。
+// Get the episode groups that have been added to a TV show.
+// https://api.themoviedb.org/3/tv/{series_id}/episode_groups
+// https://developer.themoviedb.org/reference/tv-series-episode-groups
+func (tmdb *TMDB) GetTVSeriesEpisodeGroups(seriesID uint64) (*TVSeriesEpisodeGroupsResponse, error) {
+	params := url.Values{}
+	response := TVSeriesEpisodeGroupsResponse{}
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/episode_groups", params, nil, &response)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d」剧集组失败：%v", seriesID, err))
+	}
+	return &response, nil
+}
+
 // 获取属于某部电视剧的图片。
 // Get the images that belong to a TV series.
 // https://api.themoviedb.org/3/tv/{series_id}/images
