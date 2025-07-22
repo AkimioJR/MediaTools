@@ -7,12 +7,12 @@ import (
 	"strconv"
 )
 
-type TVDetailResponse struct {
+type TVSeriesDetails struct {
 	Vote
 	Adult               bool       `json:"adult"`                // 是否成人内容
 	BackDropPath        string     `json:"backdrop_path"`        // 背景图片
 	CreatedBy           []Creator  `json:"created_by"`           // 创作者列表
-	EspisodeRunTime     []uint64   `json:"episode_run_time"`     // 每集时长
+	EpisodeRunTime      []uint64   `json:"episode_run_time"`     // 每集时长
 	FirstAirDate        string     `json:"first_air_date"`       // 首播日期
 	Genres              []Genre    `json:"genres"`               // 类型列表
 	Homepage            string     `json:"homepage"`             // 主页
@@ -45,7 +45,7 @@ type TVDetailResponse struct {
 // Get the details of a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}
 // https://developer.themoviedb.org/reference/tv-series-details
-func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVDetailResponse, error) {
+func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVSeriesDetails, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
@@ -53,7 +53,7 @@ func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVDeta
 		params.Set("language", tmdb.language)
 	}
 
-	resp := TVDetailResponse{}
+	resp := TVSeriesDetails{}
 	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID)), params, nil, &resp)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧详情失败：%v", err))
