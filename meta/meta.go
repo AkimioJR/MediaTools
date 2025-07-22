@@ -21,6 +21,7 @@ type MetaVideo struct {
 	entitle        string    // 英文标题
 	year           uint      // 年份
 	mediaType      MediaType // 媒体类型
+	tmdbID         uint64    // TMDB ID
 
 	// 资源信息
 	resourceType   ResourceType                // 来源/介质
@@ -47,6 +48,7 @@ func (meta *MetaVideo) GetCNTitle() string                             { return 
 func (meta *MetaVideo) GetENTitle() string                             { return meta.entitle }        // GetENTitle 获取英文标题
 func (meta *MetaVideo) GetYear() uint                                  { return meta.year }           // GetYear 获取年份
 func (meta *MetaVideo) GetType() MediaType                             { return meta.mediaType }      // MediaType
+func (meta *MetaVideo) GetTMDBID() uint64                              { return meta.tmdbID }         // GetTMDBID 获取 TMDB ID
 func (meta *MetaVideo) GetResourceType() ResourceType                  { return meta.resourceType }   // GetResourceType 获取资源类型
 func (meta *MetaVideo) GetResourceEffect() map[ResourceEffect]struct{} { return meta.resourceEffect } // GetResourceEffect 获取资源效果
 func (meta *MetaVideo) GetResourcePix() ResourcePix                    { return meta.resourcePix }    // GetResourcePix 获取资源分辨率
