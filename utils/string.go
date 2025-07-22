@@ -141,3 +141,21 @@ func ChineseToInt(chinese string) (int, error) {
 
 	return result, nil
 }
+
+var (
+	// reZeroWidthRe = regexp.MustCompile(`[\u200B-\u200D\uFEFF]`)
+	reSpecialRe = regexp.MustCompile(`[、.。,，·:：;；!！'’"“”()（）\[\]【】「」\-—―\+\|\\_/&#～~]`) // 需要忽略的特殊字符
+)
+
+// Clear 忽略特殊字符
+func Clear(text string) string {
+	if text == "" {
+		return text
+	}
+
+	// text = reZeroWidthRe.ReplaceAllString(text, "") // 去除零宽字符
+	text = reSpecialRe.ReplaceAllString(text, "") // 替换特殊字符
+	reSpace := regexp.MustCompile(`\s+`)          // 多空格合并为一个，并去除首尾空格
+	text = strings.TrimSpace(reSpace.ReplaceAllString(text, " "))
+	return text
+}
