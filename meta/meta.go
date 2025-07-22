@@ -77,6 +77,10 @@ func (meta *MetaVideo) GetResourceEffectStrings() []string {
 	return effects
 }
 
+func (meta *MetaVideo) GetBeginSeason() *int {
+	return meta.beginSeason
+}
+
 func (meta *MetaVideo) GetSeasons() []int {
 	if meta.mediaType != MediaTypeTV {
 		return nil
@@ -104,6 +108,11 @@ func (meta *MetaVideo) GetSeasonStr() string {
 		}
 		return fmt.Sprintf("S%02d-S%02d", *meta.beginSeason, *meta.endSeason)
 	}
+}
+
+// GetBeginEpisode 获取起始集数
+func (meta *MetaVideo) GetBeginEpisode() *int {
+	return meta.beginEpisode
 }
 
 // GetEpisodes 获取集数列表
