@@ -159,3 +159,17 @@ func Clear(text string) string {
 	text = strings.TrimSpace(reSpace.ReplaceAllString(text, " "))
 	return text
 }
+
+// FuzzyMatching 模糊匹配，忽略大小写和特殊字符
+func FuzzyMatching(text string, patterns ...string) bool {
+	if len(patterns) == 0 {
+		return false
+	}
+	text = strings.ToUpper(Clear(text))
+	for _, pattern := range patterns {
+		if text == strings.ToUpper(strings.TrimSpace(Clear(pattern))) {
+			return true
+		}
+	}
+	return false
+}
