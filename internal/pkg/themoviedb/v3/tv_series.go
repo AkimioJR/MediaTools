@@ -61,6 +61,26 @@ func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVSeri
 	return &detail, nil
 }
 
+// 获取已添加到电视剧中的其他标题。
+// Get the alternative titles that have been added to a TV show.
+// https://api.themoviedb.org/3/tv/{series_id}/alternative_titles
+// https://developer.themoviedb.org/reference/tv-series-alternative-titles
+//
+// country 可选，指定国家(指定一个 ISO-3166-1 值来筛选结果)
+func (tmdb *TMDB) GetTVSeriesAlternativeTitles(seriesID uint64, country *string) (*AlternativeTitlesResponse, error) {
+	params := url.Values{}
+	if country != nil {
+		params.Set("country", *country)
+	}
+
+	var response AlternativeTitlesResponse
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/alternative_titles", params, nil, &response)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d」别名失败：%v", seriesID, err))
+	}
+	return &response, nil
+}
+
 type TVSeriesGrop struct {
 	Description  string    `json:"description"`   // 描述
 	EpisodeCount uint64    `json:"episode_count"` // 集数

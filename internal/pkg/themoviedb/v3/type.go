@@ -110,3 +110,16 @@ type TVImage struct {
 	FilePath    string  `json:"file_path"`    // 图片文件路径
 	Width       uint64  `json:"width"`        // 图片宽度
 }
+
+// 标题/别名
+type Title struct {
+	Title string `json:"title"`      // 标题
+	Type  string `json:"type"`       // 类型
+	ISO   string `json:"iso_3166_1"` // ISO iso_3166_1 国家代码
+}
+
+// 别名APi响应
+type AlternativeTitlesResponse struct {
+	ID     uint64  `json:"id"`     //TMDB ID
+	Titles []Title `json:"titles"` // 标题列表
+}
