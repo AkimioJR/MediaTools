@@ -18,6 +18,17 @@ const (
 	MediaTypeTV                       //电视剧
 )
 
+func (mtype MediaType) String() string {
+	switch mtype {
+	case MediaTypeMovie:
+		return "电影"
+	case MediaTypeTV:
+		return "电视剧"
+	default:
+		return "未知"
+	}
+}
+
 var (
 	// 基础预处理正则
 	nameNoBeginRe = regexp.MustCompile(`^[\[【].+?[\]】]`)
