@@ -84,6 +84,26 @@ func (tmdb *TMDB) GetTVSeriesAlternativeTitles(seriesID int, country *string) ([
 	return response.Results, nil
 }
 
+
+// 获取一部电视剧最新一季的演职人员名单。
+// Get the latest season credits of a TV show.
+// https://api.themoviedb.org/3/tv/{series_id}/credits
+// https://developer.themoviedb.org/reference/tv-series-credits
+func (tmdb *TMDB) GetTVSeriesCredits(seriesID int, language *string) (*TVCreditsResponse, error) {
+	params := url.Values{}
+	if language != nil {
+		params.Set("language", *language)
+	} else {
+		params.Set("language", tmdb.language)
+	}
+	response := TVCreditsResponse{}
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(seriesID), params, nil, &response)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d」演员列表失败：%v", seriesID, err))
+	}
+	return &response, nil
+}
+
 type TVSeriesGrop struct {
 	Description  string    `json:"description"`   // 描述
 	EpisodeCount int       `json:"episode_count"` // 集数

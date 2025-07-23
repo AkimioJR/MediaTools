@@ -39,6 +39,26 @@ func (tmdb *TMDB) GetTVSeasonDetail(seriesID int, seasonNumber int, language *st
 	return &resp, nil
 }
 
+// 获取一部电视剧季的演员列表和工作人员列表。
+// Get the cast and crew for a TV season by its ID.
+// https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/credits
+// https://developer.themoviedb.org/reference/tv-season-credits
+func (tmdb *TMDB) GetTVSeasonCredits(seriesID int, seasonNumber int, language *string) (*TVCreditsResponse, error) {
+	params := url.Values{}
+	if language != nil {
+		params.Set("language", *language)
+	} else {
+		params.Set("language", tmdb.language)
+	}
+
+	response := TVCreditsResponse{}
+	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(seriesID)+"/season/"+strconv.Itoa(seasonNumber)+"/credits", params, nil, &response)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d 第 %d 季」演员列表失败：%v", seriesID, seasonNumber, err))
+	}
+	return &response, nil
+}
+
 type TVSeasonImageResponse struct {
 	ID      int       `json:"id"`      // 电视剧ID
 	Posters []TVImage `json:"posters"` // 海报图片列表

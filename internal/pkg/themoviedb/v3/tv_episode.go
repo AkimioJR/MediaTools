@@ -48,6 +48,32 @@ func (tmdb *TMDB) GetTVEpisodeDetail(seriesID int, seasonNumber int, episodeNumb
 	return &resp, nil
 }
 
+// 获取一部电视剧单集的演员列表和工作人员列表。
+// Get the cast and crew for a TV episode by its ID.
+// https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/episode/{episode_number}/credits
+// https://developer.themoviedb.org/reference/tv-episode-credits
+func (tmdb *TMDB) GetTVEpisodeCredits(seriesID int, seasonNumber int, episodeNumber int, language *string) (*TVCreditsResponse, error) {
+	params := url.Values{}
+	if language != nil {
+		params.Set("language", *language)
+	} else {
+		params.Set("language", tmdb.language)
+	}
+
+	response := TVCreditsResponse{}
+	err := tmdb.DoRequest(
+		http.MethodGet,
+		"/tv/"+strconv.Itoa(seriesID)+"/season/"+strconv.Itoa(seasonNumber)+"/episode/"+strconv.Itoa(episodeNumber)+"/credits",
+		params,
+		nil,
+		&response,
+	)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d 第 %d 季 第 %d 集」演员列表失败：%v", seriesID, seasonNumber, episodeNumber, err))
+	}
+	return &response, nil
+}
+
 type TVEpisodeImage struct {
 	ID     int       `json:"id"`
 	Stills []TVImage `json:"stills"`

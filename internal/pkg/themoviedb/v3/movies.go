@@ -75,6 +75,32 @@ func (tmdb *TMDB) GetMovieAlternativeTitles(movieID int, country *string) ([]Tit
 	return response.Titles, nil
 }
 
+type MovieCreditsResponse struct {
+	ID      int    `json:"id"`      // 电影ID
+	Credits []Cast `json:"credits"` // 演员列表
+	Crew    []Crew `json:"crew"`    // 工作人员列表
+}
+
+// 获取一部电影的演员列表和工作人员列表。
+// Get the cast and crew for a movie by its ID.
+// https://api.themoviedb.org/3/movie/{movie_id}/credits
+// https://developer.themoviedb.org/reference/movie-credits
+func (tmdb *TMDB) GetMovieCredits(movieID int, language *string) (*MovieCreditsResponse, error) {
+	params := url.Values{}
+	if language != nil {
+		params.Set("language", *language)
+	} else {
+		params.Set("language", tmdb.language)
+	}
+
+	var response MovieCreditsResponse
+	err := tmdb.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID)+"/credits", params, nil, &response)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电影「%d」演员列表失败：%v", movieID, err))
+	}
+	return &response, nil
+}
+
 // 获取属于某部电影的图片。
 // Get the images that belong to a movie.
 // https://api.themoviedb.org/3/movie/{movie_id}/images

@@ -130,3 +130,14 @@ type Translation struct {
 		Tagline  string `json:"tagline"`  // 标语
 	} `json:"data"` // 翻译数据
 }
+
+type Cast struct {
+	GuestStar
+	CastID int `json:"cast_id"` // 演员ID
+}
+
+type TVCreditsResponse struct {
+	ID   int         `json:"id"`   // 电视剧ID
+	Cast []GuestStar `json:"cast"` // 演员列表
+	Crew []Crew      `json:"crew"` // 工作人员列表
+}
