@@ -121,7 +121,7 @@ type SearchPersonResponse struct {
 // https://developer.themoviedb.org/reference/search-collection
 func (tmdb *TMDB) SearchCollection(params SearchCollectionParams) (*SearchResponse[SearchCollectionResponse], error) {
 	var resp SearchResponse[SearchCollectionResponse]
-	if params.Language != nil {
+	if params.Language == nil {
 		params.Language = &tmdb.language
 	}
 	err := tmdb.DoRequest(
@@ -178,7 +178,7 @@ func (tmdb *TMDB) SearchKeyword(params SearchKeywordParams) (*SearchResponse[Sea
 // https://developer.themoviedb.org/reference/search-movie
 func (tmdb *TMDB) SearchMovie(params SearchMovieParams) (*SearchResponse[SearchMovieResponse], error) {
 	var resp SearchResponse[SearchMovieResponse]
-	if params.Language != nil {
+	if params.Language == nil {
 		params.Language = &tmdb.language
 	}
 	err := tmdb.DoRequest(
@@ -198,7 +198,7 @@ func (tmdb *TMDB) SearchMovie(params SearchMovieParams) (*SearchResponse[SearchM
 // https://developer.themoviedb.org/reference/search-multi
 func (tmdb *TMDB) SearchMulti(params SearchMultiParams) (*SearchResponse[SearchMultiResponse], error) {
 	var resp SearchResponse[SearchMultiResponse]
-	if params.Language != nil {
+	if params.Language == nil {
 		params.Language = &tmdb.language
 	}
 	err := tmdb.DoRequest(
@@ -219,7 +219,7 @@ func (tmdb *TMDB) SearchMulti(params SearchMultiParams) (*SearchResponse[SearchM
 // https://developer.themoviedb.org/reference/search-person
 func (tmdb *TMDB) SearchPerson(params SearchPersonParams) (*SearchResponse[SearchPersonResponse], error) {
 	var resp SearchResponse[SearchPersonResponse]
-	if params.Language != nil {
+	if params.Language == nil {
 		params.Language = &tmdb.language
 	}
 	err := tmdb.DoRequest(
@@ -240,7 +240,7 @@ func (tmdb *TMDB) SearchPerson(params SearchPersonParams) (*SearchResponse[Searc
 // https://developer.themoviedb.org/reference/search-tv
 func (tmdb *TMDB) SearchTV(params SearchTVSParams) (*SearchResponse[SearchTVResponse], error) {
 	var resp SearchResponse[SearchTVResponse]
-	if params.Language != nil {
+	if params.Language == nil {
 		params.Language = &tmdb.language
 	}
 	err := tmdb.DoRequest(
