@@ -54,6 +54,19 @@ func (meta *VideoMeta) GetTitle() string {
 	return meta.ENTitle
 }
 
+// 获取标题列表
+// 返回中文标题和英文标题的列表
+func (meta *VideoMeta) GetTitles() []string {
+	titles := make([]string, 0, 2)
+	if meta.CNTitle != "" {
+		titles = append(titles, meta.CNTitle)
+	}
+	if meta.ENTitle != "" {
+		titles = append(titles, meta.ENTitle)
+	}
+	return titles
+}
+
 func (meta *VideoMeta) GetResourceEffectStrings() []string {
 	var effects []string
 	for effect := range meta.ResourceEffect {

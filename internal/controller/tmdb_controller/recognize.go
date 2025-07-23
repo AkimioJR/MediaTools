@@ -62,13 +62,7 @@ func RecognizeMedia(videoMeta *meta.VideoMeta, mtype *meta.MediaType, tmdbID *ui
 		return GetInfo(*tmdbID, mtype)
 	}
 
-	var titles []string
-	if videoMeta.CNTitle != "" {
-		titles = append(titles, videoMeta.CNTitle)
-	}
-	if videoMeta.ENTitle != "" {
-		titles = append(titles, videoMeta.ENTitle)
-	}
+	titles := videoMeta.GetTitles()
 	for _, title := range titles {
 		if videoMeta.BeginSeason == nil {
 			logrus.Infof("正在识别「%s」...", title)
