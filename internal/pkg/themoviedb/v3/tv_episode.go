@@ -8,21 +8,44 @@ import (
 )
 
 type TVEpisodeDetail struct {
-	AirDate        string      `json:"air_date"`        // 首播日期
-	EpisodeNumber  int         `json:"episode_number"`  // 集数
-	EpisodeType    string      `json:"episode_type"`    // 集类型
-	ID             int         `json:"id"`              // 集 ID
-	Name           string      `json:"name"`            // 名称
-	Overview       string      `json:"overview"`        // 概述
-	ProductionCode string      `json:"production_code"` // 制作代码
-	Runtime        int         `json:"runtime"`         // 时长
-	SeasonNumber   int         `json:"season_number"`   // 季数
-	ShowID         int         `json:"show_id"`         // 电视剧 ID
-	StillPath      string      `json:"still_path"`      // 静态图片路径
-	VoteAverage    float64     `json:"vote_average"`    // 平均评分
-	VoteCount      int         `json:"vote_count"`      // 投票数
-	Crew           []Crew      `json:"crew"`            // 工作人员列表
-	GuestStars     []GuestStar `json:"guest_stars"`     // 特邀演员列表
+	AirDate string `json:"air_date"`
+	Crew    []struct {
+		Job                string  `json:"job"`
+		Department         string  `json:"department"`
+		CreditID           string  `json:"credit_id"`
+		Adult              bool    `json:"adult"`
+		Gender             int     `json:"gender"`
+		ID                 int     `json:"id"`
+		KnownForDepartment string  `json:"known_for_department"`
+		Name               string  `json:"name"`
+		OriginalName       string  `json:"original_name"`
+		Popularity         float64 `json:"popularity"`
+		ProfilePath        string  `json:"profile_path"`
+	} `json:"crew"`
+	EpisodeNumber int    `json:"episode_number"`
+	EpisodeType   string `json:"episode_type"`
+	GuestStars    []struct {
+		Character          string  `json:"character"`
+		CreditID           string  `json:"credit_id"`
+		Order              int     `json:"order"`
+		Adult              bool    `json:"adult"`
+		Gender             int     `json:"gender"`
+		ID                 int     `json:"id"`
+		KnownForDepartment string  `json:"known_for_department"`
+		Name               string  `json:"name"`
+		OriginalName       string  `json:"original_name"`
+		Popularity         float64 `json:"popularity"`
+		ProfilePath        string  `json:"profile_path"`
+	} `json:"guest_stars"`
+	Name           string  `json:"name"`
+	Overview       string  `json:"overview"`
+	ID             int     `json:"id"`
+	ProductionCode string  `json:"production_code"`
+	Runtime        int     `json:"runtime"`
+	SeasonNumber   int     `json:"season_number"`
+	StillPath      string  `json:"still_path"`
+	VoteAverage    float64 `json:"vote_average"`
+	VoteCount      int     `json:"vote_count"`
 }
 
 // 查询电视剧单集的详细信息。
