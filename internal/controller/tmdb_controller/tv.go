@@ -62,7 +62,7 @@ func SearchTVBySeason(name string, seasonYear int, seasonNumber int) (*schemas.M
 		seriesYear := series.FirstAirDate[:len("2025")]
 		if utils.FuzzyMatching(name, series.Name, series.OriginalName) &&
 			seriesYear == strconv.Itoa(seasonYear) {
-			return getTVDetail(series.ID)
+			return getTVSeriesDetail(series.ID)
 		}
 		names, err := getNames(series.ID, meta.MediaTypeTV)
 		if err != nil {
@@ -74,7 +74,7 @@ func SearchTVBySeason(name string, seasonYear int, seasonNumber int) (*schemas.M
 			continue
 		}
 		if matchSeasonFN(series) {
-			info, err := getTVDetail(series.ID)
+			info, err := getTVSeriesDetail(series.ID)
 			if err != nil {
 				return nil, fmt.Errorf("获取电视剧「%d」详情失败: %v", series.ID, err)
 			}
@@ -116,7 +116,7 @@ func SearchTVByName(name string, year *int) (*schemas.MediaInfo, error) {
 	})
 	for _, series := range tvSeries {
 		if utils.FuzzyMatching(name, series.Name, series.OriginalName) {
-			info, err := getTVDetail(series.ID)
+			info, err := getTVSeriesDetail(series.ID)
 			if err != nil {
 				return nil, fmt.Errorf("获取电视剧「%d」详情失败: %v", series.ID, err)
 			}

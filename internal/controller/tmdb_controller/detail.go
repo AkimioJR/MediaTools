@@ -68,7 +68,7 @@ func getMovieDetail(tmdbID int) (*schemas.MediaInfo, error) {
 	return &mediaInfo, nil
 }
 
-func getTVDetail(tmdbID int) (*schemas.MediaInfo, error) {
+func getTVSeriesDetail(tmdbID int) (*schemas.MediaInfo, error) {
 	logrus.Infof("获取电视剧详情，TMDB ID: %d", tmdbID)
 
 	detail, err := client.GetTVSeriesDetails(tmdbID, nil)
