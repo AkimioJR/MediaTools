@@ -23,8 +23,11 @@ type TMDB struct {
 }
 
 type tmdbConfig struct {
-	apiURL string
-	client *http.Client
+	apiURL   string
+	imgURL   string
+	language string
+	client   *http.Client
+	limiter  *limiter.Limiter
 }
 type TMDBOptions func(c *tmdbConfig)
 
@@ -34,9 +37,27 @@ func CustomAPIURL(apiURL string) TMDBOptions {
 	}
 }
 
+func CustomImageURL(imgURL string) TMDBOptions {
+	return func(c *tmdbConfig) {
+		c.imgURL = imgURL
+	}
+}
+
 func CustomHTTPClient(client *http.Client) TMDBOptions {
 	return func(c *tmdbConfig) {
 		c.client = client
+	}
+}
+
+func CustomLanguage(language string) TMDBOptions {
+	return func(c *tmdbConfig) {
+		c.language = language
+	}
+}
+
+func CustomLimiter(d time.Duration, maxCount uint64) TMDBOptions {
+	return func(c *tmdbConfig) {
+		c.limiter = limiter.NewLimiter(d, maxCount)
 	}
 }
 
