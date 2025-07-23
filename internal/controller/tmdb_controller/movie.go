@@ -45,7 +45,7 @@ func SearchMovieByName(name string, year *int) (*schemas.MediaInfo, error) {
 	})
 	for _, movie := range movies {
 		if utils.FuzzyMatching(name, movie.Title, movie.OriginalTitle) {
-			info, err := getMovieDetail(movie.ID)
+			info, err := GetMovieDetail(movie.ID)
 			if err != nil {
 				return nil, fmt.Errorf("获取电影「%d」详情失败: %v", movie.ID, err)
 			}

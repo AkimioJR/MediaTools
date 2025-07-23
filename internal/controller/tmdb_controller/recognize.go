@@ -12,8 +12,8 @@ import (
 func GetInfo(tmdbID int, mtype *meta.MediaType) (*schemas.MediaInfo, error) {
 	if mtype == nil || *mtype == meta.MediaTypeUnknown {
 		logrus.Infof("未指定 TMDB ID 「%d」的媒体类型", tmdbID)
-		movieDetail, movieErr := getMovieDetail(tmdbID)
-		tvDetail, tvErr := getTVSeriesDetail(tmdbID)
+		movieDetail, movieErr := GetMovieDetail(tmdbID)
+		tvDetail, tvErr := GetTVSeriesDetail(tmdbID)
 
 		switch {
 		case movieErr == nil && tvErr == nil:
@@ -34,9 +34,9 @@ func GetInfo(tmdbID int, mtype *meta.MediaType) (*schemas.MediaInfo, error) {
 
 	switch *mtype {
 	case meta.MediaTypeMovie:
-		return getMovieDetail(tmdbID)
+		return GetMovieDetail(tmdbID)
 	case meta.MediaTypeTV:
-		return getTVSeriesDetail(tmdbID)
+		return GetTVSeriesDetail(tmdbID)
 	default:
 		return nil, fmt.Errorf("不支持的媒体类型: 「%s」", mtype)
 	}

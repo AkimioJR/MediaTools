@@ -51,7 +51,7 @@ func getNames(tmdbID int, mtype meta.MediaType) ([]string, error) {
 	return names, nil
 }
 
-func getMovieDetail(tmdbID int) (*schemas.MediaInfo, error) {
+func GetMovieDetail(tmdbID int) (*schemas.MediaInfo, error) {
 	logrus.Infof("获取电影详情，TMDB ID: %d", tmdbID)
 
 	detail, err := client.GetMovieDetails(tmdbID, nil)
@@ -68,20 +68,22 @@ func getMovieDetail(tmdbID int) (*schemas.MediaInfo, error) {
 	return &mediaInfo, nil
 }
 
-func getTVSeriesDetail(tmdbID int) (*schemas.MediaInfo, error) {
-	logrus.Infof("获取电视剧详情，TMDB ID: %d", tmdbID)
+func GetTVSeriesDetail(seriesID int) (*schemas.MediaInfo, error) {
+	logrus.Infof("获取电视剧详情，TMDB ID: %d", seriesID)
 
-	detail, err := client.GetTVSeriesDetails(tmdbID, nil)
+	detail, err := client.GetTVSeriesDetails(seriesID, nil)
 	if err != nil {
-		return nil, fmt.Errorf("获取电视剧详情失败，TMDB ID: %d, 错误: %v", tmdbID, err)
+		return nil, fmt.Errorf("获取电视剧详情失败，TMDB ID: %d, 错误: %v", seriesID, err)
 	}
 
 	var mediaInfo schemas.MediaInfo
-	mediaInfo.TMDBID = tmdbID
+	mediaInfo.TMDBID = seriesID
 	mediaInfo.MediaType = meta.MediaTypeTV
 	mediaInfo.TMDBInfo = schemas.TMDBInfo{
 		TVInfo: schemas.TMDBTVInfo{
-			SeriesInfo: detail,
+			SeriesInfo:    detail,
+			SeasonNumber:  -1, // 默认值 -1，表示未指定季数
+			EpisodeNumber: -1, // 默认值 -1，表示未指定集数
 		},
 	}
 	return &mediaInfo, nil
