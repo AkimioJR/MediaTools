@@ -1096,6 +1096,24 @@ func TestParseMetaVideo(t *testing.T) {
 				version:        1,
 			},
 		},
+		{
+			input: "【喵萌奶茶屋】★剧场版★[青春猪头少年不会梦到娇怜外出妹/Seishun Buta Yarou wa Odekake Sister no Yume o Minai][BDRip][1080p][繁日双语][招募翻译时轴]",
+			expected: expectedMeta{
+				mediaType:      meta.MediaTypeUnknown,
+				cntitle:        "青春猪头少年不会梦到娇怜外出妹",
+				entitle:        "Seishun Buta Yarou wa Odekake Sister no Yume o Minai",
+				year:           0,
+				part:           "",
+				season:         "",
+				episode:        "",
+				resourcePix:    meta.ResourcePix1080p,
+				resourceType:   meta.ResourceTypeBDRip,
+				resourceEffect: make(map[meta.ResourceEffect]struct{}),
+				videoEncode:    encode.VideoEncodeUnknown,
+				audioEncode:    encode.AudioEncodeUnknown,
+				version:        1,
+			},
+		},
 	}
 
 	for _, tc := range testCases {
