@@ -14,6 +14,7 @@ type TVSeasonDetail struct {
 	Episodes     []TVEpisode `json:"episodes"`      // 季内剧集列表
 	Crew         []Crew      `json:"crew"`          // 工作人员列表
 	GuestStars   []GuestStar `json:"guest_stars"`   // 特邀演员列表
+	Overview     string      `json:"overview"`      // 概述
 	PosterPath   string      `json:"poster_path"`   // 海报图片路径
 	SeasonNumber int         `json:"season_number"` // 季数
 	VoteAverage  float64     `json:"vote_average"`  // 平均评分

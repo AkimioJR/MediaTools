@@ -84,7 +84,6 @@ func (tmdb *TMDB) GetTVSeriesAlternativeTitles(seriesID int, country *string) ([
 	return response.Results, nil
 }
 
-
 // 获取一部电视剧最新一季的演职人员名单。
 // Get the latest season credits of a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}/credits

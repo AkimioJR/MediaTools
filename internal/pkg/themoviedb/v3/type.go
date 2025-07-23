@@ -83,23 +83,31 @@ type TVSeason struct {
 }
 
 type Crew struct {
-	Creator
-	Department         string  `json:"department"`           // 部门
-	Job                string  `json:"job"`                  // 职位
+	Job                string  `json:"job"`                  // 工作职位
+	Department         string  `json:"department"`           // 工作部门
+	CreditID           string  `json:"credit_id"`            // 唯一标识 ID
 	Adult              bool    `json:"adult"`                // 是否成人内容
+	Gender             int     `json:"gender"`               // 性别 0-> 未知 1-> 女性 2-> 男性
+	ID                 int     `json:"id"`                   // 唯一标识 ID
 	KnownForDepartment string  `json:"known_for_department"` // 知名领域
+	Name               string  `json:"name"`                 // 姓名
 	OriginalName       string  `json:"original_name"`        // 原始姓名
 	Popularity         float64 `json:"popularity"`           // 人气
+	ProfilePath        string  `json:"profile_path"`         // 个人资料图片路径
 }
 
 type GuestStar struct {
-	Creator
 	Character          string  `json:"character"`            // 角色名称
-	Order              int     `json:"order"`                // 出场顺序
+	CreditID           string  `json:"credit_id"`            // 唯一标识 ID
+	Order              int     `json:"order"`                // 排序顺序
 	Adult              bool    `json:"adult"`                // 是否成人内容
+	Gender             int     `json:"gender"`               // 性别 0-> 未知 1-> 女性 2-> 男性
+	ID                 int     `json:"id"`                   // 唯一标识 ID
 	KnownForDepartment string  `json:"known_for_department"` // 知名领域
+	Name               string  `json:"name"`                 // 姓名
 	OriginalName       string  `json:"original_name"`        // 原始姓名
 	Popularity         float64 `json:"popularity"`           // 人气
+	ProfilePath        string  `json:"profile_path"`         // 个人资料图片路径
 }
 
 type TVImage struct {

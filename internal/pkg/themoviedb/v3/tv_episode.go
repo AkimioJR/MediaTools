@@ -8,17 +8,21 @@ import (
 )
 
 type TVEpisodeDetail struct {
-	Keyword
-	Vote
 	AirDate        string      `json:"air_date"`        // 首播日期
-	Crew           []Crew      `json:"crew"`            // 工作人员列表
 	EpisodeNumber  int         `json:"episode_number"`  // 集数
-	GuestStars     []GuestStar `json:"guest_stars"`     // 特邀演员列表
+	EpisodeType    string      `json:"episode_type"`    // 集类型
+	ID             int         `json:"id"`              // 集 ID
+	Name           string      `json:"name"`            // 名称
 	Overview       string      `json:"overview"`        // 概述
 	ProductionCode string      `json:"production_code"` // 制作代码
 	Runtime        int         `json:"runtime"`         // 时长
 	SeasonNumber   int         `json:"season_number"`   // 季数
+	ShowID         int         `json:"show_id"`         // 电视剧 ID
 	StillPath      string      `json:"still_path"`      // 静态图片路径
+	VoteAverage    float64     `json:"vote_average"`    // 平均评分
+	VoteCount      int         `json:"vote_count"`      // 投票数
+	Crew           []Crew      `json:"crew"`            // 工作人员列表
+	GuestStars     []GuestStar `json:"guest_stars"`     // 特邀演员列表
 }
 
 // 查询电视剧单集的详细信息。
