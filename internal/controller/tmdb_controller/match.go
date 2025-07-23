@@ -1,9 +1,9 @@
 package tmdb_controller
 
 import (
+	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/pkg/themoviedb/v3"
 	"MediaTools/internal/schemas"
-	"MediaTools/meta"
 	"MediaTools/utils"
 	"fmt"
 	"sort"

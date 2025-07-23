@@ -1,8 +1,8 @@
 package schemas
 
 import (
+	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/pkg/themoviedb/v3"
-	"MediaTools/meta"
 )
 
 type TMDBTVInfo struct {

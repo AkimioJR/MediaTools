@@ -1,8 +1,8 @@
 package tmdb_controller
 
 import (
+	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
-	"MediaTools/meta"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
@@ -43,12 +43,12 @@ func GetInfo(tmdbID uint64, mtype *meta.MediaType) (*schemas.MediaInfo, error) {
 }
 
 // RecognizeMedia 识别媒体信息
-// metaVideo 识别的元数据
+// videoMeta 识别的元数据
 // mtype 媒体类型
 // tmdbID TMDB ID
 // 返回识别后的媒体信息
-func RecognizeMedia(metaVideo *meta.MetaVideo, mtype *meta.MediaType, tmdbID *uint64) (*schemas.MediaInfo, error) {
-	if tmdbID == nil && metaVideo == nil {
+func RecognizeMedia(videoMeta *meta.VideoMeta, mtype *meta.MediaType, tmdbID *uint64) (*schemas.MediaInfo, error) {
+	if tmdbID == nil && videoMeta == nil {
 		return nil, fmt.Errorf("没有提供 TMDB ID 或元数据，无法识别媒体信息")
 	}
 
@@ -63,17 +63,17 @@ func RecognizeMedia(metaVideo *meta.MetaVideo, mtype *meta.MediaType, tmdbID *ui
 	}
 
 	var titles []string
-	if metaVideo.GetCNTitle() != "" {
-		titles = append(titles, metaVideo.GetCNTitle())
+	if videoMeta.CNTitle != "" {
+		titles = append(titles, videoMeta.CNTitle)
 	}
-	if metaVideo.GetENTitle() != "" {
-		titles = append(titles, metaVideo.GetENTitle())
+	if videoMeta.ENTitle != "" {
+		titles = append(titles, videoMeta.ENTitle)
 	}
 	for _, title := range titles {
-		if metaVideo.GetBeginSeason() == nil {
+		if videoMeta.BeginSeason == nil {
 			logrus.Infof("正在识别「%s」...", title)
 		} else {
-			logrus.Infof("正在识别「%s（第 %d 季）」...", title, *metaVideo.GetBeginSeason())
+			logrus.Infof("正在识别「%s（第 %d 季）」...", title, *videoMeta.BeginSeason)
 		}
 
 		switch {
@@ -87,11 +87,11 @@ func RecognizeMedia(metaVideo *meta.MetaVideo, mtype *meta.MediaType, tmdbID *ui
 
 		case *mtype == meta.MediaTypeTV:
 			var year *int
-			if metaVideo.GetYear() > 0 {
-				intYear := int(metaVideo.GetYear())
+			if videoMeta.Year > 0 {
+				intYear := int(videoMeta.Year)
 				year = &intYear
 			}
-			info, err := Match(title, *mtype, nil, year, metaVideo.GetBeginSeason())
+			info, err := Match(title, *mtype, nil, year, videoMeta.BeginSeason)
 			if err == nil {
 				logrus.Infof("识别「%s」电视剧信息成功", title)
 				return info, nil

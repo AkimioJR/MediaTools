@@ -2,7 +2,7 @@ package model
 
 import (
 	"MediaTools/encode"
-	"MediaTools/meta"
+	"MediaTools/internal/pkg/meta"
 )
 
 type MediaInfo struct {
