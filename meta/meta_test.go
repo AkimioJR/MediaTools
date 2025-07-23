@@ -1183,7 +1183,7 @@ func TestParseMetaVideoByPath(t *testing.T) {
 			expected: expectedMeta{
 				mediaType:      meta.MediaTypeUnknown,
 				cntitle:        "",
-				entitle:        "Inception 2010",
+				entitle:        "Inception",
 				year:           2010,
 				part:           "",
 				season:         "",
@@ -1237,7 +1237,7 @@ func TestParseMetaVideoByPath(t *testing.T) {
 			expected: expectedMeta{
 				mediaType:      meta.MediaTypeUnknown,
 				cntitle:        "",
-				entitle:        "Avatar 2009",
+				entitle:        "Avatar",
 				year:           2009,
 				part:           "",
 				season:         "",
