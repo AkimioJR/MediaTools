@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/allegro/bigcache"
 )
 
 type TMDB struct {
@@ -20,6 +22,7 @@ type TMDB struct {
 	language string
 	client   *http.Client
 	limiter  *limiter.Limiter
+	cache    *bigcache.BigCache
 }
 
 type tmdbConfig struct {
@@ -66,20 +69,36 @@ func NewTMDB(apiKey string, opts ...TMDBOptions) *TMDB {
 		apiURL: "https://api.themoviedb.org",
 		client: &http.Client{},
 	}
+
+	cache, _ := bigcache.NewBigCache(bigcache.DefaultConfig(10 * time.Minute))
+
 	for _, opt := range opts {
 		opt(config)
 	}
-	return &TMDB{
+	client := TMDB{
 		apiURL:   config.apiURL,
 		imgURL:   "https://image.tmdb.org",
 		apiKey:   apiKey,
 		language: "zh-CN",
 		client:   config.client,
 		limiter:  limiter.NewLimiter(time.Second, 20),
+		cache:    cache,
 	}
+	return &client
 }
 
 func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body io.Reader, resp any) error {
+	var (
+		data []byte
+		err  error
+	)
+	cacheKey := method + "|" + path + "|" + query.Encode()
+	if method == http.MethodGet && body == nil {
+		if data, err = tmdb.cache.Get(cacheKey); err == nil {
+			return json.Unmarshal(data, resp)
+		}
+	}
+
 	query.Set("api_key", tmdb.apiKey)
 	url := tmdb.apiURL + "/3" + path + "?" + query.Encode()
 	req, err := http.NewRequest(method, url, body)
@@ -100,8 +119,20 @@ func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body i
 		}
 		return fmt.Errorf("decode error response failed: %w", err)
 	}
-	if err := json.NewDecoder(res.Body).Decode(resp); err != nil {
-		return fmt.Errorf("decode response failed: %w", err)
+	data, err = io.ReadAll(res.Body)
+	if err != nil {
+		return fmt.Errorf("read response body failed: %w", err)
+	}
+	err = json.Unmarshal(data, resp)
+	if err != nil {
+		return fmt.Errorf("unmarshal response failed: %w", err)
+	}
+
+	// 写入缓存
+	if method == http.MethodGet && body == nil {
+		if data, err = json.Marshal(resp); err == nil {
+			_ = tmdb.cache.Set(cacheKey, data)
+		}
 	}
 	return nil
 }
