@@ -137,8 +137,12 @@ func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body i
 	return nil
 }
 
+func (tmdb *TMDB) GetImageURL(path string) string {
+	return tmdb.imgURL + "/t/p/original" + path
+}
+
 func (tmdb *TMDB) DownloadImage(path string) (image.Image, error) {
-	url := tmdb.imgURL + "/t/p/original" + path
+	url := tmdb.GetImageURL(path)
 	resp, err := tmdb.client.Get(url)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("下载图片「%s」失败", url))
