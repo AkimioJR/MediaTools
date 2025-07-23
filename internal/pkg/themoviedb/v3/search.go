@@ -7,10 +7,10 @@ import (
 )
 
 type SearchResponse[T any] struct {
-	Page         uint64 `json:"page"`          // 当前页码
-	TotalPages   uint64 `json:"total_pages"`   // 总页数
-	Result       []T    `json:"results"`       // 搜索结果
-	TotalResults uint64 `json:"total_results"` // 总结果数
+	Page         int `json:"page"`          // 当前页码
+	TotalPages   int `json:"total_pages"`   // 总页数
+	Result       []T `json:"results"`       // 搜索结果
+	TotalResults int `json:"total_results"` // 总结果数
 }
 
 // ========= 请求字段 =========
@@ -69,14 +69,14 @@ type SearchCollectionResponse struct {
 
 type BaseMediaResponse struct {
 	Vote
-	Adult            bool     `json:"adult"`             // 是否成人内容
-	BackDropPath     string   `json:"backdrop_path"`     // 背景图片路径
-	GenreIDs         []uint64 `json:"genre_ids"`         // 类型ID列表
-	ID               uint64   `json:"id"`                // ID
-	OriginalLanguage string   `json:"original_language"` // 原始语言
-	Overview         string   `json:"overview"`          // 概述
-	Popularity       float64  `json:"popularity"`        // 人气
-	PosterPath       string   `json:"poster_path"`       // 海报图片路径
+	Adult            bool    `json:"adult"`             // 是否成人内容
+	BackDropPath     string  `json:"backdrop_path"`     // 背景图片路径
+	GenreIDs         []int   `json:"genre_ids"`         // 类型ID列表
+	ID               int     `json:"id"`                // ID
+	OriginalLanguage string  `json:"original_language"` // 原始语言
+	Overview         string  `json:"overview"`          // 概述
+	Popularity       float64 `json:"popularity"`        // 人气
+	PosterPath       string  `json:"poster_path"`       // 海报图片路径
 }
 
 type SearchMovieResponse struct {
@@ -106,8 +106,8 @@ type SearchMultiResponse struct {
 
 type SearchPersonResponse struct {
 	Adult              bool                  `json:"adult"`                // 是否成人内容
-	Gender             uint64                `json:"gender"`               // 性别
-	ID                 uint64                `json:"id"`                   // ID
+	Gender             int                   `json:"gender"`               // 性别
+	ID                 int                   `json:"id"`                   // ID
 	KnownForDepartment string                `json:"known_for_department"` // 知名部门
 	Name               string                `json:"name"`                 // 姓名
 	OriginalName       string                `json:"original_name"`        // 原始姓名

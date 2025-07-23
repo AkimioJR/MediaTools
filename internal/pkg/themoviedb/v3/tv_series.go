@@ -12,11 +12,11 @@ type TVSeriesDetail struct {
 	Adult               bool       `json:"adult"`                // 是否成人内容
 	BackDropPath        string     `json:"backdrop_path"`        // 背景图片
 	CreatedBy           []Creator  `json:"created_by"`           // 创作者列表
-	EpisodeRunTime      []uint64   `json:"episode_run_time"`     // 每集时长
+	EpisodeRunTime      []int      `json:"episode_run_time"`     // 每集时长
 	FirstAirDate        string     `json:"first_air_date"`       // 首播日期
 	Genres              []Genre    `json:"genres"`               // 类型列表
 	Homepage            string     `json:"homepage"`             // 主页
-	ID                  uint64     `json:"id"`                   // ID
+	ID                  int        `json:"id"`                   // ID
 	InProduction        bool       `json:"in_production"`        // 是否在连载中
 	Languages           []string   `json:"languages"`            // 语言列表
 	LastAirDate         string     `json:"last_air_date"`        // 最后播出日期
@@ -24,8 +24,8 @@ type TVSeriesDetail struct {
 	Name                string     `json:"name"`                 // 名称
 	NextEpisodeToAir    TVEpisode  `json:"next_episode_to_air"`  // 下一集名称
 	Networks            []Network  `json:"networks"`             // 播出平台
-	NumberOfEpisodes    uint64     `json:"number_of_episodes"`   // 总集
-	NumberOfSeasons     uint64     `json:"number_of_seasons"`    // 总季数
+	NumberOfEpisodes    int        `json:"number_of_episodes"`   // 总集
+	NumberOfSeasons     int        `json:"number_of_seasons"`    // 总季数
 	OriginCountry       []string   `json:"origin_country"`       // 原始国家列表
 	OriginalLanguage    string     `json:"original_language"`    // 原始语言
 	OriginalName        string     `json:"original_name"`        // 原始名称
@@ -45,7 +45,7 @@ type TVSeriesDetail struct {
 // Get the details of a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}
 // https://developer.themoviedb.org/reference/tv-series-details
-func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVSeriesDetail, error) {
+func (tmdb *TMDB) GetTVSeriesDetails(seriesID int, language *string) (*TVSeriesDetail, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
@@ -67,14 +67,14 @@ func (tmdb *TMDB) GetTVSeriesDetails(seriesID uint64, language *string) (*TVSeri
 // https://developer.themoviedb.org/reference/tv-series-alternative-titles
 //
 // country 可选，指定国家(指定一个 ISO-3166-1 值来筛选结果)
-func (tmdb *TMDB) GetTVSeriesAlternativeTitles(seriesID uint64, country *string) ([]Title, error) {
+func (tmdb *TMDB) GetTVSeriesAlternativeTitles(seriesID int, country *string) ([]Title, error) {
 	params := url.Values{}
 	if country != nil {
 		params.Set("country", *country)
 	}
 
 	var response struct {
-		ID      uint64  `json:"id"`      // 电视剧ID
+		ID      int     `json:"id"`      // 电视剧ID
 		Results []Title `json:"results"` // 结果列表
 	}
 	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/alternative_titles", params, nil, &response)
@@ -86,15 +86,15 @@ func (tmdb *TMDB) GetTVSeriesAlternativeTitles(seriesID uint64, country *string)
 
 type TVSeriesGrop struct {
 	Description  string    `json:"description"`   // 描述
-	EpisodeCount uint64    `json:"episode_count"` // 集数
-	ID           uint64    `json:"id"`            // ID
+	EpisodeCount int       `json:"episode_count"` // 集数
+	ID           int       `json:"id"`            // ID
 	Name         string    `json:"name"`          // 名称
 	Networks     []Network `json:"networks"`      // 播出平台
-	Type         uint64    `json:"type"`          // 类型
+	Type         int       `json:"type"`          // 类型
 }
 
 type TVSeriesEpisodeGroupsResponse struct {
-	ID      uint64         `json:"id"`      // 电视剧ID
+	ID      int            `json:"id"`      // 电视剧ID
 	Results []TVSeriesGrop `json:"results"` // 结果列表
 }
 
@@ -102,7 +102,7 @@ type TVSeriesEpisodeGroupsResponse struct {
 // Get the episode groups that have been added to a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}/episode_groups
 // https://developer.themoviedb.org/reference/tv-series-episode-groups
-func (tmdb *TMDB) GetTVSeriesEpisodeGroups(seriesID uint64) (*TVSeriesEpisodeGroupsResponse, error) {
+func (tmdb *TMDB) GetTVSeriesEpisodeGroups(seriesID int) (*TVSeriesEpisodeGroupsResponse, error) {
 	params := url.Values{}
 	response := TVSeriesEpisodeGroupsResponse{}
 	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/episode_groups", params, nil, &response)
@@ -116,7 +116,7 @@ func (tmdb *TMDB) GetTVSeriesEpisodeGroups(seriesID uint64) (*TVSeriesEpisodeGro
 // Get the images that belong to a TV series.
 // https://api.themoviedb.org/3/tv/{series_id}/images
 // https://developer.themoviedb.org/reference/tv-series-images
-func (tmdb *TMDB) GetTVSeriesImages(seriesID uint64, IncludeImageLanguage *string, language *string) (*Image, error) {
+func (tmdb *TMDB) GetTVSeriesImages(seriesID int, IncludeImageLanguage *string, language *string) (*Image, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
@@ -137,7 +137,7 @@ func (tmdb *TMDB) GetTVSeriesImages(seriesID uint64, IncludeImageLanguage *strin
 }
 
 type TVKeyword struct {
-	ID       uint64    `json:"id"`       // 电视剧ID
+	ID       int       `json:"id"`       // 电视剧ID
 	Keywords []Keyword `json:"keywords"` // 关键词列表
 }
 
@@ -145,7 +145,7 @@ type TVKeyword struct {
 // Get the keywords for a movie by its ID.
 // https://api.themoviedb.org/3/tv/{series_id}/keywords
 // https://developer.themoviedb.org/reference/movie-keywords
-func (tmdb *TMDB) TVSeriesKeywords(seriesID uint64) (*TVKeyword, error) {
+func (tmdb *TMDB) TVSeriesKeywords(seriesID int) (*TVKeyword, error) {
 	kyword := TVKeyword{}
 	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/keywords", url.Values{}, nil, &kyword)
 	if err != nil {
@@ -161,10 +161,10 @@ func (tmdb *TMDB) TVSeriesKeywords(seriesID uint64) (*TVKeyword, error) {
 // Get the translations that have been added to a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}/translations
 // https://developer.themoviedb.org/reference/tv-series-translations
-func (tmdb *TMDB) GetTVSeriesTranslations(seriesID uint64) ([]Translation, error) {
+func (tmdb *TMDB) GetTVSeriesTranslations(seriesID int) ([]Translation, error) {
 	params := url.Values{}
 	var response struct {
-		ID           uint64        `json:"id"`           // 电视剧ID
+		ID           int           `json:"id"`           // 电视剧ID
 		Translations []Translation `json:"translations"` // 翻译列表
 	}
 	err := tmdb.DoRequest(http.MethodGet, "/tv/"+strconv.Itoa(int(seriesID))+"/translations", params, nil, &response)

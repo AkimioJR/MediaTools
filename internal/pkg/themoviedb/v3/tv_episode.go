@@ -12,12 +12,12 @@ type TVEpisodeDetail struct {
 	Vote
 	AirDate        string      `json:"air_date"`        // 首播日期
 	Crew           []Crew      `json:"crew"`            // 工作人员列表
-	EpisodeNumber  uint64      `json:"episode_number"`  // 集数
+	EpisodeNumber  int         `json:"episode_number"`  // 集数
 	GuestStars     []GuestStar `json:"guest_stars"`     // 特邀演员列表
 	Overview       string      `json:"overview"`        // 概述
 	ProductionCode string      `json:"production_code"` // 制作代码
-	Runtime        uint64      `json:"runtime"`         // 时长
-	SeasonNumber   uint64      `json:"season_number"`   // 季数
+	Runtime        int         `json:"runtime"`         // 时长
+	SeasonNumber   int         `json:"season_number"`   // 季数
 	StillPath      string      `json:"still_path"`      // 静态图片路径
 }
 
@@ -25,7 +25,7 @@ type TVEpisodeDetail struct {
 // Query the details of a TV episode.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/episode/{episode_number}
 // https://developer.themoviedb.org/reference/tv-episode-details
-func (tmdb *TMDB) GetTVEpisodeDetail(seriesID uint64, seasonNumber uint64, episodeNumber uint64, language *string) (*TVEpisodeDetail, error) {
+func (tmdb *TMDB) GetTVEpisodeDetail(seriesID int, seasonNumber int, episodeNumber int, language *string) (*TVEpisodeDetail, error) {
 	var resp TVEpisodeDetail
 
 	params := url.Values{}
@@ -49,7 +49,7 @@ func (tmdb *TMDB) GetTVEpisodeDetail(seriesID uint64, seasonNumber uint64, episo
 }
 
 type TVEpisodeImage struct {
-	ID     uint64    `json:"id"`
+	ID     int       `json:"id"`
 	Stills []TVImage `json:"stills"`
 }
 
@@ -57,7 +57,7 @@ type TVEpisodeImage struct {
 // Get the images that belong to a TV episode.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/episode/{episode_number}/images
 // https://developer.themoviedb.org/reference/tv-episode-images
-func (tmdb *TMDB) GetTVEpisodeImage(seriesID uint64, seasonNumber uint64, episodeNumber uint64, language *string) (*TVEpisodeImage, error) {
+func (tmdb *TMDB) GetTVEpisodeImage(seriesID int, seasonNumber int, episodeNumber int, language *string) (*TVEpisodeImage, error) {
 	var img TVEpisodeImage
 
 	params := url.Values{}

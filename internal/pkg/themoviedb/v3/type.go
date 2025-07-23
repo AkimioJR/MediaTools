@@ -1,13 +1,13 @@
 package themoviedb
 
 type Keyword struct {
-	ID   uint64 `json:"id"`   // 关键词ID
+	ID   int    `json:"id"`   // 关键词ID
 	Name string `json:"name"` // 关键词名称
 }
 
 type Vote struct {
 	VoteAverage float64 `json:"vote_average"` // 平均评分
-	VoteCount   uint64  `json:"vote_count"`   // 评分数量
+	VoteCount   int     `json:"vote_count"`   // 评分数量
 }
 type Genre Keyword // 类型
 
@@ -37,15 +37,15 @@ type Collection struct {
 type Photo struct {
 	Vote
 	AspectRatio float64 `json:"aspect_ratio"` // 纵横比
-	Height      uint64  `json:"height"`       // 高度
+	Height      int     `json:"height"`       // 高度
 	ISO         string  `json:"iso_639_1"`    // ISO 639-1 语言代码
 	FilePath    string  `json:"file_path"`    // 文件路径
-	Width       uint64  `json:"width"`        // 宽度
+	Width       int     `json:"width"`        // 宽度
 }
 
 type Image struct {
 	BackDrops []Photo `json:"backdrops"` // 背景图片列表
-	ID        uint64  `json:"id"`        // ID
+	ID        int     `json:"id"`        // ID
 	Logos     []Photo `json:"logos"`     // Logo图片列表
 	Posters   []Photo `json:"posters"`   // 海报图片列表
 }
@@ -64,21 +64,21 @@ type TVEpisode struct {
 	Vote
 	Overview       string `json:"overview"`        // 概述
 	AirDate        string `json:"air_date"`        // 首播日期
-	EpisodeNumber  uint64 `json:"episode_number"`  // 集数
+	EpisodeNumber  int    `json:"episode_number"`  // 集数
 	ProductionCode string `json:"production_code"` // 制作代码
-	Runtime        uint64 `json:"runtime"`         // 时长
-	SeasonNumber   uint64 `json:"season_number"`   // 季数
-	ShowID         uint64 `json:"show_id"`         // 电视剧ID
+	Runtime        int    `json:"runtime"`         // 时长
+	SeasonNumber   int    `json:"season_number"`   // 季数
+	ShowID         int    `json:"show_id"`         // 电视剧ID
 	StillPath      string `json:"still_path"`      // 静态图片路径
 }
 
 type TVSeason struct {
 	Keyword
 	AirDate      string  `json:"air_date"`      // 首播日期
-	EpisodeCount uint64  `json:"episode_count"` // 集数
+	EpisodeCount int     `json:"episode_count"` // 集数
 	Overview     string  `json:"overview"`      // 概述
 	PosterPath   string  `json:"poster_path"`   // 海报图片路径
-	SeasonNumber uint64  `json:"season_number"` // 季数
+	SeasonNumber int     `json:"season_number"` // 季数
 	VoteAverage  float64 `json:"vote_average"`  // 平均评分
 }
 
@@ -95,7 +95,7 @@ type Crew struct {
 type GuestStar struct {
 	Creator
 	Charactor          string  `json:"character"`            // 角色名称
-	Order              uint64  `json:"order"`                // 出场顺序
+	Order              int     `json:"order"`                // 出场顺序
 	Adult              bool    `json:"adult"`                // 是否成人内容
 	KnownForDepartment string  `json:"known_for_department"` // 知名领域
 	OriginalName       string  `json:"original_name"`        // 原始姓名
@@ -105,10 +105,10 @@ type GuestStar struct {
 type TVImage struct {
 	Vote
 	AspectRatio float64 `json:"aspect_ratio"` // 图片宽高比
-	Height      uint64  `json:"height"`       // 图片高度
+	Height      int     `json:"height"`       // 图片高度
 	ISO         string  `json:"iso_639_1"`    // ISO 639-1 语言代码
 	FilePath    string  `json:"file_path"`    // 图片文件路径
-	Width       uint64  `json:"width"`        // 图片宽度
+	Width       int     `json:"width"`        // 图片宽度
 }
 
 // 标题/别名

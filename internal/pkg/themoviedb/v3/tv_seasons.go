@@ -15,7 +15,7 @@ type TVSeasonDetail struct {
 	Crew         []Crew      `json:"crew"`          // 工作人员列表
 	GuestStars   []GuestStar `json:"guest_stars"`   // 特邀演员列表
 	PosterPath   string      `json:"poster_path"`   // 海报图片路径
-	SeasonNumber uint64      `json:"season_number"` // 季数
+	SeasonNumber int         `json:"season_number"` // 季数
 	VoteAverage  float64     `json:"vote_average"`  // 平均评分
 }
 
@@ -23,7 +23,7 @@ type TVSeasonDetail struct {
 // Query the details of a TV season.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}
 // https://developer.themoviedb.org/reference/tv-season-details
-func (tmdb *TMDB) GetTVSeasonDetail(seriesID uint64, seasonNumber uint64, language *string) (*TVSeasonDetail, error) {
+func (tmdb *TMDB) GetTVSeasonDetail(seriesID int, seasonNumber int, language *string) (*TVSeasonDetail, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
@@ -40,7 +40,7 @@ func (tmdb *TMDB) GetTVSeasonDetail(seriesID uint64, seasonNumber uint64, langua
 }
 
 type TVSeasonImageResponse struct {
-	ID      uint64    `json:"id"`      // 电视剧ID
+	ID      int       `json:"id"`      // 电视剧ID
 	Posters []TVImage `json:"posters"` // 海报图片列表
 }
 
@@ -48,7 +48,7 @@ type TVSeasonImageResponse struct {
 // Get the images that belong to a TV season.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/images
 // https://developer.themoviedb.org/reference/tv-season-images
-func (tmdb *TMDB) GetTVSeasonImage(series_id uint64, season_number uint64, language *string) (*TVSeasonImageResponse, error) {
+func (tmdb *TMDB) GetTVSeasonImage(series_id int, season_number int, language *string) (*TVSeasonImageResponse, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
