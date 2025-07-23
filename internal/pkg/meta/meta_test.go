@@ -12,7 +12,7 @@ type expectedMeta struct {
 	mediaType      meta.MediaType
 	cntitle        string
 	entitle        string
-	year           uint
+	year           int
 	part           string
 	season         string
 	episode        string
