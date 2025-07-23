@@ -51,6 +51,7 @@ func (s *LocalStorage) List(obj model.FileObject) ([]model.FileObject, error) {
 			continue
 		}
 		fileObjects = append(fileObjects, &FileObj{
+			name:  info.Name(),
 			path:  pathlib.Join(file.GetPath(), info.Name()),
 			size:  info.Size(),
 			isDir: info.IsDir(),

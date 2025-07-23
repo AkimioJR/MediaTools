@@ -4,10 +4,10 @@ import (
 	"MediaTools/internal/pkg/filesystem/model"
 	"io"
 	"os"
-	pathlib "path"
 )
 
 type FileObj struct {
+	name  string
 	path  string
 	size  int64
 	isDir bool
@@ -18,7 +18,7 @@ func (f *FileObj) GetType() model.StorageType {
 }
 
 func (f *FileObj) GetName() string {
-	return pathlib.Base(f.path)
+	return f.name
 }
 
 func (f *FileObj) GetPath() string {
