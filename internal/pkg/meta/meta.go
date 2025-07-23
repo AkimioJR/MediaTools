@@ -291,7 +291,7 @@ func (meta *VideoMeta) parseName(s *parseState) {
 			// 含有电影关键词或者不含特殊字符的中文可以继续拼接
 			if slices.Contains([]string{"剧场版", "劇場版", "电影版", "電影版"}, token) ||
 				(!nameNoChineseRe.MatchString(token) && !slices.Contains([]string{"共", "第", "季", "集", "话", "話", "期"}, token)) {
-				meta.ENTitle += " " + token
+				meta.CNTitle += " " + token
 			}
 			s.stopcntitleFlag = true
 		}
