@@ -86,3 +86,45 @@ func getTVSeriesDetail(tmdbID int) (*schemas.MediaInfo, error) {
 	}
 	return &mediaInfo, nil
 }
+
+func GetTVSeasonDetail(seriesID int, seasonNumber int) (*schemas.MediaInfo, error) {
+	logrus.Infof("获取电视剧季集详情，TMDB ID: %d, 季集数: %d", seriesID, seasonNumber)
+
+	seasonDetail, err := client.GetTVSeasonDetail(seriesID, seasonNumber, nil)
+	if err != nil {
+		return nil, fmt.Errorf("获取电视剧季集详情失败，TMDB ID: %d, 季集数: %d, 错误: %v", seriesID, seasonNumber, err)
+	}
+
+	var mediaInfo schemas.MediaInfo
+	mediaInfo.TMDBID = seriesID
+	mediaInfo.MediaType = meta.MediaTypeTV
+	mediaInfo.TMDBInfo = schemas.TMDBInfo{
+		TVInfo: schemas.TMDBTVInfo{
+			SeasonInfo:    seasonDetail,
+			SeasonNumber:  seasonNumber,
+			EpisodeNumber: -1, // 默认值 -1，表示未指定集数
+		},
+	}
+	return &mediaInfo, nil
+}
+
+func GetTVEpisodeDetail(seriesID int, seasonNumber int, episodeNumber int) (*schemas.MediaInfo, error) {
+	logrus.Infof("获取电视剧集详情，TMDB ID: %d, 季集数: %d, 集数: %d", seriesID, seasonNumber, episodeNumber)
+
+	episodeDetail, err := client.GetTVEpisodeDetail(seriesID, seasonNumber, episodeNumber, nil)
+	if err != nil {
+		return nil, fmt.Errorf("获取电视剧集详情失败，TMDB ID: %d, 季集数: %d, 集数: %d, 错误: %v", seriesID, seasonNumber, episodeNumber, err)
+	}
+
+	var mediaInfo schemas.MediaInfo
+	mediaInfo.TMDBID = seriesID
+	mediaInfo.MediaType = meta.MediaTypeTV
+	mediaInfo.TMDBInfo = schemas.TMDBInfo{
+		TVInfo: schemas.TMDBTVInfo{
+			EpisodeInfo:   episodeDetail,
+			SeasonNumber:  seasonNumber,
+			EpisodeNumber: episodeNumber,
+		},
+	}
+	return &mediaInfo, nil
+}
