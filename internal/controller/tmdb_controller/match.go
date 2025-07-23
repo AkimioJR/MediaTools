@@ -1,0 +1,150 @@
+package tmdb_controller
+
+import (
+	"MediaTools/internal/pkg/themoviedb/v3"
+	"MediaTools/internal/schemas"
+	"MediaTools/meta"
+	"MediaTools/utils"
+	"fmt"
+	"sort"
+	"strings"
+
+	"github.com/sirupsen/logrus"
+)
+
+// 根据名称同时查询电影和电视剧，没有类型也没有年份时使用
+func MatchMulti(name string) (*schemas.MediaInfo, error) {
+	var page uint32 = 1
+	var params themoviedb.SearchMultiParams
+	params.Query = name
+	params.Page = &page
+
+	resp, err := client.SearchMulti(params)
+	if err != nil {
+		return nil, fmt.Errorf("综合查询 「%s」失败: %v", name, err)
+	}
+	results := make([]themoviedb.SearchMultiResponse, 0, len(resp.Result))
+	results = append(results, resp.Result...)
+	if resp.TotalPages > 1 {
+		for i := 2; i <= int(resp.TotalPages); i++ {
+			page = uint32(i)
+			params.Page = &page
+			pageResp, err := client.SearchMulti(params)
+			if err != nil {
+				return nil, fmt.Errorf("综合查询「%s」第 %d 页失败: %v", name, i, err)
+			}
+			results = append(results, pageResp.Result...)
+		}
+	}
+
+	if len(results) == 0 {
+		return nil, fmt.Errorf("未找到综合查询结果「%s」", name)
+	}
+
+	// 排序：电影在前，按年份降序
+	sort.Slice(results, func(i, j int) bool {
+		// 电影优先
+		if results[i].MediaType != results[j].MediaType {
+			return results[i].MediaType == "movie"
+		}
+		// 年份降序
+		// 取 release_date 格式 "YYYY-MM-DD"
+		getDate := func(r themoviedb.SearchMultiResponse) string {
+			if r.ReleaseDate != "" {
+				return r.ReleaseDate
+			}
+			return "0000-00-00"
+		}
+		return strings.Compare(getDate(results[i]), getDate(results[j])) > 0
+	})
+
+	var info *schemas.MediaInfo
+
+	for _, result := range results {
+		var err error
+		switch result.MediaType {
+		case "movie":
+			if utils.FuzzyMatching(name, result.Title, result.OriginalTitle) {
+				info, err = getMovieDetail(result.ID)
+				if err != nil {
+					logrus.Warningf("获取电影「%d」详情失败: %v", result.ID, err)
+					continue
+				}
+				break
+			}
+			names, err := getNames(result.ID, meta.MediaTypeMovie)
+			if err != nil {
+				logrus.Errorf("获取电影「%d」的标题/译名失败: %v", result.ID, err)
+				continue
+			}
+			if utils.FuzzyMatching(name, names...) {
+				info, err = getMovieDetail(result.ID)
+				if err != nil {
+					logrus.Warningf("获取电影「%d」详情失败: %v", result.ID, err)
+					continue
+				}
+				goto match
+			}
+		case "tv":
+			if utils.FuzzyMatching(name, result.Title, result.OriginalTitle) {
+				info, err = getTVDetail(result.ID)
+				if err != nil {
+					logrus.Warningf("获取电视剧「%d」详情失败: %v", result.ID, err)
+					continue
+				}
+				break
+			}
+			names, err := getNames(result.ID, meta.MediaTypeTV)
+			if err != nil {
+				logrus.Errorf("获取电视剧「%d」的标题/译名失败: %v", result.ID, err)
+				continue
+			}
+			if utils.FuzzyMatching(name, names...) {
+				info, err = getTVDetail(result.ID)
+				if err != nil {
+					logrus.Warningf("获取电视剧「%d」详情失败: %v", result.ID, err)
+					continue
+				}
+				goto match
+			}
+		default:
+			logrus.Warningf("不支持的媒体类型: %s", result.MediaType)
+			continue
+		}
+	}
+	if info == nil {
+		return nil, fmt.Errorf("综合查询「%s」未找到结果", name)
+	}
+match:
+	logrus.Infof("综合查询「%s」结果: %d (%s)", name, info.TMDBID, info.MediaType.String())
+	return info, nil
+}
+
+// 搜索 TMDB 中的媒体信息，匹配返回一条尽可能正确的信息
+// name 媒体名称
+// mType 媒体类型
+// year 年份，如要是季集需要是首播年份(可选)
+// seasonYear 当前季集年份(可选)
+// seasonNumber 当前季集数(可选)
+func Match(name string, mType meta.MediaType, year *int, seasonYear *int, seasonNumber *int) (*schemas.MediaInfo, error) {
+
+	switch mType {
+	case meta.MediaTypeMovie:
+		return SearchMovieByName(name, year)
+
+	case meta.MediaTypeTV:
+		if seasonYear != nil && seasonNumber != nil {
+			return SearchTVBySeason(name, *seasonYear, *seasonNumber)
+		} else {
+			return SearchTVByName(name, year)
+		}
+
+	default:
+		logrus.Warningf("未指定媒体类型，尝试综合查询「%s」", name)
+		info, err := MatchMulti(name)
+		if err != nil {
+			return nil, fmt.Errorf("综合查询「%s」失败: %v", name, err)
+		}
+		return GetInfo(info.TMDBID, &mType)
+	}
+}
