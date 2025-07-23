@@ -148,3 +148,38 @@ func Match(name string, mType meta.MediaType, year *int, seasonYear *int, season
 		return GetInfo(info.TMDBID, &mType)
 	}
 }
+
+// 搜索 TMDB 中的媒体信息，匹配返回一条尽可能正确的信息
+// 如果匹配失败，尝试移除年份重新查询
+// name 媒体名称
+// mType 媒体类型
+// year 年份，如要是季集需要是首播年份(可选)
+// seasonYear 当前季集年份(可选)
+// seasonNumber 当前季集数(可选)
+func MatchWithFallback(name string, mType meta.MediaType, year *int, seasonYear *int, seasonNumber *int) (*schemas.MediaInfo, error) {
+	// 1. 首次严格匹配
+	info, err := Match(name, mType, year, seasonYear, seasonNumber)
+	if err == nil {
+		return info, nil
+	}
+
+	// 2. 如果有年份/季年份/季号，尝试去掉这些条件再查一次
+	if utils.CheckValue(year) || utils.CheckValue(seasonYear) || utils.CheckValue(seasonNumber) {
+		logrus.Warningf("匹配 %s「%s」失败: %v，尝试移除年份/季年份/季号重新查询", mType, name, err)
+		info, err = Match(name, mType, nil, nil, nil)
+		if err == nil {
+			return info, nil
+		}
+	}
+
+	// 3. 兜底：多类型模糊匹配
+	logrus.Warningf("匹配 %s「%s」失败: %v，尝试综合模糊匹配", mType, name, err)
+	info, err = MatchMulti(name)
+	if err == nil {
+		return info, nil
+	}
+
+	// 4. 最终失败
+	logrus.Errorf("综合匹配「%s」失败: %v", name, err)
+	return nil, err
+}
