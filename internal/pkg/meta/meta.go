@@ -24,15 +24,15 @@ type VideoMeta struct {
 	TMDBID         int       // TMDB ID
 
 	// 资源信息
-	ResourceType   ResourceType                // 来源/介质
-	ResourceEffect map[ResourceEffect]struct{} // 资源效果
-	ResourcePix    ResourcePix                 // 分辨率
-	VideoEncode    encode.VideoEncode          // 视频编码
-	AudioEncode    encode.AudioEncode          // 音频编码
-	Platform       StreamingPlatform           // 流媒体平台
-	ReleaseGroups  []string                    // 发布组
-	Part           string                      // 分段
-	Version        uint8                       // 版本号
+	ResourceType   ResourceType       // 来源/介质
+	ResourceEffect []ResourceEffect   // 资源效果
+	ResourcePix    ResourcePix        // 分辨率
+	VideoEncode    encode.VideoEncode // 视频编码
+	AudioEncode    encode.AudioEncode // 音频编码
+	Platform       StreamingPlatform  // 流媒体平台
+	ReleaseGroups  []string           // 发布组
+	Part           string             // 分段
+	Version        uint8              // 版本号
 	// customization  string                      // 自定义词
 
 	// 电视剧相关·
@@ -65,14 +65,6 @@ func (meta *VideoMeta) GetTitles() []string {
 		titles = append(titles, meta.ENTitle)
 	}
 	return titles
-}
-
-func (meta *VideoMeta) GetResourceEffectStrings() []string {
-	var effects []string
-	for effect := range meta.ResourceEffect {
-		effects = append(effects, effect.String())
-	}
-	return effects
 }
 
 func (meta *VideoMeta) GetSeasons() []int {
@@ -139,7 +131,7 @@ func ParseVideoMeta(title string) *VideoMeta {
 		OrginalTitle:   title,
 		MediaType:      MediaTypeUnknown,
 		ResourceType:   ResourceTypeUnknown,
-		ResourceEffect: make(map[ResourceEffect]struct{}),
+		ResourceEffect: make([]ResourceEffect, 0),
 		ReleaseGroups:  findReleaseGroups(title), // 解析发布组
 		Platform:       UnknownStreamingPlatform,
 		Version:        ParseVersion(title), // 解析版本号
@@ -860,7 +852,9 @@ func (meta *VideoMeta) parseResourceType(s *parseState) {
 			s.lastType = lastTokenTypeEffect
 			s.continueFlag = false
 			s.stopNameFlag = true
-			meta.ResourceEffect[effect] = struct{}{}
+			if !slices.Contains(meta.ResourceEffect, effect) { // 避免重复添加
+				meta.ResourceEffect = append(meta.ResourceEffect, effect)
+			}
 		}
 		return
 	}
@@ -1241,12 +1235,12 @@ func (meta *VideoMeta) postProcess() {
 			meta.ResourceType == ResourceTypeUHDBluRay ||
 			meta.ResourceType == ResourceTypeBluRayRemux) {
 		// 检查原始字符串中是否包含DIY标记
-		upperOriginal := strings.ToUpper(meta.OrginalTitle)
-		if strings.Contains(upperOriginal, "DIY") ||
-			strings.Contains(upperOriginal, "-DIY@") {
-			// 可以添加DIY标记到资源效果中
-			meta.ResourceEffect[ResourceEffectUnknown] = struct{}{} // 需要定义DIY效果类型
-		}
+		// upperOriginal := strings.ToUpper(meta.OrginalTitle)
+		// if strings.Contains(upperOriginal, "DIY") ||
+		// 	strings.Contains(upperOriginal, "-DIY@") {
+		// 	// 可以添加DIY标记到资源效果中
+		// 	meta.ResourceEffect[ResourceEffectUnknown] = struct{}{} // 需要定义DIY效果类型
+		// }
 	}
 }
 
