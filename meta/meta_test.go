@@ -24,7 +24,7 @@ type expectedMeta struct {
 	version        uint8
 }
 
-func TestParseMetaVideo(t *testing.T) {
+func TestParseVideoMeta(t *testing.T) {
 
 	testCases := []struct {
 		input    string
@@ -1118,26 +1118,26 @@ func TestParseMetaVideo(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			meta := meta.ParseMetaVideo(tc.input)
-			require.Equal(t, tc.expected.mediaType, meta.GetType(), "媒体类型不匹配")
-			require.Equal(t, tc.expected.cntitle, meta.GetCNTitle(), "中文标题不匹配")
-			require.Equal(t, tc.expected.entitle, meta.GetENTitle(), "英文标题不匹配")
-			require.Equal(t, tc.expected.year, meta.GetYear(), "年份不匹配")
-			require.Equal(t, tc.expected.part, meta.GetPart(), "分部信息不匹配")
+			meta := meta.ParseVideoMeta(tc.input)
+			require.Equal(t, tc.expected.mediaType, meta.MediaType, "媒体类型不匹配")
+			require.Equal(t, tc.expected.cntitle, meta.CNTitle, "中文标题不匹配")
+			require.Equal(t, tc.expected.entitle, meta.ENTitle, "英文标题不匹配")
+			require.Equal(t, tc.expected.year, meta.Year, "年份不匹配")
+			require.Equal(t, tc.expected.part, meta.Part, "分部信息不匹配")
 			require.Equal(t, tc.expected.season, meta.GetSeasonStr(), "季信息不匹配")
 			require.Equal(t, tc.expected.episode, meta.GetEpisodeStr(), "集信息不匹配")
-			require.Equal(t, tc.expected.resourcePix, meta.GetResourcePix(), "资源像素不匹配")
-			require.Equal(t, tc.expected.resourceType, meta.GetResourceType(), "资源类型不匹配")
-			require.Equal(t, tc.expected.resourceEffect, meta.GetResourceEffect(), "资源效果不匹配")
-			require.Equal(t, tc.expected.videoEncode, meta.GetVideoEncode(), "视频编码不匹配")
-			require.Equal(t, tc.expected.audioEncode, meta.GetAudioEncode(), "音频编码不匹配")
-			require.Equal(t, tc.expected.version, meta.GetVersion(), "版本号不匹配")
+			require.Equal(t, tc.expected.resourcePix, meta.ResourcePix, "资源像素不匹配")
+			require.Equal(t, tc.expected.resourceType, meta.ResourceType, "资源类型不匹配")
+			require.Equal(t, tc.expected.resourceEffect, meta.ResourceEffect, "资源效果不匹配")
+			require.Equal(t, tc.expected.videoEncode, meta.VideoEncode, "视频编码不匹配")
+			require.Equal(t, tc.expected.audioEncode, meta.AudioEncode, "音频编码不匹配")
+			require.Equal(t, tc.expected.version, meta.Version, "版本号不匹配")
 		})
 
 	}
 }
 
-func TestParseMetaVideoByPath(t *testing.T) {
+func TestParseVideoMetaByPath(t *testing.T) {
 	testCases := []struct {
 		path     string
 		expected expectedMeta
@@ -1253,20 +1253,20 @@ func TestParseMetaVideoByPath(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.path, func(t *testing.T) {
-			meta := meta.ParseMetaVideoByPath(tc.path)
-			require.Equal(t, tc.expected.mediaType, meta.GetType(), "媒体类型不匹配")
-			require.Equal(t, tc.expected.cntitle, meta.GetCNTitle(), "中文标题不匹配")
-			require.Equal(t, tc.expected.entitle, meta.GetENTitle(), "英文标题不匹配")
-			require.Equal(t, tc.expected.year, meta.GetYear(), "年份不匹配")
-			require.Equal(t, tc.expected.part, meta.GetPart(), "分部信息不匹配")
+			meta := meta.ParseVideoMetaByPath(tc.path)
+			require.Equal(t, tc.expected.mediaType, meta.MediaType, "媒体类型不匹配")
+			require.Equal(t, tc.expected.cntitle, meta.CNTitle, "中文标题不匹配")
+			require.Equal(t, tc.expected.entitle, meta.ENTitle, "英文标题不匹配")
+			require.Equal(t, tc.expected.year, meta.Year, "年份不匹配")
+			require.Equal(t, tc.expected.part, meta.Part, "分部信息不匹配")
 			require.Equal(t, tc.expected.season, meta.GetSeasonStr(), "季信息不匹配")
 			require.Equal(t, tc.expected.episode, meta.GetEpisodeStr(), "集信息不匹配")
-			require.Equal(t, tc.expected.resourcePix, meta.GetResourcePix(), "资源像素不匹配")
-			require.Equal(t, tc.expected.resourceType, meta.GetResourceType(), "资源类型不匹配")
-			require.Equal(t, tc.expected.resourceEffect, meta.GetResourceEffect(), "资源效果不匹配")
-			require.Equal(t, tc.expected.videoEncode, meta.GetVideoEncode(), "视频编码不匹配")
-			require.Equal(t, tc.expected.audioEncode, meta.GetAudioEncode(), "音频编码不匹配")
-			require.Equal(t, tc.expected.version, meta.GetVersion(), "版本号不匹配")
+			require.Equal(t, tc.expected.resourcePix, meta.ResourcePix, "资源像素不匹配")
+			require.Equal(t, tc.expected.resourceType, meta.ResourceType, "资源类型不匹配")
+			require.Equal(t, tc.expected.resourceEffect, meta.ResourceEffect, "资源效果不匹配")
+			require.Equal(t, tc.expected.videoEncode, meta.VideoEncode, "视频编码不匹配")
+			require.Equal(t, tc.expected.audioEncode, meta.AudioEncode, "音频编码不匹配")
+			require.Equal(t, tc.expected.version, meta.Version, "版本号不匹配")
 		})
 
 	}

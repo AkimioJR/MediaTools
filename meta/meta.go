@@ -11,154 +11,130 @@ import (
 	"strings"
 )
 
-// MetaVideo 视频媒体信息结构体
-type MetaVideo struct {
+// VideoMeta 解析视频媒体名字信息结构体
+type VideoMeta struct {
 	// 基础信息
-	orginalTitle   string    // 原始标题
-	processedTitle string    // 处理后的标题
-	isFile         bool      // 是否是媒体文件
-	cntitle        string    // 中文标题
-	entitle        string    // 英文标题
-	year           uint      // 年份
-	mediaType      MediaType // 媒体类型
-	tmdbID         uint64    // TMDB ID
+	OrginalTitle   string    // 原始标题
+	ProcessedTitle string    // 处理后的标题
+	IsFile         bool      // 是否是媒体文件
+	CNTitle        string    // 中文标题
+	ENTitle        string    // 英文标题
+	Year           uint      // 年份
+	MediaType      MediaType // 媒体类型
+	TMDBID         uint64    // TMDB ID
 
 	// 资源信息
-	resourceType   ResourceType                // 来源/介质
-	resourceEffect map[ResourceEffect]struct{} // 资源效果
-	resourcePix    ResourcePix                 // 分辨率
-	videoEncode    encode.VideoEncode          // 视频编码
-	audioEncode    encode.AudioEncode          // 音频编码
-	platform       StreamingPlatform           // 流媒体平台
-	releaseGroups  []string                    // 发布组
-	part           string                      // 分段
-	version        uint8                       // 版本号
+	ResourceType   ResourceType                // 来源/介质
+	ResourceEffect map[ResourceEffect]struct{} // 资源效果
+	ResourcePix    ResourcePix                 // 分辨率
+	VideoEncode    encode.VideoEncode          // 视频编码
+	AudioEncode    encode.AudioEncode          // 音频编码
+	Platform       StreamingPlatform           // 流媒体平台
+	ReleaseGroups  []string                    // 发布组
+	Part           string                      // 分段
+	Version        uint8                       // 版本号
 	// customization  string                      // 自定义词
 
 	// 电视剧相关·
-	beginSeason  *int // 起始季
-	endSeason    *int // 结束集
-	totalSeason  int  // 总季数
-	beginEpisode *int // 起始集
-	endEpisode   *int // 结束集
-	totalEpisode int  // 总集数
+	BeginSeason  *int // 起始季
+	EndSeason    *int // 结束集
+	TotalSeason  int  // 总季数
+	BeginEpisode *int // 起始集
+	EndEpisode   *int // 结束集
+	TotalEpisode int  // 总集数
 }
-
-func (meta *MetaVideo) GetCNTitle() string                             { return meta.cntitle }        // GetCNTitle 获取中文标题
-func (meta *MetaVideo) GetENTitle() string                             { return meta.entitle }        // GetENTitle 获取英文标题
-func (meta *MetaVideo) GetYear() uint                                  { return meta.year }           // GetYear 获取年份
-func (meta *MetaVideo) GetType() MediaType                             { return meta.mediaType }      // MediaType
-func (meta *MetaVideo) GetTMDBID() uint64                              { return meta.tmdbID }         // GetTMDBID 获取 TMDB ID
-func (meta *MetaVideo) GetResourceType() ResourceType                  { return meta.resourceType }   // GetResourceType 获取资源类型
-func (meta *MetaVideo) GetResourceEffect() map[ResourceEffect]struct{} { return meta.resourceEffect } // GetResourceEffect 获取资源效果
-func (meta *MetaVideo) GetResourcePix() ResourcePix                    { return meta.resourcePix }    // GetResourcePix 获取资源分辨率
-func (meta *MetaVideo) GetVideoEncode() encode.VideoEncode             { return meta.videoEncode }    // GetVideoEncode 获取视频编码
-func (meta *MetaVideo) GetAudioEncode() encode.AudioEncode             { return meta.audioEncode }    // GetAudioEncode 获取音频编码
-func (meta *MetaVideo) GetStreamingPlatform() StreamingPlatform        { return meta.platform }       // GetWebSource 获取网络来源
-func (meta *MetaVideo) GetReleaseGroups() []string                     { return meta.releaseGroups }  // GetResourceTeam 获取资源组
-func (meta *MetaVideo) GetPart() string                                { return meta.part }           // GetPart 获取分集信息
-func (meta *MetaVideo) GetVersion() uint8                              { return meta.version }        // GetVersion 获取版本号，若未识别到版本号，则返回1
 
 // 获取标题
 // 有中文标题优先返回中文标题
 // 否则返回英文标题
-func (meta *MetaVideo) GetTitle() string {
-	if meta.cntitle != "" {
-		return meta.cntitle
+func (meta *VideoMeta) GetTitle() string {
+	if meta.CNTitle != "" {
+		return meta.CNTitle
 	}
-	return meta.entitle
+	return meta.ENTitle
 }
 
-func (meta *MetaVideo) GetResourceEffectStrings() []string {
+func (meta *VideoMeta) GetResourceEffectStrings() []string {
 	var effects []string
-	for effect := range meta.resourceEffect {
+	for effect := range meta.ResourceEffect {
 		effects = append(effects, effect.String())
 	}
 	return effects
 }
 
-func (meta *MetaVideo) GetBeginSeason() *int {
-	return meta.beginSeason
-}
-
-func (meta *MetaVideo) GetSeasons() []int {
-	if meta.mediaType != MediaTypeTV {
+func (meta *VideoMeta) GetSeasons() []int {
+	if meta.MediaType != MediaTypeTV {
 		return nil
 	}
 
 	var seasons []int
-	if meta.beginSeason != nil {
-		if meta.endSeason != nil {
-			for i := *meta.beginSeason; i <= *meta.endSeason; i++ {
+	if meta.BeginSeason != nil {
+		if meta.EndSeason != nil {
+			for i := *meta.BeginSeason; i <= *meta.EndSeason; i++ {
 				seasons = append(seasons, i)
 			}
 		} else {
-			seasons = append(seasons, *meta.beginSeason)
+			seasons = append(seasons, *meta.BeginSeason)
 		}
 	}
 	return seasons
 }
 
-func (meta *MetaVideo) GetSeasonStr() string {
-	if meta.beginSeason == nil {
+func (meta *VideoMeta) GetSeasonStr() string {
+	if meta.BeginSeason == nil {
 		return ""
 	} else {
-		if meta.endSeason == nil {
-			return fmt.Sprintf("S%02d", *meta.beginSeason)
+		if meta.EndSeason == nil {
+			return fmt.Sprintf("S%02d", *meta.BeginSeason)
 		}
-		return fmt.Sprintf("S%02d-S%02d", *meta.beginSeason, *meta.endSeason)
+		return fmt.Sprintf("S%02d-S%02d", *meta.BeginSeason, *meta.EndSeason)
 	}
 }
 
-// GetBeginEpisode 获取起始集数
-func (meta *MetaVideo) GetBeginEpisode() *int {
-	return meta.beginEpisode
-}
-
 // GetEpisodes 获取集数列表
-func (meta *MetaVideo) GetEpisodes() []int {
-	if meta.mediaType != MediaTypeTV {
+func (meta *VideoMeta) GetEpisodes() []int {
+	if meta.MediaType != MediaTypeTV {
 		return nil
 	}
 
 	var episodes []int
-	if meta.beginEpisode != nil {
-		if meta.endEpisode != nil {
-			for i := *meta.beginEpisode; i <= *meta.endEpisode; i++ {
+	if meta.BeginEpisode != nil {
+		if meta.EndEpisode != nil {
+			for i := *meta.BeginEpisode; i <= *meta.EndEpisode; i++ {
 				episodes = append(episodes, i)
 			}
 		} else {
-			episodes = append(episodes, *meta.beginEpisode)
+			episodes = append(episodes, *meta.BeginEpisode)
 		}
 	}
 	return episodes
 }
 
-func (meta *MetaVideo) GetEpisodeStr() string {
-	if meta.beginEpisode == nil {
+func (meta *VideoMeta) GetEpisodeStr() string {
+	if meta.BeginEpisode == nil {
 		return ""
 	} else {
-		if meta.endEpisode == nil {
-			return fmt.Sprintf("E%02d", *meta.beginEpisode)
+		if meta.EndEpisode == nil {
+			return fmt.Sprintf("E%02d", *meta.BeginEpisode)
 		}
-		return fmt.Sprintf("E%02d-E%02d", *meta.beginEpisode, *meta.endEpisode)
+		return fmt.Sprintf("E%02d-E%02d", *meta.BeginEpisode, *meta.EndEpisode)
 	}
 }
 
-func ParseMetaVideo(title string) *MetaVideo {
-	meta := &MetaVideo{
-		orginalTitle:   title,
-		mediaType:      MediaTypeUnknown,
-		resourceType:   ResourceTypeUnknown,
-		resourceEffect: make(map[ResourceEffect]struct{}),
-		releaseGroups:  findReleaseGroups(title), // 解析发布组
-		platform:       UnknownStreamingPlatform,
-		version:        ParseVersion(title), // 解析版本号
+func ParseVideoMeta(title string) *VideoMeta {
+	meta := &VideoMeta{
+		OrginalTitle:   title,
+		MediaType:      MediaTypeUnknown,
+		ResourceType:   ResourceTypeUnknown,
+		ResourceEffect: make(map[ResourceEffect]struct{}),
+		ReleaseGroups:  findReleaseGroups(title), // 解析发布组
+		Platform:       UnknownStreamingPlatform,
+		Version:        ParseVersion(title), // 解析版本号
 	}
 
 	if utils.IsMediaExtension(path.Ext(title)) {
 		title = strings.TrimSuffix(title, path.Ext(title)) // 去掉文件扩展名
-		meta.isFile = true
+		meta.IsFile = true
 	}
 
 	loc := nameNoBeginRe.FindStringIndex(title) // 去掉名称中第1个[]的内容（一般是发布组）
@@ -169,7 +145,7 @@ func ParseMetaVideo(title string) *MetaVideo {
 	title = fileSizeRe.ReplaceAllString(title, "")          // 把大小去掉
 	title = dateFmtRe.ReplaceAllString(title, "")           // 把年月日去掉
 	title = strings.TrimSpace(title)                        // 去掉首尾空格
-	meta.processedTitle = title
+	meta.ProcessedTitle = title
 
 	state := &parseState{
 		tokens:          NewTokens(title), // 拆分tokens
@@ -230,22 +206,22 @@ func ParseMetaVideo(title string) *MetaVideo {
 }
 
 // 识别 Part
-func (meta *MetaVideo) parsePart(s *parseState) {
+func (meta *VideoMeta) parsePart(s *parseState) {
 	if meta.GetTitle() == "" {
 		return
 	}
-	if meta.GetYear() == 0 &&
-		meta.beginSeason == nil &&
-		meta.beginEpisode == nil &&
-		meta.GetResourcePix() == ResourcePixUnknown &&
-		meta.GetResourceType() == ResourceTypeUnknown {
+	if meta.Year == 0 &&
+		meta.BeginSeason == nil &&
+		meta.BeginEpisode == nil &&
+		meta.ResourcePix == ResourcePixUnknown &&
+		meta.ResourceType == ResourceTypeUnknown {
 		return
 	}
 
 	token := s.tokens.Current()
 
 	if partRe.MatchString(token) {
-		meta.part = token
+		meta.Part = token
 
 		nextToken := s.tokens.Peek()
 		utf8Str := []rune(nextToken)
@@ -253,7 +229,7 @@ func (meta *MetaVideo) parsePart(s *parseState) {
 		if nextToken != "" {
 			if (utils.IsDigits(nextToken) && (length == 1 || (length == 2 && utf8Str[0] == '0'))) ||
 				slices.Contains([]string{"A", "B", "C", "I", "II", "III"}, strings.ToUpper(nextToken)) {
-				meta.part += nextToken
+				meta.Part += nextToken
 			}
 		}
 
@@ -263,15 +239,15 @@ func (meta *MetaVideo) parsePart(s *parseState) {
 }
 
 // 识别 cntitle、entitle
-func (meta *MetaVideo) parseName(s *parseState) {
+func (meta *VideoMeta) parseName(s *parseState) {
 	token := s.tokens.Current()
 
 	if s.unknownNameStr != "" { // 回收标题
-		if meta.cntitle == "" {
-			if meta.entitle == "" {
-				meta.entitle = s.unknownNameStr
-			} else if s.unknownNameStr != strconv.Itoa(int(meta.year)) {
-				meta.entitle += " " + s.unknownNameStr
+		if meta.CNTitle == "" {
+			if meta.ENTitle == "" {
+				meta.ENTitle = s.unknownNameStr
+			} else if s.unknownNameStr != strconv.Itoa(int(meta.Year)) {
+				meta.ENTitle += " " + s.unknownNameStr
 			}
 			s.lastType = lastTokenTypeentitle
 		}
@@ -282,7 +258,7 @@ func (meta *MetaVideo) parseName(s *parseState) {
 		return
 	}
 
-	if slices.Contains(meta.releaseGroups, token) { // 如果当前token是发布组，直接跳过
+	if slices.Contains(meta.ReleaseGroups, token) { // 如果当前token是发布组，直接跳过
 		s.continueFlag = false
 		return
 	}
@@ -296,13 +272,13 @@ func (meta *MetaVideo) parseName(s *parseState) {
 	if utils.IsChinese(token) { // 中文处理
 		// 含有中文，直接做为标题（连着的数字或者英文会保留），且不再取用后面出现的中文
 		s.lastType = lastTokenTypecntitle
-		if meta.cntitle == "" {
-			meta.cntitle = token
+		if meta.CNTitle == "" {
+			meta.CNTitle = token
 		} else if !s.stopcntitleFlag {
 			// 含有电影关键词或者不含特殊字符的中文可以继续拼接
 			if slices.Contains([]string{"剧场版", "劇場版", "电影版", "電影版"}, token) ||
 				(!nameNoChineseRe.MatchString(token) && !slices.Contains([]string{"共", "第", "季", "集", "话", "話", "期"}, token)) {
-				meta.cntitle += " " + token
+				meta.ENTitle += " " + token
 			}
 			s.stopcntitleFlag = true
 		}
@@ -342,9 +318,9 @@ func (meta *MetaVideo) parseName(s *parseState) {
 								currentTitle := ""
 								switch s.lastType {
 								case lastTokenTypecntitle:
-									currentTitle = meta.cntitle
+									currentTitle = meta.CNTitle
 								case lastTokenTypeentitle:
-									currentTitle = meta.entitle
+									currentTitle = meta.ENTitle
 								}
 
 								// 如果标题包含"Part", "Season", "第"等关键词，数字更可能是标题的一部分
@@ -356,9 +332,9 @@ func (meta *MetaVideo) parseName(s *parseState) {
 									// 附加到标题
 									switch s.lastType {
 									case lastTokenTypecntitle:
-										meta.cntitle += " " + token
+										meta.CNTitle += " " + token
 									case lastTokenTypeentitle:
-										meta.entitle += " " + token
+										meta.ENTitle += " " + token
 									}
 									s.continueFlag = false
 									return
@@ -368,9 +344,9 @@ func (meta *MetaVideo) parseName(s *parseState) {
 								if tokenInt > 100 {
 									switch s.lastType {
 									case lastTokenTypecntitle:
-										meta.cntitle += " " + token
+										meta.CNTitle += " " + token
 									case lastTokenTypeentitle:
-										meta.entitle += " " + token
+										meta.ENTitle += " " + token
 									}
 									s.continueFlag = false
 									return
@@ -383,9 +359,9 @@ func (meta *MetaVideo) parseName(s *parseState) {
 							if len(token) == 3 {
 								switch s.lastType {
 								case lastTokenTypecntitle:
-									meta.cntitle += " " + token
+									meta.CNTitle += " " + token
 								case lastTokenTypeentitle:
-									meta.entitle += " " + token
+									meta.ENTitle += " " + token
 								}
 								s.continueFlag = false
 								return
@@ -395,9 +371,9 @@ func (meta *MetaVideo) parseName(s *parseState) {
 					// 其他情况（罗马数字或其他特殊数字）拼装到已有标题中
 					switch s.lastType {
 					case lastTokenTypecntitle:
-						meta.cntitle += " " + token
+						meta.CNTitle += " " + token
 					case lastTokenTypeentitle:
-						meta.entitle += " " + token
+						meta.ENTitle += " " + token
 					}
 					s.continueFlag = false
 				} else if utils.IsDigits(token) && len(token) == 4 { // 4位数字，可能是年份，也可能是标题的一部分
@@ -412,8 +388,8 @@ func (meta *MetaVideo) parseName(s *parseState) {
 				}
 			}
 		} else if seasonRe.MatchString(token) { // 季的处理
-			if meta.entitle != "" && strings.HasSuffix(strings.ToUpper(meta.entitle), "SEASON") { // 如果匹配到季，英文名结尾为Season，说明Season属于标题，不应在后续作为干扰词去除
-				meta.entitle += " "
+			if meta.ENTitle != "" && strings.HasSuffix(strings.ToUpper(meta.ENTitle), "SEASON") { // 如果匹配到季，英文名结尾为Season，说明Season属于标题，不应在后续作为干扰词去除
+				meta.ENTitle += " "
 			}
 			s.stopNameFlag = true
 			return
@@ -429,10 +405,10 @@ func (meta *MetaVideo) parseName(s *parseState) {
 			}
 
 			// 英文或者英文+数字，拼装起来
-			if meta.entitle != "" {
-				meta.entitle += " " + token
+			if meta.ENTitle != "" {
+				meta.ENTitle += " " + token
 			} else {
-				meta.entitle = token
+				meta.ENTitle = token
 			}
 			s.lastType = lastTokenTypeentitle
 		}
@@ -440,7 +416,7 @@ func (meta *MetaVideo) parseName(s *parseState) {
 }
 
 // 识别年份
-func (meta *MetaVideo) parseYear(s *parseState) {
+func (meta *VideoMeta) parseYear(s *parseState) {
 	if meta.GetTitle() == "" {
 		return
 	}
@@ -458,24 +434,24 @@ func (meta *MetaVideo) parseYear(s *parseState) {
 		return
 	}
 
-	if meta.GetYear() != 0 {
-		if meta.GetENTitle() != "" {
-			meta.entitle = strings.TrimSpace(meta.GetENTitle()) + " " + strconv.Itoa(int(meta.GetYear()))
-		} else if meta.GetCNTitle() != "" {
-			meta.cntitle += " " + strconv.Itoa(int(meta.GetYear()))
+	if meta.Year != 0 {
+		if meta.ENTitle != "" {
+			meta.ENTitle = strings.TrimSpace(meta.ENTitle) + " " + strconv.Itoa(int(meta.Year))
+		} else if meta.CNTitle != "" {
+			meta.CNTitle += " " + strconv.Itoa(int(meta.Year))
 		}
-	} else if meta.GetENTitle() != "" && strings.HasSuffix(strings.ToLower(meta.GetENTitle()), "season") { // 如果匹配到年，且英文名结尾为Season，说明Season属于标题，不应在后续作为干扰词去除
-		meta.entitle += " "
+	} else if meta.ENTitle != "" && strings.HasSuffix(strings.ToLower(meta.ENTitle), "season") { // 如果匹配到年，且英文名结尾为Season，说明Season属于标题，不应在后续作为干扰词去除
+		meta.ENTitle += " "
 	}
 
-	meta.year = uint(num)
+	meta.Year = uint(num)
 	s.lastType = lastTokenTypeYear
 	s.continueFlag = false
 	s.stopNameFlag = true
 }
 
 // 识别分辨率
-func (meta *MetaVideo) parseResourcePix(s *parseState) {
+func (meta *VideoMeta) parseResourcePix(s *parseState) {
 	if meta.GetTitle() == "" {
 		return
 	}
@@ -486,7 +462,7 @@ func (meta *MetaVideo) parseResourcePix(s *parseState) {
 	// 先使用更精确的2K/4K/8K匹配
 	matches := resourcePixStandardRe.FindStringSubmatch(token)
 	if len(matches) > 1 {
-		if meta.resourcePix == ResourcePixUnknown {
+		if meta.ResourcePix == ResourcePixUnknown {
 			r = ParseResourcePix(matches[1])
 			if r != ResourcePixUnknown {
 				goto match // 如果匹配到有效的分辨率
@@ -500,7 +476,7 @@ func (meta *MetaVideo) parseResourcePix(s *parseState) {
 		for i := 1; i < len(matches); i++ {
 			if matches[i] != "" {
 				resourcePixStr := matches[i]
-				if resourcePixStr != "" && meta.resourcePix == ResourcePixUnknown {
+				if resourcePixStr != "" && meta.ResourcePix == ResourcePixUnknown {
 					if utils.IsDigits(resourcePixStr) { // 如果分辨率是纯数字且不以k、p、i结尾，添加p后缀
 						lastChar := resourcePixStr[len(resourcePixStr)-1]
 						if lastChar != 'k' && lastChar != 'p' && lastChar != 'i' {
@@ -523,11 +499,11 @@ match: // 如果匹配到有效的分辨率
 	s.lastType = lastTokenTypePix
 	s.continueFlag = false
 	s.stopNameFlag = true
-	meta.resourcePix = r
+	meta.ResourcePix = r
 }
 
 // 识别季
-func (meta *MetaVideo) parseSeason(s *parseState) {
+func (meta *VideoMeta) parseSeason(s *parseState) {
 	token := s.tokens.Current()
 
 	if sxxexxRe.MatchString(token) { // 跳过 SxxExx 格式，让集数解析器处理
@@ -541,10 +517,10 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 
 		if startSeasonNum, err := strconv.Atoi(startSeasonStr); err == nil && startSeasonNum > 0 {
 			if endSeasonNum, err := strconv.Atoi(endSeasonStr); err == nil && endSeasonNum >= startSeasonNum {
-				meta.beginSeason = &startSeasonNum
-				meta.endSeason = &endSeasonNum
-				meta.totalSeason = (endSeasonNum - startSeasonNum) + 1
-				meta.mediaType = MediaTypeTV
+				meta.BeginSeason = &startSeasonNum
+				meta.EndSeason = &endSeasonNum
+				meta.TotalSeason = (endSeasonNum - startSeasonNum) + 1
+				meta.MediaType = MediaTypeTV
 				s.lastType = lastTokenTypeSeason
 				s.stopNameFlag = true
 				s.continueFlag = false
@@ -569,13 +545,13 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 
 		if seasonNum > -1 {
 			s.lastType = lastTokenTypeSeason
-			meta.mediaType = MediaTypeTV
+			meta.MediaType = MediaTypeTV
 			s.stopcntitleFlag = true // 只停止中文名的处理
 			s.continueFlag = false
 
-			if meta.beginSeason == nil {
-				meta.beginSeason = &seasonNum
-				meta.totalSeason = 1
+			if meta.BeginSeason == nil {
+				meta.BeginSeason = &seasonNum
+				meta.TotalSeason = 1
 			}
 			return
 		}
@@ -585,7 +561,7 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 	matches := seasonRe.FindStringSubmatch(token)
 	if len(matches) > 0 {
 		s.lastType = lastTokenTypeSeason
-		meta.mediaType = MediaTypeTV
+		meta.MediaType = MediaTypeTV
 		s.stopNameFlag = true
 		s.continueFlag = false
 
@@ -603,17 +579,17 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 		}
 
 		if seasonNum > 0 {
-			if meta.beginSeason == nil {
-				meta.beginSeason = &seasonNum
-				meta.totalSeason = 1
+			if meta.BeginSeason == nil {
+				meta.BeginSeason = &seasonNum
+				meta.TotalSeason = 1
 			} else {
-				if seasonNum > *meta.beginSeason {
-					meta.endSeason = &seasonNum
-					meta.totalSeason = (seasonNum - *meta.beginSeason) + 1
+				if seasonNum > *meta.BeginSeason {
+					meta.EndSeason = &seasonNum
+					meta.TotalSeason = (seasonNum - *meta.BeginSeason) + 1
 					// 如果是文件且总季数大于1，重置结束季
-					if meta.isFile && meta.totalSeason > 1 {
-						meta.endSeason = nil
-						meta.totalSeason = 1
+					if meta.IsFile && meta.TotalSeason > 1 {
+						meta.EndSeason = nil
+						meta.TotalSeason = 1
 					}
 				}
 			}
@@ -627,27 +603,27 @@ func (meta *MetaVideo) parseSeason(s *parseState) {
 
 		// 如果前一个token是SEASON且当前季为空且数字长度小于3
 		if s.lastType == lastTokenTypeSeason &&
-			meta.beginSeason == nil &&
+			meta.BeginSeason == nil &&
 			len(token) < 3 {
-			meta.beginSeason = &tokenInt
-			meta.totalSeason = 1
+			meta.BeginSeason = &tokenInt
+			meta.TotalSeason = 1
 			s.lastType = lastTokenTypeSeason
 			s.stopNameFlag = true
 			s.continueFlag = false
-			meta.mediaType = MediaTypeTV
+			meta.MediaType = MediaTypeTV
 		}
-	} else if strings.ToUpper(token) == "SEASON" && meta.beginSeason == nil {
+	} else if strings.ToUpper(token) == "SEASON" && meta.BeginSeason == nil {
 		// 遇到SEASON关键词
 		s.lastType = lastTokenTypeSeason
-	} else if meta.mediaType == MediaTypeTV && meta.beginSeason == nil {
+	} else if meta.MediaType == MediaTypeTV && meta.BeginSeason == nil {
 		// 如果已确定为电视剧类型但没有季数，默认为第1季
 		defaultSeason := 1
-		meta.beginSeason = &defaultSeason
+		meta.BeginSeason = &defaultSeason
 	}
 }
 
 // 识别集数
-func (meta *MetaVideo) parseEpisode(s *parseState) {
+func (meta *VideoMeta) parseEpisode(s *parseState) {
 	token := s.tokens.Current()
 
 	// 特殊处理 SxxExx 格式
@@ -655,14 +631,14 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 		seasonStr := sxxexxMatches[1]
 		episodeStr := sxxexxMatches[2]
 
-		if seasonNum, err := strconv.Atoi(seasonStr); err == nil && seasonNum > 0 && meta.beginSeason == nil {
-			meta.beginSeason = &seasonNum
-			meta.totalSeason = 1
+		if seasonNum, err := strconv.Atoi(seasonStr); err == nil && seasonNum > 0 && meta.BeginSeason == nil {
+			meta.BeginSeason = &seasonNum
+			meta.TotalSeason = 1
 		}
 
-		if episodeNum, err := strconv.Atoi(episodeStr); err == nil && episodeNum > 0 && meta.beginEpisode == nil {
-			meta.beginEpisode = &episodeNum
-			meta.totalEpisode = 1
+		if episodeNum, err := strconv.Atoi(episodeStr); err == nil && episodeNum > 0 && meta.BeginEpisode == nil {
+			meta.BeginEpisode = &episodeNum
+			meta.TotalEpisode = 1
 		}
 
 		goto setEpisodeFlags
@@ -700,9 +676,9 @@ func (meta *MetaVideo) parseEpisode(s *parseState) {
 			goto checkEpisodeRegex
 		}
 
-		if meta.beginEpisode == nil {
-			meta.beginEpisode = &episodeNum
-			meta.totalEpisode = 1
+		if meta.BeginEpisode == nil {
+			meta.BeginEpisode = &episodeNum
+			meta.TotalEpisode = 1
 		}
 		goto setEpisodeFlags
 	}
@@ -715,10 +691,10 @@ checkEpisodeRegex:
 
 		if startEpisode, err := strconv.Atoi(startEpisodeStr); err == nil && startEpisode > 0 {
 			if endEpisode, err := strconv.Atoi(endEpisodeStr); err == nil && endEpisode > startEpisode {
-				if meta.beginEpisode == nil {
-					meta.beginEpisode = &startEpisode
-					meta.endEpisode = &endEpisode
-					meta.totalEpisode = (endEpisode - startEpisode) + 1
+				if meta.BeginEpisode == nil {
+					meta.BeginEpisode = &startEpisode
+					meta.EndEpisode = &endEpisode
+					meta.TotalEpisode = (endEpisode - startEpisode) + 1
 				}
 				goto setEpisodeFlags
 			}
@@ -738,15 +714,15 @@ checkEpisodeRegex:
 		}
 
 		if episodeNum > 0 {
-			if meta.beginEpisode == nil {
-				meta.beginEpisode = &episodeNum
-				meta.totalEpisode = 1
-			} else if episodeNum > *meta.beginEpisode {
-				meta.endEpisode = &episodeNum
-				meta.totalEpisode = (episodeNum - *meta.beginEpisode) + 1
-				if meta.isFile && meta.totalEpisode > 2 {
-					meta.endEpisode = nil
-					meta.totalEpisode = 1
+			if meta.BeginEpisode == nil {
+				meta.BeginEpisode = &episodeNum
+				meta.TotalEpisode = 1
+			} else if episodeNum > *meta.BeginEpisode {
+				meta.EndEpisode = &episodeNum
+				meta.TotalEpisode = (episodeNum - *meta.BeginEpisode) + 1
+				if meta.IsFile && meta.TotalEpisode > 2 {
+					meta.EndEpisode = nil
+					meta.TotalEpisode = 1
 				}
 			}
 		}
@@ -758,44 +734,44 @@ checkEpisodeRegex:
 		// 检查是否为集数范围格式（当前数字 + 下一个数字）
 		nextToken := s.tokens.Peek()
 		if utils.IsDigits(nextToken) && len([]rune(nextToken)) >= 1 && len([]rune(nextToken)) <= 4 {
-			if nextInt, err := strconv.Atoi(nextToken); err == nil && nextInt > tokenInt && meta.beginEpisode == nil {
+			if nextInt, err := strconv.Atoi(nextToken); err == nil && nextInt > tokenInt && meta.BeginEpisode == nil {
 				// 这是一个集数范围
-				meta.beginEpisode = &tokenInt
-				meta.endEpisode = &nextInt
-				meta.totalEpisode = (nextInt - tokenInt) + 1
+				meta.BeginEpisode = &tokenInt
+				meta.EndEpisode = &nextInt
+				meta.TotalEpisode = (nextInt - tokenInt) + 1
 				s.tokens.GetNext() // 跳过下一个 token，因为我们已经处理了
 				goto setEpisodeFlags
 			}
 		}
 
 		switch {
-		case meta.beginEpisode != nil && meta.endEpisode == nil &&
-			length < 5 && tokenInt > *meta.beginEpisode &&
+		case meta.BeginEpisode != nil && meta.EndEpisode == nil &&
+			length < 5 && tokenInt > *meta.BeginEpisode &&
 			s.lastType == lastTokenTypeEpisode:
-			meta.endEpisode = &tokenInt
-			meta.totalEpisode = (tokenInt - *meta.beginEpisode) + 1
-			if meta.isFile && meta.totalEpisode > 2 {
-				meta.endEpisode = nil
-				meta.totalEpisode = 1
+			meta.EndEpisode = &tokenInt
+			meta.TotalEpisode = (tokenInt - *meta.BeginEpisode) + 1
+			if meta.IsFile && meta.TotalEpisode > 2 {
+				meta.EndEpisode = nil
+				meta.TotalEpisode = 1
 			}
 			goto setEpisodeFlags
 
-		case meta.beginEpisode == nil && length > 1 && length < 4 &&
+		case meta.BeginEpisode == nil && length > 1 && length < 4 &&
 			s.lastType != lastTokenTypeYear && s.lastType != lastTokenTypePix &&
 			s.lastType != lastTokenTypeVideoEncode && token != s.unknownNameStr:
-			meta.beginEpisode = &tokenInt
-			meta.totalEpisode = 1
+			meta.BeginEpisode = &tokenInt
+			meta.TotalEpisode = 1
 			goto setEpisodeFlags
 
-		case meta.beginEpisode == nil && length <= 3 && tokenInt <= 99 &&
-			s.lastType == lastTokenTypeYear && meta.beginSeason != nil:
-			meta.beginEpisode = &tokenInt
-			meta.totalEpisode = 1
+		case meta.BeginEpisode == nil && length <= 3 && tokenInt <= 99 &&
+			s.lastType == lastTokenTypeYear && meta.BeginSeason != nil:
+			meta.BeginEpisode = &tokenInt
+			meta.TotalEpisode = 1
 			goto setEpisodeFlags
 
-		case s.lastType == lastTokenTypeEpisode && meta.beginEpisode == nil && length < 5:
-			meta.beginEpisode = &tokenInt
-			meta.totalEpisode = 1
+		case s.lastType == lastTokenTypeEpisode && meta.BeginEpisode == nil && length < 5:
+			meta.BeginEpisode = &tokenInt
+			meta.TotalEpisode = 1
 			goto setEpisodeFlags
 		}
 	} else if strings.ToUpper(token) == "EPISODE" { // 处理EPISODE关键词
@@ -809,11 +785,11 @@ setEpisodeFlags:
 	s.lastType = lastTokenTypeEpisode
 	s.continueFlag = false
 	s.stopNameFlag = true
-	meta.mediaType = MediaTypeTV
+	meta.MediaType = MediaTypeTV
 }
 
 // 识别资源类型
-func (meta *MetaVideo) parseResourceType(s *parseState) {
+func (meta *VideoMeta) parseResourceType(s *parseState) {
 	if meta.GetTitle() == "" {
 		return
 	}
@@ -822,32 +798,32 @@ func (meta *MetaVideo) parseResourceType(s *parseState) {
 	tokenUpper := strings.ToUpper(token)
 
 	// 处理特殊组合情况
-	if tokenUpper == "DL" && s.lastType == lastTokenTypeSource && meta.resourceType == ResourceTypeWeb {
-		meta.resourceType = ResourceTypeWebDL
+	if tokenUpper == "DL" && s.lastType == lastTokenTypeSource && meta.ResourceType == ResourceTypeWeb {
+		meta.ResourceType = ResourceTypeWebDL
 		s.continueFlag = false
 		return
-	} else if tokenUpper == "RAY" && s.lastType == lastTokenTypeSource && meta.resourceType == ResourceTypeBlu {
+	} else if tokenUpper == "RAY" && s.lastType == lastTokenTypeSource && meta.ResourceType == ResourceTypeBlu {
 		// UHD BluRay组合
-		if meta.resourceType == ResourceTypeUHD {
-			meta.resourceType = ResourceTypeUHDBluRay
+		if meta.ResourceType == ResourceTypeUHD {
+			meta.ResourceType = ResourceTypeUHDBluRay
 		} else {
-			meta.resourceType = ResourceTypeBluRay
+			meta.ResourceType = ResourceTypeBluRay
 		}
 		s.continueFlag = false
 		return
 	} else if tokenUpper == "WEBDL" {
-		meta.resourceType = ResourceTypeWebDL
+		meta.ResourceType = ResourceTypeWebDL
 		s.continueFlag = false
 		return
 	}
 
 	// UHD REMUX组合
-	if tokenUpper == "REMUX" && meta.resourceType == ResourceTypeBluRay {
-		meta.resourceType = ResourceTypeBluRayRemux
+	if tokenUpper == "REMUX" && meta.ResourceType == ResourceTypeBluRay {
+		meta.ResourceType = ResourceTypeBluRayRemux
 		s.continueFlag = false
 		return
-	} else if tokenUpper == "BLURAY" && meta.resourceType == ResourceTypeUHD {
-		meta.resourceType = ResourceTypeUHDBluRay
+	} else if tokenUpper == "BLURAY" && meta.ResourceType == ResourceTypeUHD {
+		meta.ResourceType = ResourceTypeUHDBluRay
 		s.continueFlag = false
 		return
 	}
@@ -858,8 +834,8 @@ func (meta *MetaVideo) parseResourceType(s *parseState) {
 		s.lastType = lastTokenTypeSource
 		s.continueFlag = false
 		s.stopNameFlag = true
-		if meta.resourceType == ResourceTypeUnknown {
-			meta.resourceType = ParseResourceType(matches[0])
+		if meta.ResourceType == ResourceTypeUnknown {
+			meta.ResourceType = ParseResourceType(matches[0])
 		}
 		return
 	}
@@ -871,14 +847,14 @@ func (meta *MetaVideo) parseResourceType(s *parseState) {
 			s.lastType = lastTokenTypeEffect
 			s.continueFlag = false
 			s.stopNameFlag = true
-			meta.resourceEffect[effect] = struct{}{}
+			meta.ResourceEffect[effect] = struct{}{}
 		}
 		return
 	}
 }
 
 // 识别流媒体平台
-func (meta *MetaVideo) parsePlatform(s *parseState) {
+func (meta *VideoMeta) parsePlatform(s *parseState) {
 	// 检查是否已有名称
 	if meta.GetTitle() == "" {
 		return
@@ -973,7 +949,7 @@ func (meta *MetaVideo) parsePlatform(s *parseState) {
 	}
 
 	if hasWebToken {
-		meta.platform = ParseStreamingPlatform(platformName)
+		meta.Platform = ParseStreamingPlatform(platformName)
 		s.lastType = lastTokenTypePlatform
 		s.continueFlag = false
 		s.stopNameFlag = true
@@ -981,18 +957,18 @@ func (meta *MetaVideo) parsePlatform(s *parseState) {
 }
 
 // 识别视频编码
-func (meta *MetaVideo) parseVideoEncode(s *parseState) {
+func (meta *VideoMeta) parseVideoEncode(s *parseState) {
 	// 检查是否已有名称
 	if meta.GetTitle() == "" {
 		return
 	}
 
 	// 检查是否有其他必要信息
-	if meta.GetYear() == 0 &&
-		meta.resourcePix == ResourcePixUnknown &&
-		meta.resourceType == ResourceTypeUnknown &&
-		meta.beginSeason == nil &&
-		meta.beginEpisode == nil {
+	if meta.Year == 0 &&
+		meta.ResourcePix == ResourcePixUnknown &&
+		meta.ResourceType == ResourceTypeUnknown &&
+		meta.BeginSeason == nil &&
+		meta.BeginEpisode == nil {
 		return
 	}
 
@@ -1006,7 +982,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 		s.stopNameFlag = true
 		s.lastType = lastTokenTypeVideoEncode
 
-		if meta.videoEncode == encode.VideoEncodeUnknown {
+		if meta.VideoEncode == encode.VideoEncodeUnknown {
 			// 从正则匹配结果中提取编码信息
 			var encodeStr string
 			for i := 1; i < len(matches); i++ {
@@ -1019,7 +995,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 				encodeStr = matches[0]
 			}
 
-			meta.videoEncode = encode.ParseVideoEncode(encodeStr)
+			meta.VideoEncode = encode.ParseVideoEncode(encodeStr)
 		}
 		return
 	}
@@ -1044,7 +1020,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 
 		if prevTokenUpper == "H" || prevTokenUpper == "X" {
 			encodeStr := prevTokenUpper + token
-			meta.videoEncode = encode.ParseVideoEncode(encodeStr)
+			meta.VideoEncode = encode.ParseVideoEncode(encodeStr)
 			s.continueFlag = false
 			s.stopNameFlag = true
 		}
@@ -1062,7 +1038,7 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 
 		if prevTokenUpper == "VC" || prevTokenUpper == "MPEG" {
 			encodeStr := prevTokenUpper + token
-			meta.videoEncode = encode.ParseVideoEncode(encodeStr)
+			meta.VideoEncode = encode.ParseVideoEncode(encodeStr)
 			s.continueFlag = false
 			s.stopNameFlag = true
 		}
@@ -1072,10 +1048,10 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 	// 处理 10bit 编码
 	if tokenUpper == "10BIT" || strings.Contains(tokenUpper, "YUV420P10") {
 		s.lastType = lastTokenTypeVideoEncode
-		if meta.videoEncode == encode.VideoEncodeUnknown { // 如果没有其他编码信息，设置为纯10bit编码
-			meta.videoEncode = encode.VideoEncode10bit
+		if meta.VideoEncode == encode.VideoEncodeUnknown { // 如果没有其他编码信息，设置为纯10bit编码
+			meta.VideoEncode = encode.VideoEncode10bit
 		} else { // 使用辅助方法升级为对应的10bit版本
-			meta.videoEncode = meta.videoEncode.CombineWith10bit()
+			meta.VideoEncode = meta.VideoEncode.CombineWith10bit()
 		}
 		s.continueFlag = false
 		s.stopNameFlag = true
@@ -1084,18 +1060,18 @@ func (meta *MetaVideo) parseVideoEncode(s *parseState) {
 }
 
 // 识别音频编码
-func (meta *MetaVideo) parseAudioEncode(s *parseState) {
+func (meta *VideoMeta) parseAudioEncode(s *parseState) {
 	// 检查是否已有名称
 	if meta.GetTitle() == "" {
 		return
 	}
 
 	// 检查是否有其他必要信息
-	if meta.GetYear() == 0 &&
-		meta.resourcePix == ResourcePixUnknown &&
-		meta.resourceType == ResourceTypeUnknown &&
-		meta.beginSeason == nil &&
-		meta.beginEpisode == nil {
+	if meta.Year == 0 &&
+		meta.ResourcePix == ResourcePixUnknown &&
+		meta.ResourceType == ResourceTypeUnknown &&
+		meta.BeginSeason == nil &&
+		meta.BeginEpisode == nil {
 		return
 	}
 
@@ -1179,18 +1155,18 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 			s.tokens.GetNext()
 		}
 
-		if meta.audioEncode == encode.AudioEncodeUnknown {
-			meta.audioEncode = bestMatch
+		if meta.AudioEncode == encode.AudioEncodeUnknown {
+			meta.AudioEncode = bestMatch
 		} else {
 			// 如果已有音频编码，进行组合处理
-			currentEncode := meta.audioEncode
+			currentEncode := meta.AudioEncode
 
 			// 如果任一编码是Atmos，优先保留Atmos
 			if currentEncode == encode.AudioEncodeAtmos || bestMatch == encode.AudioEncodeAtmos {
-				meta.audioEncode = encode.AudioEncodeAtmos
+				meta.AudioEncode = encode.AudioEncodeAtmos
 			} else {
 				// 其他情况使用新匹配的编码（贪婪匹配结果更准确）
-				meta.audioEncode = bestMatch
+				meta.AudioEncode = bestMatch
 			}
 		}
 		return
@@ -1198,8 +1174,8 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 
 	// 处理数字token（用于音频编码的版本号等）
 	if utils.IsDigits(token) && s.lastType == lastTokenTypeAudioEncode {
-		if meta.audioEncode != encode.AudioEncodeUnknown {
-			currentStr := meta.audioEncode.String()
+		if meta.AudioEncode != encode.AudioEncodeUnknown {
+			currentStr := meta.AudioEncode.String()
 			if currentStr != "" {
 				// 获取前一个token作为参考
 				prevToken := ""
@@ -1225,7 +1201,7 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 				// 尝试解析新的组合编码
 				newEncode := encode.ParseAudioEncode(newEncodeStr)
 				if newEncode != encode.AudioEncodeUnknown {
-					meta.audioEncode = newEncode
+					meta.AudioEncode = newEncode
 				}
 				// 注：如果解析失败，保持原有编码不变
 			}
@@ -1236,33 +1212,33 @@ func (meta *MetaVideo) parseAudioEncode(s *parseState) {
 }
 
 // postProcess 后处理：清理和优化解析结果
-func (meta *MetaVideo) postProcess() {
+func (meta *VideoMeta) postProcess() {
 	// 处理part
-	if meta.part != "" && strings.ToUpper(meta.part) == "PART" {
-		meta.part = ""
+	if meta.Part != "" && strings.ToUpper(meta.Part) == "PART" {
+		meta.Part = ""
 	}
 
 	// 清理名称中的干扰字符
-	meta.cntitle = meta.fixName(meta.cntitle)
-	meta.entitle = meta.fixName(meta.entitle)
+	meta.CNTitle = meta.fixName(meta.CNTitle)
+	meta.ENTitle = meta.fixName(meta.ENTitle)
 
 	// 处理BluRay DIY标记
-	if meta.resourceType != ResourceTypeUnknown &&
-		(meta.resourceType == ResourceTypeBluRay ||
-			meta.resourceType == ResourceTypeUHDBluRay ||
-			meta.resourceType == ResourceTypeBluRayRemux) {
+	if meta.ResourceType != ResourceTypeUnknown &&
+		(meta.ResourceType == ResourceTypeBluRay ||
+			meta.ResourceType == ResourceTypeUHDBluRay ||
+			meta.ResourceType == ResourceTypeBluRayRemux) {
 		// 检查原始字符串中是否包含DIY标记
-		upperOriginal := strings.ToUpper(meta.orginalTitle)
+		upperOriginal := strings.ToUpper(meta.OrginalTitle)
 		if strings.Contains(upperOriginal, "DIY") ||
 			strings.Contains(upperOriginal, "-DIY@") {
 			// 可以添加DIY标记到资源效果中
-			meta.resourceEffect[ResourceEffectUnknown] = struct{}{} // 需要定义DIY效果类型
+			meta.ResourceEffect[ResourceEffectUnknown] = struct{}{} // 需要定义DIY效果类型
 		}
 	}
 }
 
 // fixName 清理名称中的干扰字符
-func (meta *MetaVideo) fixName(name string) string {
+func (meta *VideoMeta) fixName(name string) string {
 	if name == "" {
 		return name
 	}
@@ -1278,20 +1254,20 @@ func (meta *MetaVideo) fixName(name string) string {
 	if utils.IsDigits(name) {
 		num, err := strconv.Atoi(name)
 		if err == nil && num < 1800 &&
-			meta.year == 0 &&
-			meta.beginSeason == nil &&
-			meta.resourcePix == ResourcePixUnknown &&
-			meta.resourceType == ResourceTypeUnknown &&
-			meta.audioEncode == encode.AudioEncodeUnknown &&
-			meta.videoEncode == encode.VideoEncodeUnknown {
+			meta.Year == 0 &&
+			meta.BeginSeason == nil &&
+			meta.ResourcePix == ResourcePixUnknown &&
+			meta.ResourceType == ResourceTypeUnknown &&
+			meta.AudioEncode == encode.AudioEncodeUnknown &&
+			meta.VideoEncode == encode.VideoEncodeUnknown {
 
 			// 如果还没有起始集，将此数字设为起始集
-			if meta.beginEpisode == nil {
-				meta.beginEpisode = &num
-				meta.totalEpisode = 1
-				meta.mediaType = MediaTypeTV
+			if meta.BeginEpisode == nil {
+				meta.BeginEpisode = &num
+				meta.TotalEpisode = 1
+				meta.MediaType = MediaTypeTV
 				return ""
-			} else if meta.isInEpisode(num) && meta.beginSeason == nil {
+			} else if meta.isInEpisode(num) && meta.BeginSeason == nil {
 				// 如果数字在集数范围内且没有季数信息，清空名称
 				return ""
 			}
@@ -1302,19 +1278,19 @@ func (meta *MetaVideo) fixName(name string) string {
 }
 
 // isInEpisode 检查数字是否在当前集数范围内
-func (meta *MetaVideo) isInEpisode(episode int) bool {
-	if meta.beginEpisode == nil {
+func (meta *VideoMeta) isInEpisode(episode int) bool {
+	if meta.BeginEpisode == nil {
 		return false
 	}
 
-	if meta.endEpisode == nil {
-		return episode == *meta.beginEpisode
+	if meta.EndEpisode == nil {
+		return episode == *meta.BeginEpisode
 	}
 
-	return episode >= *meta.beginEpisode && episode <= *meta.endEpisode
+	return episode >= *meta.BeginEpisode && episode <= *meta.EndEpisode
 }
 
-func ParseMetaVideoByPath(p string) *MetaVideo {
+func ParseVideoMetaByPath(p string) *VideoMeta {
 	idx := 3
 	parts := strings.Split(p, "/")
 	names := make([]string, idx)
@@ -1328,5 +1304,5 @@ func ParseMetaVideoByPath(p string) *MetaVideo {
 			break
 		}
 	}
-	return ParseMetaVideo(strings.Join(names, " "))
+	return ParseVideoMeta(strings.Join(names, " "))
 }
