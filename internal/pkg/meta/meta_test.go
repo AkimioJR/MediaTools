@@ -2,7 +2,7 @@ package meta_test
 
 import (
 	"MediaTools/encode"
-	"MediaTools/meta"
+	"MediaTools/internal/pkg/meta"
 	"testing"
 
 	"github.com/stretchr/testify/require"
