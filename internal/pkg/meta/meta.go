@@ -36,12 +36,12 @@ type VideoMeta struct {
 	// customization  string                      // 自定义词
 
 	// 电视剧相关·
-	BeginSeason  *int // 起始季
-	EndSeason    *int // 结束集
-	TotalSeason  int  // 总季数
-	BeginEpisode *int // 起始集
-	EndEpisode   *int // 结束集
-	TotalEpisode int  // 总集数
+	Season       int // 季
+	EndSeason    int // 结束季
+	TotalSeason  int // 总季数
+	Episode      int // 集
+	EndEpisode   int // 结束集
+	TotalEpisode int // 总集数
 }
 
 // 获取标题
@@ -73,26 +73,26 @@ func (meta *VideoMeta) GetSeasons() []int {
 	}
 
 	var seasons []int
-	if meta.BeginSeason != nil {
-		if meta.EndSeason != nil {
-			for i := *meta.BeginSeason; i <= *meta.EndSeason; i++ {
+	if meta.Season != -1 {
+		if meta.EndSeason != -1 {
+			for i := meta.Season; i <= meta.EndSeason; i++ {
 				seasons = append(seasons, i)
 			}
 		} else {
-			seasons = append(seasons, *meta.BeginSeason)
+			seasons = append(seasons, meta.Season)
 		}
 	}
 	return seasons
 }
 
 func (meta *VideoMeta) GetSeasonStr() string {
-	if meta.BeginSeason == nil {
+	if meta.Season == -1 {
 		return ""
 	} else {
-		if meta.EndSeason == nil {
-			return fmt.Sprintf("S%02d", *meta.BeginSeason)
+		if meta.EndSeason == -1 {
+			return fmt.Sprintf("S%02d", meta.Season)
 		}
-		return fmt.Sprintf("S%02d-S%02d", *meta.BeginSeason, *meta.EndSeason)
+		return fmt.Sprintf("S%02d-S%02d", meta.Season, meta.EndSeason)
 	}
 }
 
@@ -103,26 +103,26 @@ func (meta *VideoMeta) GetEpisodes() []int {
 	}
 
 	var episodes []int
-	if meta.BeginEpisode != nil {
-		if meta.EndEpisode != nil {
-			for i := *meta.BeginEpisode; i <= *meta.EndEpisode; i++ {
+	if meta.Episode != -1 {
+		if meta.EndEpisode != -1 {
+			for i := meta.Episode; i <= meta.EndEpisode; i++ {
 				episodes = append(episodes, i)
 			}
 		} else {
-			episodes = append(episodes, *meta.BeginEpisode)
+			episodes = append(episodes, meta.Episode)
 		}
 	}
 	return episodes
 }
 
 func (meta *VideoMeta) GetEpisodeStr() string {
-	if meta.BeginEpisode == nil {
+	if meta.Episode == -1 {
 		return ""
 	} else {
-		if meta.EndEpisode == nil {
-			return fmt.Sprintf("E%02d", *meta.BeginEpisode)
+		if meta.EndEpisode == -1 {
+			return fmt.Sprintf("E%02d", meta.Episode)
 		}
-		return fmt.Sprintf("E%02d-E%02d", *meta.BeginEpisode, *meta.EndEpisode)
+		return fmt.Sprintf("E%02d-E%02d", meta.Episode, meta.EndEpisode)
 	}
 }
 
@@ -135,6 +135,10 @@ func ParseVideoMeta(title string) *VideoMeta {
 		ReleaseGroups:  findReleaseGroups(title), // 解析发布组
 		Platform:       UnknownStreamingPlatform,
 		Version:        ParseVersion(title), // 解析版本号
+		Season:         -1,
+		EndSeason:      -1,
+		Episode:        -1,
+		EndEpisode:     -1,
 	}
 
 	if utils.IsMediaExtension(path.Ext(title)) {
@@ -216,8 +220,8 @@ func (meta *VideoMeta) parsePart(s *parseState) {
 		return
 	}
 	if meta.Year == 0 &&
-		meta.BeginSeason == nil &&
-		meta.BeginEpisode == nil &&
+		meta.Season == -1 &&
+		meta.Episode == -1 &&
 		meta.ResourcePix == ResourcePixUnknown &&
 		meta.ResourceType == ResourceTypeUnknown {
 		return
@@ -522,8 +526,8 @@ func (meta *VideoMeta) parseSeason(s *parseState) {
 
 		if startSeasonNum, err := strconv.Atoi(startSeasonStr); err == nil && startSeasonNum > 0 {
 			if endSeasonNum, err := strconv.Atoi(endSeasonStr); err == nil && endSeasonNum >= startSeasonNum {
-				meta.BeginSeason = &startSeasonNum
-				meta.EndSeason = &endSeasonNum
+				meta.Season = startSeasonNum
+				meta.EndSeason = endSeasonNum
 				meta.TotalSeason = (endSeasonNum - startSeasonNum) + 1
 				meta.MediaType = MediaTypeTV
 				s.lastType = lastTokenTypeSeason
@@ -554,8 +558,8 @@ func (meta *VideoMeta) parseSeason(s *parseState) {
 			s.stopcntitleFlag = true // 只停止中文名的处理
 			s.continueFlag = false
 
-			if meta.BeginSeason == nil {
-				meta.BeginSeason = &seasonNum
+			if meta.Season == -1 {
+				meta.Season = seasonNum
 				meta.TotalSeason = 1
 			}
 			return
@@ -584,16 +588,16 @@ func (meta *VideoMeta) parseSeason(s *parseState) {
 		}
 
 		if seasonNum > 0 {
-			if meta.BeginSeason == nil {
-				meta.BeginSeason = &seasonNum
+			if meta.Season == -1 {
+				meta.Season = seasonNum
 				meta.TotalSeason = 1
 			} else {
-				if seasonNum > *meta.BeginSeason {
-					meta.EndSeason = &seasonNum
-					meta.TotalSeason = (seasonNum - *meta.BeginSeason) + 1
+				if seasonNum > meta.Season {
+					meta.EndSeason = seasonNum
+					meta.TotalSeason = (seasonNum - meta.Season) + 1
 					// 如果是文件且总季数大于1，重置结束季
 					if meta.IsFile && meta.TotalSeason > 1 {
-						meta.EndSeason = nil
+						meta.EndSeason = -1
 						meta.TotalSeason = 1
 					}
 				}
@@ -608,22 +612,22 @@ func (meta *VideoMeta) parseSeason(s *parseState) {
 
 		// 如果前一个token是SEASON且当前季为空且数字长度小于3
 		if s.lastType == lastTokenTypeSeason &&
-			meta.BeginSeason == nil &&
+			meta.Season == -1 &&
 			len(token) < 3 {
-			meta.BeginSeason = &tokenInt
+			meta.Season = tokenInt
 			meta.TotalSeason = 1
 			s.lastType = lastTokenTypeSeason
 			s.stopNameFlag = true
 			s.continueFlag = false
 			meta.MediaType = MediaTypeTV
 		}
-	} else if strings.ToUpper(token) == "SEASON" && meta.BeginSeason == nil {
+	} else if strings.ToUpper(token) == "SEASON" && meta.Season == -1 {
 		// 遇到SEASON关键词
 		s.lastType = lastTokenTypeSeason
-	} else if meta.MediaType == MediaTypeTV && meta.BeginSeason == nil {
+	} else if meta.MediaType == MediaTypeTV && meta.Season == -1 {
 		// 如果已确定为电视剧类型但没有季数，默认为第1季
 		defaultSeason := 1
-		meta.BeginSeason = &defaultSeason
+		meta.Season = defaultSeason
 	}
 }
 
@@ -636,13 +640,13 @@ func (meta *VideoMeta) parseEpisode(s *parseState) {
 		seasonStr := sxxexxMatches[1]
 		episodeStr := sxxexxMatches[2]
 
-		if seasonNum, err := strconv.Atoi(seasonStr); err == nil && seasonNum > 0 && meta.BeginSeason == nil {
-			meta.BeginSeason = &seasonNum
+		if seasonNum, err := strconv.Atoi(seasonStr); err == nil && seasonNum > 0 && meta.Season == -1 {
+			meta.Season = seasonNum
 			meta.TotalSeason = 1
 		}
 
-		if episodeNum, err := strconv.Atoi(episodeStr); err == nil && episodeNum > 0 && meta.BeginEpisode == nil {
-			meta.BeginEpisode = &episodeNum
+		if episodeNum, err := strconv.Atoi(episodeStr); err == nil && episodeNum > 0 && meta.Episode == -1 {
+			meta.Episode = episodeNum
 			meta.TotalEpisode = 1
 		}
 
@@ -681,8 +685,8 @@ func (meta *VideoMeta) parseEpisode(s *parseState) {
 			goto checkEpisodeRegex
 		}
 
-		if meta.BeginEpisode == nil {
-			meta.BeginEpisode = &episodeNum
+		if meta.Episode == -1 {
+			meta.Episode = episodeNum
 			meta.TotalEpisode = 1
 		}
 		goto setEpisodeFlags
@@ -696,9 +700,9 @@ checkEpisodeRegex:
 
 		if startEpisode, err := strconv.Atoi(startEpisodeStr); err == nil && startEpisode > 0 {
 			if endEpisode, err := strconv.Atoi(endEpisodeStr); err == nil && endEpisode > startEpisode {
-				if meta.BeginEpisode == nil {
-					meta.BeginEpisode = &startEpisode
-					meta.EndEpisode = &endEpisode
+				if meta.Episode == -1 {
+					meta.Episode = startEpisode
+					meta.EndEpisode = endEpisode
 					meta.TotalEpisode = (endEpisode - startEpisode) + 1
 				}
 				goto setEpisodeFlags
@@ -719,14 +723,14 @@ checkEpisodeRegex:
 		}
 
 		if episodeNum > 0 {
-			if meta.BeginEpisode == nil {
-				meta.BeginEpisode = &episodeNum
+			if meta.Episode == -1 {
+				meta.Episode = episodeNum
 				meta.TotalEpisode = 1
-			} else if episodeNum > *meta.BeginEpisode {
-				meta.EndEpisode = &episodeNum
-				meta.TotalEpisode = (episodeNum - *meta.BeginEpisode) + 1
+			} else if episodeNum > meta.Episode {
+				meta.EndEpisode = episodeNum
+				meta.TotalEpisode = (episodeNum - meta.Episode) + 1
 				if meta.IsFile && meta.TotalEpisode > 2 {
-					meta.EndEpisode = nil
+					meta.EndEpisode = -1
 					meta.TotalEpisode = 1
 				}
 			}
@@ -739,10 +743,10 @@ checkEpisodeRegex:
 		// 检查是否为集数范围格式（当前数字 + 下一个数字）
 		nextToken := s.tokens.Peek()
 		if utils.IsDigits(nextToken) && len([]rune(nextToken)) >= 1 && len([]rune(nextToken)) <= 4 {
-			if nextInt, err := strconv.Atoi(nextToken); err == nil && nextInt > tokenInt && meta.BeginEpisode == nil {
+			if nextInt, err := strconv.Atoi(nextToken); err == nil && nextInt > tokenInt && meta.Episode == -1 {
 				// 这是一个集数范围
-				meta.BeginEpisode = &tokenInt
-				meta.EndEpisode = &nextInt
+				meta.Episode = tokenInt
+				meta.EndEpisode = nextInt
 				meta.TotalEpisode = (nextInt - tokenInt) + 1
 				s.tokens.GetNext() // 跳过下一个 token，因为我们已经处理了
 				goto setEpisodeFlags
@@ -750,32 +754,32 @@ checkEpisodeRegex:
 		}
 
 		switch {
-		case meta.BeginEpisode != nil && meta.EndEpisode == nil &&
-			length < 5 && tokenInt > *meta.BeginEpisode &&
+		case meta.Episode != -1 && meta.EndEpisode == -1 &&
+			length < 5 && tokenInt > meta.Episode &&
 			s.lastType == lastTokenTypeEpisode:
-			meta.EndEpisode = &tokenInt
-			meta.TotalEpisode = (tokenInt - *meta.BeginEpisode) + 1
+			meta.EndEpisode = tokenInt
+			meta.TotalEpisode = (tokenInt - meta.Episode) + 1
 			if meta.IsFile && meta.TotalEpisode > 2 {
-				meta.EndEpisode = nil
+				meta.EndEpisode = -1
 				meta.TotalEpisode = 1
 			}
 			goto setEpisodeFlags
 
-		case meta.BeginEpisode == nil && length > 1 && length < 4 &&
+		case meta.Episode == -1 && length > 1 && length < 4 &&
 			s.lastType != lastTokenTypeYear && s.lastType != lastTokenTypePix &&
 			s.lastType != lastTokenTypeVideoEncode && token != s.unknownNameStr:
-			meta.BeginEpisode = &tokenInt
+			meta.Episode = tokenInt
 			meta.TotalEpisode = 1
 			goto setEpisodeFlags
 
-		case meta.BeginEpisode == nil && length <= 3 && tokenInt <= 99 &&
-			s.lastType == lastTokenTypeYear && meta.BeginSeason != nil:
-			meta.BeginEpisode = &tokenInt
+		case meta.Episode == -1 && length <= 3 && tokenInt <= 99 &&
+			s.lastType == lastTokenTypeYear && meta.Season != -1:
+			meta.Episode = tokenInt
 			meta.TotalEpisode = 1
 			goto setEpisodeFlags
 
-		case s.lastType == lastTokenTypeEpisode && meta.BeginEpisode == nil && length < 5:
-			meta.BeginEpisode = &tokenInt
+		case s.lastType == lastTokenTypeEpisode && meta.Episode == -1 && length < 5:
+			meta.Episode = tokenInt
 			meta.TotalEpisode = 1
 			goto setEpisodeFlags
 		}
@@ -974,8 +978,8 @@ func (meta *VideoMeta) parseVideoEncode(s *parseState) {
 	if meta.Year == 0 &&
 		meta.ResourcePix == ResourcePixUnknown &&
 		meta.ResourceType == ResourceTypeUnknown &&
-		meta.BeginSeason == nil &&
-		meta.BeginEpisode == nil {
+		meta.Season == -1 &&
+		meta.Episode == -1 {
 		return
 	}
 
@@ -1077,8 +1081,8 @@ func (meta *VideoMeta) parseAudioEncode(s *parseState) {
 	if meta.Year == 0 &&
 		meta.ResourcePix == ResourcePixUnknown &&
 		meta.ResourceType == ResourceTypeUnknown &&
-		meta.BeginSeason == nil &&
-		meta.BeginEpisode == nil {
+		meta.Season == -1 &&
+		meta.Episode == -1 {
 		return
 	}
 
@@ -1262,19 +1266,19 @@ func (meta *VideoMeta) fixName(name string) string {
 		num, err := strconv.Atoi(name)
 		if err == nil && num < 1800 &&
 			meta.Year == 0 &&
-			meta.BeginSeason == nil &&
+			meta.Season == -1 &&
 			meta.ResourcePix == ResourcePixUnknown &&
 			meta.ResourceType == ResourceTypeUnknown &&
 			meta.AudioEncode == encode.AudioEncodeUnknown &&
 			meta.VideoEncode == encode.VideoEncodeUnknown {
 
 			// 如果还没有起始集，将此数字设为起始集
-			if meta.BeginEpisode == nil {
-				meta.BeginEpisode = &num
+			if meta.Episode == -1 {
+				meta.Episode = num
 				meta.TotalEpisode = 1
 				meta.MediaType = MediaTypeTV
 				return ""
-			} else if meta.isInEpisode(num) && meta.BeginSeason == nil {
+			} else if meta.isInEpisode(num) && meta.Season == -1 {
 				// 如果数字在集数范围内且没有季数信息，清空名称
 				return ""
 			}
@@ -1286,15 +1290,15 @@ func (meta *VideoMeta) fixName(name string) string {
 
 // isInEpisode 检查数字是否在当前集数范围内
 func (meta *VideoMeta) isInEpisode(episode int) bool {
-	if meta.BeginEpisode == nil {
+	if meta.Episode == -1 {
 		return false
 	}
 
-	if meta.EndEpisode == nil {
-		return episode == *meta.BeginEpisode
+	if meta.EndEpisode == -1 {
+		return episode == meta.Episode
 	}
 
-	return episode >= *meta.BeginEpisode && episode <= *meta.EndEpisode
+	return episode >= meta.Episode && episode <= meta.EndEpisode
 }
 
 func ParseVideoMetaByPath(p string) *VideoMeta {
