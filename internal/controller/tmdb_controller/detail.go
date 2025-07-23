@@ -10,7 +10,7 @@ import (
 )
 
 // 搜索tmdb中所有的标题和译名
-func getNames(tmdbID uint64, mtype meta.MediaType) ([]string, error) {
+func getNames(tmdbID int, mtype meta.MediaType) ([]string, error) {
 
 	var (
 		names        []string
@@ -51,7 +51,7 @@ func getNames(tmdbID uint64, mtype meta.MediaType) ([]string, error) {
 	return names, nil
 }
 
-func getMovieDetail(tmdbID uint64) (*schemas.MediaInfo, error) {
+func getMovieDetail(tmdbID int) (*schemas.MediaInfo, error) {
 	logrus.Infof("获取电影详情，TMDB ID: %d", tmdbID)
 
 	detail, err := client.GetMovieDetails(tmdbID, nil)
@@ -68,7 +68,7 @@ func getMovieDetail(tmdbID uint64) (*schemas.MediaInfo, error) {
 	return &mediaInfo, nil
 }
 
-func getTVDetail(tmdbID uint64) (*schemas.MediaInfo, error) {
+func getTVDetail(tmdbID int) (*schemas.MediaInfo, error) {
 	logrus.Infof("获取电视剧详情，TMDB ID: %d", tmdbID)
 
 	detail, err := client.GetTVSeriesDetails(tmdbID, nil)

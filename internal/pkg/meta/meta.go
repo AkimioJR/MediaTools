@@ -19,9 +19,9 @@ type VideoMeta struct {
 	IsFile         bool      // 是否是媒体文件
 	CNTitle        string    // 中文标题
 	ENTitle        string    // 英文标题
-	Year           uint      // 年份
+	Year           int       // 年份
 	MediaType      MediaType // 媒体类型
-	TMDBID         uint64    // TMDB ID
+	TMDBID         int       // TMDB ID
 
 	// 资源信息
 	ResourceType   ResourceType                // 来源/介质
@@ -457,7 +457,7 @@ func (meta *VideoMeta) parseYear(s *parseState) {
 		meta.ENTitle += " "
 	}
 
-	meta.Year = uint(num)
+	meta.Year = num
 	s.lastType = lastTokenTypeYear
 	s.continueFlag = false
 	s.stopNameFlag = true

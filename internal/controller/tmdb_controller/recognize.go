@@ -9,7 +9,7 @@ import (
 )
 
 // 给定TMDB号，查询一条媒体信息
-func GetInfo(tmdbID uint64, mtype *meta.MediaType) (*schemas.MediaInfo, error) {
+func GetInfo(tmdbID int, mtype *meta.MediaType) (*schemas.MediaInfo, error) {
 	if mtype == nil || *mtype == meta.MediaTypeUnknown {
 		logrus.Infof("未指定 TMDB ID 「%d」的媒体类型", tmdbID)
 		movieDetail, movieErr := getMovieDetail(tmdbID)
@@ -47,7 +47,7 @@ func GetInfo(tmdbID uint64, mtype *meta.MediaType) (*schemas.MediaInfo, error) {
 // mtype 媒体类型
 // tmdbID TMDB ID
 // 返回识别后的媒体信息
-func RecognizeMedia(videoMeta *meta.VideoMeta, mType *meta.MediaType, tmdbID *uint64) (*schemas.MediaInfo, error) {
+func RecognizeMedia(videoMeta *meta.VideoMeta, mType *meta.MediaType, tmdbID *int) (*schemas.MediaInfo, error) {
 	// 1. 优先处理直接提供 tmdbID 的情况
 	if tmdbID != nil && *tmdbID > 0 {
 		return GetInfo(*tmdbID, mType)

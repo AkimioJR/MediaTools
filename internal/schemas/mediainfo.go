@@ -18,7 +18,7 @@ type TMDBInfo struct {
 
 type MediaInfo struct {
 	MediaType meta.MediaType // 电影、电视剧等
-	TMDBID    uint64         // TMDB ID
+	TMDBID    int            // TMDB ID
 	TMDBInfo  TMDBInfo       // TMDB 相关信息
 
 	// IMDBID      string // IMDb ID

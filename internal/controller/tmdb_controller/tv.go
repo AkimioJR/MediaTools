@@ -27,7 +27,7 @@ func SearchTVBySeason(name string, seasonYear int, seasonNumber int) (*schemas.M
 			return false
 		}
 		for _, season := range detail.Seasons {
-			if season.SeasonNumber == uint64(seasonNumber) && season.AirDate[:len("2025")] == strconv.Itoa(seasonYear) {
+			if season.SeasonNumber == seasonNumber && season.AirDate[:len("2025")] == strconv.Itoa(seasonYear) {
 				return true
 			}
 		}
