@@ -72,10 +72,10 @@ func RecognizeMedia(videoMeta *meta.VideoMeta, mType *meta.MediaType, tmdbID *in
 	}
 
 	for _, title := range videoMeta.GetTitles() {
-		if videoMeta.BeginSeason == nil {
+		if videoMeta.Season == -1 {
 			logrus.Infof("正在识别「%s」...", title)
 		} else {
-			logrus.Infof("正在识别「%s（第 %d 季）」...", title, *videoMeta.BeginSeason)
+			logrus.Infof("正在识别「%s（第 %d 季）」...", title, videoMeta.Season)
 		}
 
 		var year *int
@@ -83,7 +83,7 @@ func RecognizeMedia(videoMeta *meta.VideoMeta, mType *meta.MediaType, tmdbID *in
 			intYear := int(videoMeta.Year)
 			year = &intYear
 		}
-		info, err := MatchWithFallback(title, mediaType, year, year, videoMeta.BeginSeason)
+		info, err := MatchWithFallback(title, mediaType, year, year, &videoMeta.Season)
 		if err == nil {
 			logrus.Infof("识别「%s」媒体信息成功", title)
 			return info, nil
