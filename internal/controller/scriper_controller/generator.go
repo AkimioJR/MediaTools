@@ -24,11 +24,11 @@ func genMovieMetaInfo(mediaInfo *schemas.MediaInfo) *MovieMetaData {
 		writers   []Creator // 编剧列表
 		credits   []Creator // 其他制作人员列表
 	)
-	resp, err := tmdb_controller.GetMovieCredits(mediaInfo.TMDBID, nil)
+	resp, err := tmdb_controller.GetMovieCredit(mediaInfo.TMDBID, nil)
 	if err != nil {
 		logrus.Warningf("获取电影「%s」演员/制作人员列表失败: %v", mediaInfo.TMDBInfo.MovieInfo.Title, err)
 	} else {
-		for _, cast := range resp.Credits {
+		for _, cast := range resp.Cast {
 			actors = append(actors, Actor{
 				Name:    cast.Name,
 				Role:    cast.Character,
@@ -92,19 +92,21 @@ func genTVSeriesMetaInfo(mediaInfo *schemas.MediaInfo) *TVSeriesMetaData {
 		logrus.Warningf("获取电视剧「%s」发行年份失败: %v", mediaInfo.TMDBInfo.TVInfo.SeriesInfo.Name, err)
 	}
 	var actors []Actor
-	resp, err := tmdb_controller.GetTVSeriesCredits(mediaInfo.TMDBID, nil)
+	resp, err := tmdb_controller.GetTVSerieCredit(mediaInfo.TMDBID, nil)
 	if err != nil {
 		logrus.Warningf("获取电视剧「%s」演员/制作人员列表失败: %v", mediaInfo.TMDBInfo.TVInfo.SeriesInfo.Name, err)
 	} else {
 		for _, cast := range resp.Cast {
-			actors = append(actors, Actor{
-				Name:    cast.Name,
-				Role:    cast.Character,
-				Type:    "Actor",
-				TMDBID:  strconv.Itoa(cast.ID),
-				Thumb:   tmdb_controller.GetImageURL(cast.ProfilePath),
-				Profile: fmt.Sprintf("https://www.themoviedb.org/person/%d", cast.ID),
-			})
+			for _, role := range cast.Roles {
+				actors = append(actors, Actor{
+					Name:    cast.Name,
+					Role:    role.Character,
+					Type:    "Actor",
+					TMDBID:  strconv.Itoa(cast.ID),
+					Thumb:   tmdb_controller.GetImageURL(cast.ProfilePath),
+					Profile: fmt.Sprintf("https://www.themoviedb.org/person/%d", cast.ID),
+				})
+			}
 		}
 	}
 	var genres []string
