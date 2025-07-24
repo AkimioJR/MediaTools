@@ -34,30 +34,30 @@ func TestRecognizeMedia(t *testing.T) {
 	info, err := tmdb_controller.RecognizeMedia(mv, nil, nil)
 	require.NoError(t, err)
 	require.Equal(t, meta.MediaTypeTV, info.MediaType)
-	require.Equal(t, uint64(72517), info.TMDBID)
+	require.Equal(t, 72517, info.TMDBID)
 
 	mv = meta.ParseVideoMeta("[黒ネズミたち] 帝乃三姊妹意外地容易相处。 / Mikadono Sanshimai wa Angai, Choroi. - 02 (ABEMA 1280x720 AVC AAC MP4) [367.7 MB]")
 	info, err = tmdb_controller.RecognizeMedia(mv, nil, nil)
 	require.NoError(t, err)
 	require.Equal(t, meta.MediaTypeTV, info.MediaType)
-	require.Equal(t, uint64(272556), info.TMDBID)
+	require.Equal(t, 272556, info.TMDBID)
 
 	mv = meta.ParseVideoMeta("【推しの子】 致深爱你的那个我 / Kimi wo Aishita Hitori no Boku e - Movie (CR 1920x1080 AVC AAC MKV)")
 	info, err = tmdb_controller.RecognizeMedia(mv, nil, nil)
 	require.NoError(t, err)
 	require.Equal(t, meta.MediaTypeMovie, info.MediaType)
-	require.Equal(t, uint64(874745), info.TMDBID)
+	require.Equal(t, 874745, info.TMDBID)
 
 	mv = meta.ParseVideoMeta("【喵萌奶茶屋】★剧场版★[青春猪头少年不会梦到娇怜外出妹/Seishun Buta Yarou wa Odekake Sister no Yume o Minai][BDRip][1080p][繁日双语][招募翻译时轴]")
 	info, err = tmdb_controller.RecognizeMedia(mv, nil, nil)
 	require.NoError(t, err)
 	require.Equal(t, meta.MediaTypeMovie, info.MediaType)
-	require.Equal(t, uint64(1056803), info.TMDBID)
+	require.Equal(t, 1056803, info.TMDBID)
 
 	mv = meta.ParseVideoMeta("Thor Love and Thunder (2022) [1080p] [WEBRip] [5.1]")
 	m := meta.MediaTypeMovie
 	info, err = tmdb_controller.RecognizeMedia(mv, &m, nil)
 	require.NoError(t, err)
 	require.Equal(t, meta.MediaTypeMovie, info.MediaType)
-	require.Equal(t, uint64(616037), info.TMDBID)
+	require.Equal(t, 616037, info.TMDBID)
 }
