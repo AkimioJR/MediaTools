@@ -6,7 +6,7 @@ import (
 )
 
 type TMDBTVInfo struct {
-	SeriesInfo    *themoviedb.TVSeriesDetail  // TMDB 电视剧相关信息
+	SeriesInfo    *themoviedb.TVSerieDetail   // TMDB 电视剧相关信息
 	SeasonInfo    *themoviedb.TVSeasonDetail  // TMDB 电视剧季相关信息
 	EpisodeInfo   *themoviedb.TVEpisodeDetail // TMDB 电视剧集相关信息
 	SeasonNumber  int                         // 季数
