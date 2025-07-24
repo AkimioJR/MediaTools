@@ -75,11 +75,54 @@ func (tmdb *TMDB) GetTVEpisodeDetail(seriesID int, seasonNumber int, episodeNumb
 	return &resp, nil
 }
 
+type TVEpisodeCredit struct {
+	Cast []struct {
+		Adult              bool    `json:"adult"`
+		Gender             int     `json:"gender"`
+		ID                 int     `json:"id"`
+		KnownForDepartment string  `json:"known_for_department"`
+		Name               string  `json:"name"`
+		OriginalName       string  `json:"original_name"`
+		Popularity         float64 `json:"popularity"`
+		ProfilePath        string  `json:"profile_path"`
+		Character          string  `json:"character"`
+		CreditID           string  `json:"credit_id"`
+		Order              int     `json:"order"`
+	} `json:"cast"`
+	Crew []struct {
+		Department         string  `json:"department"`
+		Job                string  `json:"job"`
+		CreditID           string  `json:"credit_id"`
+		Adult              bool    `json:"adult"`
+		Gender             int     `json:"gender"`
+		ID                 int     `json:"id"`
+		KnownForDepartment string  `json:"known_for_department"`
+		Name               string  `json:"name"`
+		OriginalName       string  `json:"original_name"`
+		Popularity         float64 `json:"popularity"`
+		ProfilePath        string  `json:"profile_path"`
+	} `json:"crew"`
+	GuestStars []struct {
+		Character          string  `json:"character"`
+		CreditID           string  `json:"credit_id"`
+		Order              int     `json:"order"`
+		Adult              bool    `json:"adult"`
+		Gender             int     `json:"gender"`
+		ID                 int     `json:"id"`
+		KnownForDepartment string  `json:"known_for_department"`
+		Name               string  `json:"name"`
+		OriginalName       string  `json:"original_name"`
+		Popularity         float64 `json:"popularity"`
+		ProfilePath        string  `json:"profile_path"`
+	} `json:"guest_stars"`
+	ID int `json:"id"`
+}
+
 // 获取一部电视剧单集的演员列表和工作人员列表。
 // Get the cast and crew for a TV episode by its ID.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/episode/{episode_number}/credits
 // https://developer.themoviedb.org/reference/tv-episode-credits
-func (tmdb *TMDB) GetTVEpisodeCredits(seriesID int, seasonNumber int, episodeNumber int, language *string) (*TVCreditsResponse, error) {
+func (tmdb *TMDB) GetTVEpisodeCredit(seriesID int, seasonNumber int, episodeNumber int, language *string) (*TVEpisodeCredit, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
@@ -87,23 +130,31 @@ func (tmdb *TMDB) GetTVEpisodeCredits(seriesID int, seasonNumber int, episodeNum
 		params.Set("language", tmdb.language)
 	}
 
-	response := TVCreditsResponse{}
+	var resp TVEpisodeCredit
 	err := tmdb.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(seriesID)+"/season/"+strconv.Itoa(seasonNumber)+"/episode/"+strconv.Itoa(episodeNumber)+"/credits",
 		params,
 		nil,
-		&response,
+		&resp,
 	)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d 第 %d 季 第 %d 集」演员列表失败：%v", seriesID, seasonNumber, episodeNumber, err))
 	}
-	return &response, nil
+	return &resp, nil
 }
 
 type TVEpisodeImage struct {
-	ID     int       `json:"id"`
-	Stills []TVImage `json:"stills"`
+	ID     int `json:"id"`
+	Stills []struct {
+		AspectRatio float64     `json:"aspect_ratio"`
+		Height      int         `json:"height"`
+		Iso6391     interface{} `json:"iso_639_1"`
+		FilePath    string      `json:"file_path"`
+		VoteAverage float64     `json:"vote_average"`
+		VoteCount   int         `json:"vote_count"`
+		Width       int         `json:"width"`
+	} `json:"stills"`
 }
 
 // 获取属于电视剧单集的图片。

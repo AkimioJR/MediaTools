@@ -20,100 +20,159 @@ type SearchKeywordParams struct {
 	Page  *uint32 `query:"page"`  // 页码
 }
 
-type SearchCompanyParams SearchKeywordParams
+type SearchCompanyParams struct {
+	Query string  `query:"query"` // 搜索关键词
+	Page  *uint32 `query:"page"`  // 页码
+}
 
 type SearchMultiParams struct {
-	SearchKeywordParams
+	Query        string  `query:"query"`         // 搜索关键词
+	Page         *uint32 `query:"page"`          // 页码
 	IncludeAdult *bool   `query:"include_adult"` // 是否包含成人内容
 	Language     *string `query:"language"`      // 语言
 }
 
 type SearchCollectionParams struct {
-	SearchMultiParams
-	Region *string `query:"region"` // 地区
+	Query        string  `query:"query"`         // 搜索关键词
+	Page         *uint32 `query:"page"`          // 页码
+	IncludeAdult *bool   `query:"include_adult"` // 是否包含成人内容
+	Language     *string `query:"language"`      // 语言
+	Region       *string `query:"region"`        // 地区
 }
 
 type SearchMovieParams struct {
-	SearchCollectionParams
+	Query              string  `query:"query"`                // 搜索关键词
+	Page               *uint32 `query:"page"`                 // 页码
+	IncludeAdult       *bool   `query:"include_adult"`        // 是否包含成人内容
+	Language           *string `query:"language"`             // 语言
+	Region             *string `query:"region"`               // 地区
 	PrimaryReleaseYear *string `query:"primary_release_year"` // 主发行年份
 	Year               *string `query:"year"`                 // 年份
 }
 
 type SearchTVSParams struct {
-	SearchMultiParams
+	Query            string  `query:"query"`               // 搜索关键词
+	Page             *uint32 `query:"page"`                // 页码
+	IncludeAdult     *bool   `query:"include_adult"`       // 是否包含成人内容
+	Language         *string `query:"language"`            // 语言
 	FirstAirDateYear *uint32 `query:"first_air_date_year"` // 首播年份
 	Year             *uint32 `query:"year"`                // 年份
 }
 
-type SearchPersonParams SearchMultiParams
+type SearchPersonParams struct {
+	Query        string  `query:"query"`         // 搜索关键词
+	Page         *uint32 `query:"page"`          // 页码
+	IncludeAdult *bool   `query:"include_adult"` // 是否包含成人内容
+	Language     *string `query:"language"`      // 语言
+}
 
 // ========= 响应字段 =========
 
-type SearchKeywordResponse Keyword
+type SearchKeywordResponse struct {
+	ID   int    `json:"id"`   // 关键词ID
+	Name string `json:"name"` // 关键词名称
+}
 
 type SearchCompanyResponse struct {
-	SearchKeywordResponse
-	LogoPath      string `json:"logo_path"`      // 公司Logo路径
-	OriginCountry string `json:"origin_country"` // 原始国家
+	ID            int    `json:"id"`
+	LogoPath      string `json:"logo_path"`
+	Name          string `json:"name"`
+	OriginCountry string `json:"origin_country"`
 }
 
 type SearchCollectionResponse struct {
-	SearchKeywordResponse
-	Adult            bool   `json:"adult"`             // 是否成人内容
-	BackDropPath     string `json:"backdrop_path"`     // 背景图片路径
-	OriginalLanguage string `json:"original_language"` // 原始语言
-	OriginalName     string `json:"original_name"`     // 原始名称
-	Overview         string `json:"overview"`          // 概述
-	PosterPath       string `json:"poster_path"`       // 海报图片路径
-}
-
-type BaseMediaResponse struct {
-	Vote
-	Adult            bool    `json:"adult"`             // 是否成人内容
-	BackDropPath     string  `json:"backdrop_path"`     // 背景图片路径
-	GenreIDs         []int   `json:"genre_ids"`         // 类型ID列表
-	ID               int     `json:"id"`                // ID
-	OriginalLanguage string  `json:"original_language"` // 原始语言
-	Overview         string  `json:"overview"`          // 概述
-	Popularity       float64 `json:"popularity"`        // 人气
-	PosterPath       string  `json:"poster_path"`       // 海报图片路径
+	Adult            bool   `json:"adult"`
+	BackdropPath     string `json:"backdrop_path"`
+	ID               int    `json:"id"`
+	Name             string `json:"name"`
+	OriginalLanguage string `json:"original_language"`
+	OriginalName     string `json:"original_name"`
+	Overview         string `json:"overview"`
+	PosterPath       string `json:"poster_path"`
 }
 
 type SearchMovieResponse struct {
-	BaseMediaResponse
-	OriginalTitle string `json:"original_title"` // 原始标题
-	Title         string `json:"title"`          // 标题
-	ReleaseDate   string `json:"release_date"`   // 发行日期
-	Video         bool   `json:"video"`          // 是否视频
+	Adult            bool    `json:"adult"`
+	BackdropPath     string  `json:"backdrop_path"`
+	GenreIds         []int   `json:"genre_ids"`
+	ID               int     `json:"id"`
+	OriginalLanguage string  `json:"original_language"`
+	OriginalTitle    string  `json:"original_title"`
+	Overview         string  `json:"overview"`
+	Popularity       float64 `json:"popularity"`
+	PosterPath       string  `json:"poster_path"`
+	ReleaseDate      string  `json:"release_date"`
+	Title            string  `json:"title"`
+	Video            bool    `json:"video"`
+	VoteAverage      float64 `json:"vote_average"`
+	VoteCount        int     `json:"vote_count"`
 }
 
 type SearchTVResponse struct {
-	BaseMediaResponse
-	OriginalCountry []string `json:"original_country"` // 原始国家
-	OriginalName    string   `json:"original_name"`    // 原始名称
-	Name            string   `json:"name"`             // 名称
-	FirstAirDate    string   `json:"first_air_date"`   // 首播日期
+	Adult            bool     `json:"adult"`
+	BackdropPath     string   `json:"backdrop_path"`
+	GenreIds         []int    `json:"genre_ids"`
+	ID               int      `json:"id"`
+	OriginCountry    []string `json:"origin_country"`
+	OriginalLanguage string   `json:"original_language"`
+	OriginalName     string   `json:"original_name"`
+	Overview         string   `json:"overview"`
+	Popularity       float64  `json:"popularity"`
+	PosterPath       string   `json:"poster_path"`
+	FirstAirDate     string   `json:"first_air_date"`
+	Name             string   `json:"name"`
+	VoteAverage      float64  `json:"vote_average"`
+	VoteCount        int      `json:"vote_count"`
 }
 
 type SearchMultiResponse struct {
-	BaseMediaResponse
-	MediaType     string `json:"media_type"`     // 媒体类型
-	OriginalTitle string `json:"original_title"` // 原始标题（电影）
-	Title         string `json:"title"`          // 标题（电影）
-	ReleaseDate   string `json:"release_date"`   // 发行日期（电影）
-	Video         bool   `json:"video"`          // 是否视频（电影）
+	Adult            bool     `json:"adult"`
+	BackdropPath     string   `json:"backdrop_path"`
+	ID               int      `json:"id"`
+	Title            string   `json:"title,omitempty"`
+	OriginalLanguage string   `json:"original_language"`
+	OriginalTitle    string   `json:"original_title,omitempty"`
+	Overview         string   `json:"overview"`
+	PosterPath       string   `json:"poster_path"`
+	MediaType        string   `json:"media_type"`
+	GenreIds         []int    `json:"genre_ids"`
+	Popularity       float64  `json:"popularity"`
+	ReleaseDate      string   `json:"release_date,omitempty"`
+	Video            bool     `json:"video,omitempty"`
+	VoteAverage      float64  `json:"vote_average"`
+	VoteCount        int      `json:"vote_count"`
+	Name             string   `json:"name,omitempty"`
+	OriginalName     string   `json:"original_name,omitempty"`
+	FirstAirDate     string   `json:"first_air_date,omitempty"`
+	OriginCountry    []string `json:"origin_country,omitempty"`
 }
 
 type SearchPersonResponse struct {
-	Adult              bool                  `json:"adult"`                // 是否成人内容
-	Gender             int                   `json:"gender"`               // 性别
-	ID                 int                   `json:"id"`                   // ID
-	KnownForDepartment string                `json:"known_for_department"` // 知名部门
-	Name               string                `json:"name"`                 // 姓名
-	OriginalName       string                `json:"original_name"`        // 原始姓名
-	Popularity         float64               `json:"popularity"`           // 人气
-	ProfilePath        string                `json:"profile_path"`         // 个人资料图片路径
-	KnownFor           []SearchMultiResponse `json:"known_for"`            // 知名作品
+	Adult              bool    `json:"adult"`
+	Gender             int     `json:"gender"`
+	ID                 int     `json:"id"`
+	KnownForDepartment string  `json:"known_for_department"`
+	Name               string  `json:"name"`
+	OriginalName       string  `json:"original_name"`
+	Popularity         float64 `json:"popularity"`
+	ProfilePath        string  `json:"profile_path"`
+	KnownFor           []struct {
+		Adult            bool    `json:"adult"`
+		BackdropPath     string  `json:"backdrop_path"`
+		ID               int     `json:"id"`
+		Title            string  `json:"title"`
+		OriginalLanguage string  `json:"original_language"`
+		OriginalTitle    string  `json:"original_title"`
+		Overview         string  `json:"overview"`
+		PosterPath       string  `json:"poster_path"`
+		MediaType        string  `json:"media_type"`
+		GenreIds         []int   `json:"genre_ids"`
+		Popularity       float64 `json:"popularity"`
+		ReleaseDate      string  `json:"release_date"`
+		Video            bool    `json:"video"`
+		VoteAverage      float64 `json:"vote_average"`
+		VoteCount        int     `json:"vote_count"`
+	} `json:"known_for"`
 }
 
 // 按收藏的原名、译名及别名进行搜索。
