@@ -4,6 +4,11 @@ import (
 	"MediaTools/encode"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/pkg/themoviedb/v3"
+	"fmt"
+	"html/template"
+	"path"
+	"strconv"
+	"strings"
 )
 
 type TMDBTVInfo struct {
@@ -61,4 +66,64 @@ type MediaItem struct {
 	EpisodeStr   string `json:"episode_str"`   // 集 E12 E12-E15
 	EpisodeTitle string `json:"episode_title"` // 集标题
 	EpisodeDate  string `json:"episode_date"`  // 集发布日期
+}
+
+func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error) {
+	item := MediaItem{
+		MediaType:      info.MediaType,
+		TMDBID:         info.TMDBID,
+		Part:           videoMeta.Part,
+		Version:        videoMeta.Version,
+		ReleaseGroups:  videoMeta.ReleaseGroups,
+		Platform:       videoMeta.Platform,
+		ResourceType:   videoMeta.ResourceType,
+		ResourceEffect: videoMeta.ResourceEffect,
+		ResourcePix:    videoMeta.ResourcePix,
+		VideoEncode:    videoMeta.VideoEncode,
+		AudioEncode:    videoMeta.AudioEncode,
+		FileExtension:  path.Ext(videoMeta.OrginalTitle),
+	}
+
+	switch info.MediaType {
+	case meta.MediaTypeMovie:
+		item.Title = info.TMDBInfo.MovieInfo.Title
+		item.OriginalTitle = info.TMDBInfo.MovieInfo.OriginalTitle
+		year, err := strconv.Atoi(info.TMDBInfo.MovieInfo.ReleaseDate[:4])
+		if err == nil {
+			item.Year = year
+		}
+	case meta.MediaTypeTV:
+		item.Title = info.TMDBInfo.TVInfo.SeriesInfo.Name
+		item.OriginalTitle = info.TMDBInfo.TVInfo.SeriesInfo.OriginalName
+		year, err := strconv.Atoi(info.TMDBInfo.TVInfo.SeriesInfo.FirstAirDate[:4])
+		if err == nil {
+			item.Year = year
+		}
+		item.Season = videoMeta.Season
+		item.SeasonStr = videoMeta.GetSeasonStr()
+		year, err = strconv.Atoi(info.TMDBInfo.TVInfo.SeasonInfo.AirDate[:4])
+		if err == nil {
+			item.SeasonYear = year
+		}
+		item.Episode = videoMeta.Episode
+		item.EpisodeStr = videoMeta.GetEpisodeStr()
+		item.EpisodeTitle = info.TMDBInfo.TVInfo.EpisodeInfo.Name
+		item.EpisodeDate = info.TMDBInfo.TVInfo.EpisodeInfo.AirDate
+	default:
+		return nil, fmt.Errorf("不支持的媒体类型: %s", info.MediaType.String())
+	}
+
+	return &item, nil
+}
+
+func (item *MediaItem) Format(format string) (string, error) {
+	tmpl, err := template.New("mediaName").Parse(format)
+	if err != nil {
+		return "", fmt.Errorf("解析模板字符串「%s」失败: %v", format, err)
+	}
+	var buffer strings.Builder
+	if err := tmpl.Execute(&buffer, item); err != nil {
+		return "", fmt.Errorf("渲染模板失败: %v", err)
+	}
+	return buffer.String(), nil
 }
