@@ -227,20 +227,33 @@ func genTVEpisodeMetaInfo(mediaInfo *schemas.MediaInfo) *TVEpisodeMetaData {
 	}
 	return &data
 }
-func GenMetaDataNFO(mediaInfo *schemas.MediaInfo) ([]byte, error) {
+func GenMetaDataNFO(infoType InfoType, mediaInfo *schemas.MediaInfo) ([]byte, error) {
 	var nfoData any
-	switch mediaInfo.MediaType {
-	case meta.MediaTypeMovie:
-		nfoData = genMovieMetaInfo(mediaInfo)
-	case meta.MediaTypeTV:
-		switch {
-		case mediaInfo.TMDBInfo.TVInfo.SeasonNumber != -1 && mediaInfo.TMDBInfo.TVInfo.EpisodeNumber != -1:
-			nfoData = genTVEpisodeMetaInfo(mediaInfo)
-		case mediaInfo.TMDBInfo.TVInfo.SeasonNumber != -1:
-			nfoData = genTVSeasonMetaInfo(mediaInfo)
-		default:
-			nfoData = genTVSeriesMetaInfo(mediaInfo)
+	switch infoType {
+	case InfoTypeMovie:
+		if mediaInfo.MediaType != meta.MediaTypeMovie || mediaInfo.TMDBInfo.MovieInfo == nil {
+			return nil, fmt.Errorf("媒体信息不完整，无法生成电影 NFO")
 		}
+		nfoData = genMovieMetaInfo(mediaInfo)
+	case InfoTypeTV:
+		if mediaInfo.MediaType != meta.MediaTypeTV || mediaInfo.TMDBInfo.TVInfo.SeriesInfo == nil {
+			return nil, fmt.Errorf("媒体信息不完整，无法生成电视剧 NFO")
+		}
+		nfoData = genTVSeriesMetaInfo(mediaInfo)
+	case InfoTypeTVSeason:
+		if mediaInfo.MediaType != meta.MediaTypeTV ||
+			mediaInfo.TMDBInfo.TVInfo.SeasonInfo == nil ||
+			mediaInfo.TMDBInfo.TVInfo.SeasonNumber == -1 {
+			return nil, fmt.Errorf("媒体信息不完整，无法生成电视剧季集 NFO")
+		}
+		nfoData = genTVSeasonMetaInfo(mediaInfo)
+	case InfoTypeTVEpisode:
+		if mediaInfo.MediaType != meta.MediaTypeTV ||
+			mediaInfo.TMDBInfo.TVInfo.EpisodeInfo == nil ||
+			mediaInfo.TMDBInfo.TVInfo.EpisodeNumber == -1 {
+			return nil, fmt.Errorf("媒体信息不完整，无法生成电视剧集 NFO")
+		}
+		nfoData = genTVEpisodeMetaInfo(mediaInfo)
 	default:
 		return nil, fmt.Errorf("不支持的媒体类型: %s", mediaInfo.MediaType)
 	}
