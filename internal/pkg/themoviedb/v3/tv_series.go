@@ -69,14 +69,14 @@ type TVSerieDetail struct {
 		Name     string `json:"name"`
 	} `json:"production_countries"`
 	Seasons []struct {
-		AirDate      string `json:"air_date"`
-		EpisodeCount int    `json:"episode_count"`
-		ID           int    `json:"id"`
-		Name         string `json:"name"`
-		Overview     string `json:"overview"`
-		PosterPath   string `json:"poster_path"`
-		SeasonNumber int    `json:"season_number"`
-		VoteAverage  int    `json:"vote_average"`
+		AirDate      string  `json:"air_date"`
+		EpisodeCount int     `json:"episode_count"`
+		ID           int     `json:"id"`
+		Name         string  `json:"name"`
+		Overview     string  `json:"overview"`
+		PosterPath   string  `json:"poster_path"`
+		SeasonNumber int     `json:"season_number"`
+		VoteAverage  float64 `json:"vote_average"`
 	} `json:"seasons"`
 	SpokenLanguages []struct {
 		EnglishName string `json:"english_name"`
