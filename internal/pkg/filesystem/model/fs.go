@@ -1,8 +1,11 @@
 package model
 
-import "io"
+import (
+	"io"
+	"strings"
+)
 
-type StorageType uint16
+type StorageType uint8
 
 const (
 	StorageUnknown StorageType = iota // 未知文件系统
@@ -15,6 +18,15 @@ func (t StorageType) String() string {
 		return "LocalStorage"
 	default:
 		return "unknown"
+	}
+}
+
+func ParseStorageType(s string) StorageType {
+	switch strings.ToLower(s) {
+	case "localstorage":
+		return StorageLocal
+	default:
+		return StorageUnknown
 	}
 }
 
