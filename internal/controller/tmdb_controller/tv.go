@@ -21,7 +21,7 @@ func SearchTVBySeason(name string, seasonYear int, seasonNumber int) (*schemas.M
 	logrus.Infof("正在搜索「%s (%d) 第 %d 季」...", name, seasonYear, seasonNumber)
 
 	matchSeasonFN := func(tv themoviedb.SearchTVResponse) bool {
-		detail, err := client.GetTVSeriesDetails(tv.ID, nil)
+		detail, err := client.GetTVSerieDetail(tv.ID, nil)
 		if err != nil {
 			logrus.Warningf("获取电视剧「%d」详情失败: %v", tv.ID, err)
 			return false
