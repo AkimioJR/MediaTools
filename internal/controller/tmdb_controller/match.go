@@ -13,7 +13,7 @@ import (
 )
 
 // 根据名称同时查询电影和电视剧，没有类型也没有年份时使用
-func MatchMulti(name string) (*schemas.MediaInfo, error) {
+func MatchMulti(name string, mType *meta.MediaType) (*schemas.MediaInfo, error) {
 	var page uint32 = 1
 	var params themoviedb.SearchMultiParams
 	params.Query = name
@@ -43,11 +43,26 @@ func MatchMulti(name string) (*schemas.MediaInfo, error) {
 
 	// 排序：电影在前，按年份降序
 	sort.Slice(results, func(i, j int) bool {
-		// 电影优先
+		// 如果指定了类型、对应类型优先
+		if mType != nil {
+			switch *mType {
+			case meta.MediaTypeMovie:
+				if results[i].MediaType != results[j].MediaType {
+					return results[i].MediaType == "movie"
+				}
+			case meta.MediaTypeTV:
+				if results[i].MediaType != results[j].MediaType {
+					return results[i].MediaType == "tv"
+				}
+			}
+		}
+
+		// 否则电影优先
 		if results[i].MediaType != results[j].MediaType {
 			return results[i].MediaType == "movie"
 		}
-		// 年份降序
+
+		// 如果类型一致，年份新的优先
 		// 取 release_date 格式 "YYYY-MM-DD"
 		getDate := func(r themoviedb.SearchMultiResponse) string {
 			if r.ReleaseDate != "" {
@@ -141,7 +156,7 @@ func Match(name string, mType meta.MediaType, year *int, seasonYear *int, season
 
 	default:
 		logrus.Warningf("未指定媒体类型，尝试综合查询「%s」", name)
-		info, err := MatchMulti(name)
+		info, err := MatchMulti(name, nil)
 		if err != nil {
 			return nil, fmt.Errorf("综合查询「%s」失败: %v", name, err)
 		}
@@ -174,12 +189,19 @@ func MatchWithFallback(name string, mType meta.MediaType, year *int, seasonYear 
 
 	// 3. 兜底：多类型模糊匹配
 	logrus.Warningf("匹配 %s「%s」失败: %v，尝试综合模糊匹配", mType, name, err)
-	info, err = MatchMulti(name)
+	info, err = MatchMulti(name, &mType)
 	if err == nil {
 		return info, nil
 	}
 
-	// 4. 最终失败
+	// 4. 移除掉类型再次匹配
+	logrus.Warningf("综合模糊匹配匹配 %s「%s」失败: %v，移除类型再次尝试匹配", mType, name, err)
+	info, err = MatchMulti(name, nil)
+	if err == nil {
+		return info, nil
+	}
+
+	// 5. 最终失败
 	logrus.Errorf("综合匹配「%s」失败: %v", name, err)
 	return nil, err
 }
