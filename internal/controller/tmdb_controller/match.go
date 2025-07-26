@@ -13,6 +13,8 @@ import (
 )
 
 // 根据名称同时查询电影和电视剧，没有类型也没有年份时使用
+// name 查询的名称
+// mType 优先返回的媒体类型，如果为 nil 则电影优先
 func MatchMulti(name string, mType *meta.MediaType) (*schemas.MediaInfo, error) {
 	var page uint32 = 1
 	var params themoviedb.SearchMultiParams
@@ -43,23 +45,21 @@ func MatchMulti(name string, mType *meta.MediaType) (*schemas.MediaInfo, error) 
 
 	// 排序：电影在前，按年份降序
 	sort.Slice(results, func(i, j int) bool {
-		// 如果指定了类型、对应类型优先
-		if mType != nil {
-			switch *mType {
-			case meta.MediaTypeMovie:
-				if results[i].MediaType != results[j].MediaType {
-					return results[i].MediaType == "movie"
-				}
-			case meta.MediaTypeTV:
-				if results[i].MediaType != results[j].MediaType {
-					return results[i].MediaType == "tv"
-				}
-			}
-		}
-
-		// 否则电影优先
 		if results[i].MediaType != results[j].MediaType {
-			return results[i].MediaType == "movie"
+			if mType != nil { // 如果指定了类型、对应类型优先
+				switch *mType {
+				case meta.MediaTypeMovie:
+					if results[i].MediaType != results[j].MediaType {
+						return results[i].MediaType == "movie"
+					}
+				case meta.MediaTypeTV:
+					if results[i].MediaType != results[j].MediaType {
+						return results[i].MediaType == "tv"
+					}
+				}
+			} else { // 否则电影优先
+				return results[i].MediaType == "movie"
+			}
 		}
 
 		// 如果类型一致，年份新的优先
