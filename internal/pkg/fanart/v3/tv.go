@@ -10,18 +10,18 @@ import (
 type TVImagesData struct {
 	Name           string       `json:"name"`
 	ThetvdbID      string       `json:"thetvdb_id"`
-	Clearlogo      []BaseInfo   `json:"clearlogo"`
-	Hdtvlogo       []BaseInfo   `json:"hdtvlogo"`
-	Clearart       []BaseInfo   `json:"clearart"`
-	Showbackground []SeasonInfo `json:"showbackground"`
-	Tvthumb        []BaseInfo   `json:"tvthumb"`
-	Seasonposter   []BaseInfo   `json:"seasonposter"`
-	Seasonthumb    []SeasonInfo `json:"seasonthumb"`
-	Hdclearart     []BaseInfo   `json:"hdclearart"`
-	Tvbanner       []BaseInfo   `json:"tvbanner"`
-	Characterart   []BaseInfo   `json:"characterart"`
-	Tvposter       []BaseInfo   `json:"tvposter"`
-	Seasonbanner   []SeasonInfo `json:"seasonbanner"`
+	ClearLogo      []BaseInfo   `json:"clearlogo"`
+	HDTVLogo       []BaseInfo   `json:"hdtvlogo"`
+	ClearArt       []BaseInfo   `json:"clearart"`
+	ShowBackground []SeasonInfo `json:"showbackground"`
+	TVThumb        []BaseInfo   `json:"tvthumb"`
+	SeasonPoster   []BaseInfo   `json:"seasonposter"`
+	SeasonThumb    []SeasonInfo `json:"seasonthumb"`
+	HDClearArt     []BaseInfo   `json:"hdclearart"`
+	TVBanner       []BaseInfo   `json:"tvbanner"`
+	CharacterArt   []BaseInfo   `json:"characterart"`
+	TVPoster       []BaseInfo   `json:"tvposter"`
+	SeasonBanner   []SeasonInfo `json:"seasonbanner"`
 }
 
 // 获取剧集的图片数据
