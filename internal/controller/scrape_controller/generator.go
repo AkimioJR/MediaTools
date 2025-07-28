@@ -1,4 +1,4 @@
-package scriper_controller
+package scrape_controller
 
 import (
 	"MediaTools/internal/controller/tmdb_controller"

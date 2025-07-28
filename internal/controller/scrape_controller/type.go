@@ -1,4 +1,4 @@
-package scriper_controller
+package scrape_controller
 
 type InfoType uint8
 
