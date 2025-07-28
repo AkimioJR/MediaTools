@@ -31,8 +31,9 @@ type MediaInfo struct {
 	TMDBID    int            // TMDB ID
 	TMDBInfo  TMDBInfo       // TMDB 相关信息
 
-	// IMDBID      string // IMDb ID
-	// TVDBID      uint64 // TVDB ID
+	IMDBID string // IMDb ID
+	TVDBID int    // TVDB ID
+
 	// DoubanID    string // 豆瓣 ID
 	// BangumiID   string // 番组计划 ID
 	// DoubanInfo  any    // 豆瓣相关信息
