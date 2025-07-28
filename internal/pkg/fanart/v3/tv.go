@@ -7,83 +7,20 @@ import (
 )
 
 type TVImagesData struct {
-	Name      string `json:"name"`
-	ThetvdbID string `json:"thetvdb_id"`
-	Clearlogo []struct {
-		ID    string `json:"id"`
-		URL   string `json:"url"`
-		Lang  string `json:"lang"`
-		Likes string `json:"likes"`
-	} `json:"clearlogo"`
-	Hdtvlogo []struct {
-		ID    string `json:"id"`
-		URL   string `json:"url"`
-		Lang  string `json:"lang"`
-		Likes string `json:"likes"`
-	} `json:"hdtvlogo"`
-	Clearart []struct {
-		ID    string `json:"id"`
-		URL   string `json:"url"`
-		Lang  string `json:"lang"`
-		Likes string `json:"likes"`
-	} `json:"clearart"`
-	Showbackground []struct {
-		ID     string `json:"id"`
-		URL    string `json:"url"`
-		Lang   string `json:"lang"`
-		Likes  string `json:"likes"`
-		Season string `json:"season"`
-	} `json:"showbackground"`
-	Tvthumb []struct {
-		ID    string `json:"id"`
-		URL   string `json:"url"`
-		Lang  string `json:"lang"`
-		Likes string `json:"likes"`
-	} `json:"tvthumb"`
-	Seasonposter []struct {
-		ID    string `json:"id"`
-		URL   string `json:"url"`
-		Lang  string `json:"lang"`
-		Likes string `json:"likes"`
-	} `json:"seasonposter"`
-	Seasonthumb []struct {
-		ID     string `json:"id"`
-		URL    string `json:"url"`
-		Lang   string `json:"lang"`
-		Likes  string `json:"likes"`
-		Season string `json:"season"`
-	} `json:"seasonthumb"`
-	Hdclearart []struct {
-		ID    string `json:"id"`
-		URL   string `json:"url"`
-		Lang  string `json:"lang"`
-		Likes string `json:"likes"`
-	} `json:"hdclearart"`
-	Tvbanner []struct {
-		ID    string `json:"id"`
-		URL   string `json:"url"`
-		Lang  string `json:"lang"`
-		Likes string `json:"likes"`
-	} `json:"tvbanner"`
-	Characterart []struct {
-		ID    string `json:"id"`
-		URL   string `json:"url"`
-		Lang  string `json:"lang"`
-		Likes string `json:"likes"`
-	} `json:"characterart"`
-	Tvposter []struct {
-		ID    string `json:"id"`
-		URL   string `json:"url"`
-		Lang  string `json:"lang"`
-		Likes string `json:"likes"`
-	} `json:"tvposter"`
-	Seasonbanner []struct {
-		ID     string `json:"id"`
-		URL    string `json:"url"`
-		Lang   string `json:"lang"`
-		Likes  string `json:"likes"`
-		Season string `json:"season"`
-	} `json:"seasonbanner"`
+	Name           string        `json:"name"`
+	ThetvdbID      string        `json:"thetvdb_id"`
+	Clearlogo      []Image       `json:"clearlogo"`
+	Hdtvlogo       []Image       `json:"hdtvlogo"`
+	Clearart       []Image       `json:"clearart"`
+	Showbackground []SeasonImage `json:"showbackground"`
+	Tvthumb        []Image       `json:"tvthumb"`
+	Seasonposter   []Image       `json:"seasonposter"`
+	Seasonthumb    []SeasonImage `json:"seasonthumb"`
+	Hdclearart     []Image       `json:"hdclearart"`
+	Tvbanner       []Image       `json:"tvbanner"`
+	Characterart   []Image       `json:"characterart"`
+	Tvposter       []Image       `json:"tvposter"`
+	Seasonbanner   []SeasonImage `json:"seasonbanner"`
 }
 
 // 获取剧集的图片数据

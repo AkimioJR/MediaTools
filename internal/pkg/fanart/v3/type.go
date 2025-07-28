@@ -1,6 +1,8 @@
 package fanart
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type ErrorResponse struct {
 	Status       string `json:"status"`
@@ -24,4 +26,16 @@ func NewFanartError(err error, msg string) *FanartError {
 		err: err,
 		msg: msg,
 	}
+}
+
+type Image struct {
+	ID    string `json:"id"`
+	URL   string `json:"url"`
+	Lang  string `json:"lang"`
+	Likes string `json:"likes"`
+}
+
+type SeasonImage struct {
+	Image
+	Season string `json:"season"`
 }
