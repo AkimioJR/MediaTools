@@ -15,14 +15,14 @@ func GetMovieImagesData(imdbID string) (*fanart.MovieImagesData, error) {
 		return nil, err
 	}
 
-	data.Hdmovielogo = fanart.SortByLanguages(data.Hdmovielogo, config.Fanart.Languages)
-	data.Movielogo = fanart.SortByLanguages(data.Movielogo, config.Fanart.Languages)
-	data.Movieposter = fanart.SortByLanguages(data.Movieposter, config.Fanart.Languages)
-	data.Hdmovieclearart = fanart.SortByLanguages(data.Hdmovieclearart, config.Fanart.Languages)
-	data.Movieart = fanart.SortByLanguages(data.Movieart, config.Fanart.Languages)
-	data.Moviebackground = fanart.SortByLanguages(data.Moviebackground, config.Fanart.Languages)
-	data.Moviebanner = fanart.SortByLanguages(data.Moviebanner, config.Fanart.Languages)
-	data.Moviethumb = fanart.SortByLanguages(data.Moviethumb, config.Fanart.Languages)
+	data.HDMovieLogo = fanart.SortByLanguages(data.HDMovieLogo, config.Fanart.Languages)
+	data.MovieLogo = fanart.SortByLanguages(data.MovieLogo, config.Fanart.Languages)
+	data.MoviePoster = fanart.SortByLanguages(data.MoviePoster, config.Fanart.Languages)
+	data.HDMovieClearArt = fanart.SortByLanguages(data.HDMovieClearArt, config.Fanart.Languages)
+	data.MovieArt = fanart.SortByLanguages(data.MovieArt, config.Fanart.Languages)
+	data.MovieBackground = fanart.SortByLanguages(data.MovieBackground, config.Fanart.Languages)
+	data.MovieBanner = fanart.SortByLanguages(data.MovieBanner, config.Fanart.Languages)
+	data.MovieThumb = fanart.SortByLanguages(data.MovieThumb, config.Fanart.Languages)
 
 	return data, nil
 }
@@ -36,18 +36,18 @@ func GetTVImagesData(thetvdbID int) (*fanart.TVImagesData, error) {
 		return nil, err
 	}
 
-	data.Clearlogo = fanart.SortByLanguages(data.Clearlogo, config.Fanart.Languages)
-	data.Hdtvlogo = fanart.SortByLanguages(data.Hdtvlogo, config.Fanart.Languages)
-	data.Clearart = fanart.SortByLanguages(data.Clearart, config.Fanart.Languages)
-	data.Showbackground = fanart.SortByLanguages(data.Showbackground, config.Fanart.Languages)
-	data.Tvthumb = fanart.SortByLanguages(data.Tvthumb, config.Fanart.Languages)
-	data.Seasonposter = fanart.SortByLanguages(data.Seasonposter, config.Fanart.Languages)
-	data.Seasonthumb = fanart.SortByLanguages(data.Seasonthumb, config.Fanart.Languages)
-	data.Hdclearart = fanart.SortByLanguages(data.Hdclearart, config.Fanart.Languages)
-	data.Tvbanner = fanart.SortByLanguages(data.Tvbanner, config.Fanart.Languages)
-	data.Characterart = fanart.SortByLanguages(data.Characterart, config.Fanart.Languages)
-	data.Tvposter = fanart.SortByLanguages(data.Tvposter, config.Fanart.Languages)
-	data.Seasonbanner = fanart.SortByLanguages(data.Seasonbanner, config.Fanart.Languages)
+	data.ClearLogo = fanart.SortByLanguages(data.ClearLogo, config.Fanart.Languages)
+	data.HDTVLogo = fanart.SortByLanguages(data.HDTVLogo, config.Fanart.Languages)
+	data.ClearArt = fanart.SortByLanguages(data.ClearArt, config.Fanart.Languages)
+	data.ShowBackground = fanart.SortByLanguages(data.ShowBackground, config.Fanart.Languages)
+	data.TVThumb = fanart.SortByLanguages(data.TVThumb, config.Fanart.Languages)
+	data.SeasonPoster = fanart.SortByLanguages(data.SeasonPoster, config.Fanart.Languages)
+	data.SeasonThumb = fanart.SortByLanguages(data.SeasonThumb, config.Fanart.Languages)
+	data.HDClearArt = fanart.SortByLanguages(data.HDClearArt, config.Fanart.Languages)
+	data.TVBanner = fanart.SortByLanguages(data.TVBanner, config.Fanart.Languages)
+	data.CharacterArt = fanart.SortByLanguages(data.CharacterArt, config.Fanart.Languages)
+	data.TVPoster = fanart.SortByLanguages(data.TVPoster, config.Fanart.Languages)
+	data.SeasonBanner = fanart.SortByLanguages(data.SeasonBanner, config.Fanart.Languages)
 
 	return data, nil
 
