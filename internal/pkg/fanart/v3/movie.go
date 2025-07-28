@@ -3,6 +3,7 @@ package fanart
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 type MovieImagesData struct {
@@ -27,7 +28,7 @@ func (client *FanartClient) GetMovieImagesData(imdbID string) (*MovieImagesData,
 	err := client.DoRequest(
 		http.MethodGet,
 		"/movie/"+imdbID+"/images",
-		nil,
+		url.Values{},
 		nil,
 		&resp,
 	)

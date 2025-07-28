@@ -3,6 +3,7 @@ package fanart
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -30,7 +31,7 @@ func (client *FanartClient) GetTVImagesData(thetvdbID int) (*TVImagesData, error
 	err := client.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(thetvdbID)+"/images",
-		nil,
+		url.Values{},
 		nil,
 		&resp,
 	)
