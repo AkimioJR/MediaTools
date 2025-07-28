@@ -28,20 +28,26 @@ func NewFanartError(err error, msg string) *FanartError {
 	}
 }
 
-type Image struct {
+type BaseInfo struct {
 	ID    string `json:"id"`
 	URL   string `json:"url"`
 	Lang  string `json:"lang"`
 	Likes string `json:"likes"`
 }
 
-type SeasonImage struct {
-	Image
+type SeasonInfo struct {
+	BaseInfo
 	Season string `json:"season"`
 }
 
-func (img Image) getLang() string {
-	return img.Lang
+type DiscInfo struct {
+	BaseInfo
+	Disc     string `json:"disc"`
+	DiscType string `json:"disc_type"`
+}
+
+func (info BaseInfo) getLang() string {
+	return info.Lang
 }
 
 type img interface {

@@ -6,25 +6,18 @@ import (
 )
 
 type MovieImagesData struct {
-	Name        string  `json:"name"`
-	TmdbID      string  `json:"tmdb_id"`
-	ImdbID      string  `json:"imdb_id"`
-	Hdmovielogo []Image `json:"hdmovielogo"`
-	Moviedisc   []struct {
-		ID       string `json:"id"`
-		URL      string `json:"url"`
-		Lang     string `json:"lang"`
-		Likes    string `json:"likes"`
-		Disc     string `json:"disc"`
-		DiscType string `json:"disc_type"`
-	} `json:"moviedisc"`
-	Movielogo       []Image `json:"movielogo"`
-	Movieposter     []Image `json:"movieposter"`
-	Hdmovieclearart []Image `json:"hdmovieclearart"`
-	Movieart        []Image `json:"movieart"`
-	Moviebackground []Image `json:"moviebackground"`
-	Moviebanner     []Image `json:"moviebanner"`
-	Moviethumb      []Image `json:"moviethumb"`
+	Name            string     `json:"name"`
+	TmdbID          string     `json:"tmdb_id"`
+	ImdbID          string     `json:"imdb_id"`
+	Hdmovielogo     []BaseInfo `json:"hdmovielogo"`
+	Moviedisc       []DiscInfo `json:"moviedisc"`
+	Movielogo       []BaseInfo `json:"movielogo"`
+	Movieposter     []BaseInfo `json:"movieposter"`
+	Hdmovieclearart []BaseInfo `json:"hdmovieclearart"`
+	Movieart        []BaseInfo `json:"movieart"`
+	Moviebackground []BaseInfo `json:"moviebackground"`
+	Moviebanner     []BaseInfo `json:"moviebanner"`
+	Moviethumb      []BaseInfo `json:"moviethumb"`
 }
 
 // 获取电影的图片数据
