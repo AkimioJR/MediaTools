@@ -46,12 +46,16 @@ type MediaItem struct {
 	OriginalTitle string                 `json:"original_title"` // 原始标题
 	Year          int                    `json:"year"`           // 年份
 	MediaType     meta.MediaType         `json:"media_type"`     // 电影、电视剧
-	TMDBID        int                    `json:"tmdb_id"`        // TMDB ID
 	Part          string                 `json:"part"`           // 分段
 	Version       uint8                  `json:"version"`        // 版本号
 	ReleaseGroups []string               `json:"release_groups"` // 发布组
 	Platform      meta.StreamingPlatform `json:"platform"`       // 流媒体平台
 	FileExtension string                 `json:"file_extension"` // 文件扩展名
+
+	// ID 信息
+	TMDBID int    `json:"tmdb_id"` // TMDB ID
+	IMDBID string `json:"imdb_id"` // IMDb ID
+	TVDBID int    `json:"tvdb_id"` // TVDB ID
 
 	// 资源相关信息
 	ResourceType   meta.ResourceType     `json:"resource_type"`   // 资源类型
@@ -73,7 +77,6 @@ type MediaItem struct {
 func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error) {
 	item := MediaItem{
 		MediaType:      info.MediaType,
-		TMDBID:         info.TMDBID,
 		Part:           videoMeta.Part,
 		Version:        videoMeta.Version,
 		ReleaseGroups:  videoMeta.ReleaseGroups,
@@ -84,6 +87,10 @@ func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error
 		VideoEncode:    videoMeta.VideoEncode,
 		AudioEncode:    videoMeta.AudioEncode,
 		FileExtension:  path.Ext(videoMeta.OrginalTitle),
+
+		TMDBID: info.TMDBID,
+		IMDBID: info.IMDBID,
+		TVDBID: info.TVDBID,
 	}
 
 	switch info.MediaType {
@@ -128,7 +135,7 @@ func (item *MediaItem) Format() (string, error) {
 	default:
 		return "", fmt.Errorf("不支持的媒体类型: %s", item.MediaType.String())
 	}
-	
+
 	tmpl, err := template.New("mediaName").Parse(format)
 	if err != nil {
 		return "", fmt.Errorf("解析模板字符串「%s」失败: %v", format, err)
