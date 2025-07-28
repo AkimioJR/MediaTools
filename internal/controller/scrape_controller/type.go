@@ -8,3 +8,7 @@ const (
 	InfoTypeTVSeason
 	InfoTypeTVEpisode
 )
+
+type InfoData interface {
+	XML() ([]byte, error) // 返回 XML 格式的数据
+}

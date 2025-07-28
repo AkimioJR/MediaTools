@@ -4,7 +4,6 @@ import (
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
-	"encoding/xml"
 	"fmt"
 	"strconv"
 
@@ -228,7 +227,7 @@ func genTVEpisodeMetaInfo(mediaInfo *schemas.MediaInfo) *TVEpisodeMetaData {
 	return &data
 }
 func GenMetaDataNFO(infoType InfoType, mediaInfo *schemas.MediaInfo) ([]byte, error) {
-	var nfoData any
+	var nfoData InfoData
 	switch infoType {
 	case InfoTypeMovie:
 		if mediaInfo.MediaType != meta.MediaTypeMovie || mediaInfo.TMDBInfo.MovieInfo == nil {
@@ -257,5 +256,5 @@ func GenMetaDataNFO(infoType InfoType, mediaInfo *schemas.MediaInfo) ([]byte, er
 	default:
 		return nil, fmt.Errorf("不支持的媒体类型: %s", mediaInfo.MediaType)
 	}
-	return xml.MarshalIndent(nfoData, "", "  ")
+	return nfoData.XML()
 }

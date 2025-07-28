@@ -52,6 +52,7 @@ type Creator struct {
 	Profile string `xml:"profile,omitempty"`     // 个人简介（可选）
 }
 
+// 电视剧元数据
 type TVSeriesMetaData struct {
 	XMLName       xml.Name   `xml:"tvshow"`
 	Title         string     `xml:"title"`                  // 剧集标题
@@ -99,6 +100,10 @@ type TVSeriesMetaData struct {
 	UserNote      string `xml:"user_note,omitempty"`     // 用户备注
 }
 
+func (t *TVSeriesMetaData) XML() ([]byte, error) {
+	return xml.MarshalIndent(t, "", "  ")
+}
+
 // 电视剧季信息
 type TVSeasonMetaData struct {
 	XMLName      xml.Name   `xml:"season"`
@@ -119,6 +124,10 @@ type TVSeasonMetaData struct {
 	ShowTitle    string     `xml:"showtitle,omitempty"`    // 所属剧集标题
 	Thumbs       []Thumb    `xml:"thumb,omitempty"`        // 缩略图
 	UserNote     string     `xml:"user_note,omitempty"`    // 用户备注
+}
+
+func (t *TVSeasonMetaData) XML() ([]byte, error) {
+	return xml.MarshalIndent(t, "", "  ")
 }
 
 // 电视剧集信息
@@ -157,6 +166,10 @@ type TVEpisodeMetaData struct {
 	Edition          string     `xml:"edition,omitempty"`           // 版本（如NONE）
 	OriginalFilename string     `xml:"original_filename,omitempty"` // 原始文件名
 	UserNote         string     `xml:"user_note,omitempty"`         // 用户备注
+}
+
+func (t *TVEpisodeMetaData) XML() ([]byte, error) {
+	return xml.MarshalIndent(t, "", "  ")
 }
 
 // 电影元数据
@@ -208,3 +221,11 @@ type MovieMetaData struct {
 	OriginalFilename string    `xml:"original_filename,omitempty"` // 原始文件名
 	UserNote         string    `xml:"user_note,omitempty"`         // 用户备注
 }
+
+func (t *MovieMetaData) XML() ([]byte, error) {
+	return xml.MarshalIndent(t, "", "  ")
+}
+
+var _ InfoData = (*TVSeriesMetaData)(nil)
+var _ InfoData = (*TVSeasonMetaData)(nil)
+var _ InfoData = (*TVEpisodeMetaData)(nil)
