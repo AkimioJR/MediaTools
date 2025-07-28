@@ -12,9 +12,16 @@ type TMDBConfig struct {
 	Language string `yaml:"language"`
 }
 
+type FanartConfig struct {
+	APIKey   string   `yaml:"api_key"`
+	Language []string `yaml:"language"` // 语言顺序
+}
+
 type Configuration struct {
-	Log  LogConfig  `yaml:"log"`
-	TMDB TMDBConfig `yaml:"tmdb"`
+	Log          LogConfig          `yaml:"log"`
+	TMDB         TMDBConfig         `yaml:"tmdb"`
+	Fanart       FanartConfig       `yaml:"fanart"`
+	MediaLibrary MediaLibraryConfig `yaml:"media_library"`
 }
 
 type MediaLibraryConfig struct {
