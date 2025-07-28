@@ -86,14 +86,14 @@ func genMovieMetaInfo(mediaInfo *schemas.MediaInfo) *MovieMetaData {
 }
 
 func genTVSerieMetaInfo(mediaInfo *schemas.MediaInfo) *TVSeriesMetaData {
-	year, err := strconv.Atoi(mediaInfo.TMDBInfo.TVInfo.SeriesInfo.FirstAirDate[:4])
+	year, err := strconv.Atoi(mediaInfo.TMDBInfo.TVInfo.SerieInfo.FirstAirDate[:4])
 	if err != nil {
-		logrus.Warningf("获取电视剧「%s」发行年份失败: %v", mediaInfo.TMDBInfo.TVInfo.SeriesInfo.Name, err)
+		logrus.Warningf("获取电视剧「%s」发行年份失败: %v", mediaInfo.TMDBInfo.TVInfo.SerieInfo.Name, err)
 	}
 	var actors []Actor
 	resp, err := tmdb_controller.GetTVSerieCredit(mediaInfo.TMDBID, nil)
 	if err != nil {
-		logrus.Warningf("获取电视剧「%s」演员/制作人员列表失败: %v", mediaInfo.TMDBInfo.TVInfo.SeriesInfo.Name, err)
+		logrus.Warningf("获取电视剧「%s」演员/制作人员列表失败: %v", mediaInfo.TMDBInfo.TVInfo.SerieInfo.Name, err)
 	} else {
 		for _, cast := range resp.Cast {
 			for _, role := range cast.Roles {
@@ -109,7 +109,7 @@ func genTVSerieMetaInfo(mediaInfo *schemas.MediaInfo) *TVSeriesMetaData {
 		}
 	}
 	var genres []string
-	for _, genre := range mediaInfo.TMDBInfo.TVInfo.SeriesInfo.Genres {
+	for _, genre := range mediaInfo.TMDBInfo.TVInfo.SerieInfo.Genres {
 		genres = append(genres, genre.Name)
 	}
 
@@ -120,19 +120,19 @@ func genTVSerieMetaInfo(mediaInfo *schemas.MediaInfo) *TVSeriesMetaData {
 	})
 
 	data := TVSeriesMetaData{
-		Title:         mediaInfo.TMDBInfo.TVInfo.SeriesInfo.Name,         // 电视剧标题
-		OriginalTitle: mediaInfo.TMDBInfo.TVInfo.SeriesInfo.OriginalName, // 原始标题
-		Plot:          mediaInfo.TMDBInfo.TVInfo.SeriesInfo.Overview,     // 剧情简介
-		Outline:       mediaInfo.TMDBInfo.TVInfo.SeriesInfo.Overview,     // 大纲简介
-		Actors:        actors,                                            // 演员列表
-		Genres:        genres,                                            // 电视剧类型
-		Year:          year,                                              // 发行年份
-		Premiered:     mediaInfo.TMDBInfo.TVInfo.SeriesInfo.FirstAirDate, // 首映日期
-		Rating:        mediaInfo.TMDBInfo.TVInfo.SeriesInfo.VoteAverage,  // 评分
-		Season:        -1,                                                // 默认值 -1，表示未指定季数
-		Episode:       -1,                                                // 默认值 -1，表示未指定集数
-		TMDBID:        mediaInfo.TMDBID,                                  // TMDB ID
-		UniqueIDs:     uniqueIDs,                                         // 唯一ID列表
+		Title:         mediaInfo.TMDBInfo.TVInfo.SerieInfo.Name,         // 电视剧标题
+		OriginalTitle: mediaInfo.TMDBInfo.TVInfo.SerieInfo.OriginalName, // 原始标题
+		Plot:          mediaInfo.TMDBInfo.TVInfo.SerieInfo.Overview,     // 剧情简介
+		Outline:       mediaInfo.TMDBInfo.TVInfo.SerieInfo.Overview,     // 大纲简介
+		Actors:        actors,                                           // 演员列表
+		Genres:        genres,                                           // 电视剧类型
+		Year:          year,                                             // 发行年份
+		Premiered:     mediaInfo.TMDBInfo.TVInfo.SerieInfo.FirstAirDate, // 首映日期
+		Rating:        mediaInfo.TMDBInfo.TVInfo.SerieInfo.VoteAverage,  // 评分
+		Season:        -1,                                               // 默认值 -1，表示未指定季数
+		Episode:       -1,                                               // 默认值 -1，表示未指定集数
+		TMDBID:        mediaInfo.TMDBID,                                 // TMDB ID
+		UniqueIDs:     uniqueIDs,                                        // 唯一ID列表
 	}
 
 	return &data
@@ -235,7 +235,7 @@ func GenMetaDataNFO(infoType InfoType, mediaInfo *schemas.MediaInfo) ([]byte, er
 		}
 		nfoData = genMovieMetaInfo(mediaInfo)
 	case InfoTypeTV:
-		if mediaInfo.MediaType != meta.MediaTypeTV || mediaInfo.TMDBInfo.TVInfo.SeriesInfo == nil {
+		if mediaInfo.MediaType != meta.MediaTypeTV || mediaInfo.TMDBInfo.TVInfo.SerieInfo == nil {
 			return nil, fmt.Errorf("媒体信息不完整，无法生成电视剧 NFO")
 		}
 		nfoData = genTVSerieMetaInfo(mediaInfo)

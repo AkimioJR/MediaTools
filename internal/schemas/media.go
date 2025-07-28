@@ -13,7 +13,7 @@ import (
 )
 
 type TMDBTVInfo struct {
-	SeriesInfo    *themoviedb.TVSerieDetail   // TMDB 电视剧相关信息
+	SerieInfo     *themoviedb.TVSerieDetail   // TMDB 电视剧相关信息
 	SeasonInfo    *themoviedb.TVSeasonDetail  // TMDB 电视剧季相关信息
 	EpisodeInfo   *themoviedb.TVEpisodeDetail // TMDB 电视剧集相关信息
 	SeasonNumber  int                         // 季数
@@ -102,9 +102,9 @@ func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error
 			item.Year = year
 		}
 	case meta.MediaTypeTV:
-		item.Title = info.TMDBInfo.TVInfo.SeriesInfo.Name
-		item.OriginalTitle = info.TMDBInfo.TVInfo.SeriesInfo.OriginalName
-		year, err := strconv.Atoi(info.TMDBInfo.TVInfo.SeriesInfo.FirstAirDate[:4])
+		item.Title = info.TMDBInfo.TVInfo.SerieInfo.Name
+		item.OriginalTitle = info.TMDBInfo.TVInfo.SerieInfo.OriginalName
+		year, err := strconv.Atoi(info.TMDBInfo.TVInfo.SerieInfo.FirstAirDate[:4])
 		if err == nil {
 			item.Year = year
 		}

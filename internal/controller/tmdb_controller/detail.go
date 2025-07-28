@@ -85,7 +85,7 @@ func GetTVSeriesDetail(seriesID int) (*schemas.MediaInfo, error) {
 	mediaInfo.MediaType = meta.MediaTypeTV
 	mediaInfo.TMDBInfo = schemas.TMDBInfo{
 		TVInfo: schemas.TMDBTVInfo{
-			SeriesInfo:    detail,
+			SerieInfo:     detail,
 			SeasonNumber:  -1, // 默认值 -1，表示未指定季数
 			EpisodeNumber: -1, // 默认值 -1，表示未指定集数
 		},

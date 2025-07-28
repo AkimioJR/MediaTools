@@ -20,7 +20,7 @@ func TestGetInfo(t *testing.T) {
 	m := meta.MediaTypeTV
 	info, err := tmdb_controller.GetInfo(271607, &m)
 	require.NoError(t, err)
-	require.Equal(t, "薰香花朵凛然绽放", info.TMDBInfo.TVInfo.SeriesInfo.Name)
+	require.Equal(t, "薰香花朵凛然绽放", info.TMDBInfo.TVInfo.SerieInfo.Name)
 	m = meta.MediaTypeMovie
 	info, err = tmdb_controller.GetInfo(874745, &m)
 	require.NoError(t, err)
