@@ -50,7 +50,7 @@ func (client *FanartClient) DoRequest(method string, path string, query url.Valu
 
 	client.limiter.Acquire()
 	query.Set("api_key", client.apiKey)
-	url := client.api + "/3" + path + "?" + query.Encode()
+	url := client.api + "/v3" + path + "?" + query.Encode()
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return fmt.Errorf("create request failed: %w", err)

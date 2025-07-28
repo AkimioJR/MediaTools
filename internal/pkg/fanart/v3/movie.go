@@ -27,7 +27,7 @@ func (client *FanartClient) GetMovieImagesData(imdbID string) (*MovieImagesData,
 	var resp MovieImagesData
 	err := client.DoRequest(
 		http.MethodGet,
-		"/movie/"+imdbID+"/images",
+		"/movies/"+imdbID,
 		url.Values{},
 		nil,
 		&resp,
