@@ -3,8 +3,9 @@ package config
 import "github.com/spf13/viper"
 
 var (
-	Log  LogConfig
-	TMDB TMDBConfig
+	Log          LogConfig
+	TMDB         TMDBConfig
+	MediaLibrary MediaLibraryConfig
 )
 
 func Init() error {

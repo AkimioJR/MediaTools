@@ -16,3 +16,9 @@ type Configuration struct {
 	Log  LogConfig  `yaml:"log"`
 	TMDB TMDBConfig `yaml:"tmdb"`
 }
+
+type MediaLibraryConfig struct {
+	Libraries   []string `yaml:"libraries"`    // 媒体库路径列表
+	MovieFormat string   `yaml:"movie_format"` // 电影格式
+	TVFormat    string   `yaml:"tv_format"`    // 电视剧格式
+}
