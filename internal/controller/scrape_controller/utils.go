@@ -1,6 +1,7 @@
 package scrape_controller
 
 import (
+	"MediaTools/internal/controller/fanart_controller"
 	"MediaTools/internal/controller/tmdb_controller"
 	"image"
 	"image/jpeg"
@@ -38,15 +39,26 @@ func SaveImage(imgPath string, img image.Image) error {
 	}
 }
 
-// 下载图片并保存到指定路径
+// 下载 TMDB 图片并保存到指定路径
 // 自动根据 TMDB 图片的扩展名决定保存格式
 // p: TMDB 中图片地址
 // target: 目标路径，不带后缀名
-func DownloadImageAndSave(p string, target string) error {
+func DownloadTMDBImageAndSave(p string, target string) error {
 	img, err := tmdb_controller.DownloadImage(p)
 	if err != nil {
 		return err
 	}
-	target += path.Ext(p)
-	return SaveImage(target, img)
+	return SaveImage(target+path.Ext(p), img)
+}
+
+// 下载 Fanart 图片并保存到指定路径
+// 自动根据 Fanart 图片的扩展名决定保存格式
+// url: Fanart 中图片地址
+// target: 目标路径，不带后缀名
+func DownloadFanartImageAndSave(url string, target string) error {
+	img, err := fanart_controller.DownloadImage(url)
+	if err != nil {
+		return err
+	}
+	return SaveImage(target+path.Ext(url), img)
 }
