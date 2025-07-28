@@ -1,7 +1,7 @@
 package local
 
 import (
-	"MediaTools/internal/pkg/filesystem/model"
+	"MediaTools/internal/pkg/storage/model"
 	"io"
 	"os"
 	pathlib "path"
@@ -21,17 +21,17 @@ func (s *LocalStorage) GetTransferType() []model.TransferType {
 	return []model.TransferType{model.TransferCopy, model.TransferMove, model.TransferLink, model.TransferSoftLink}
 }
 
-func (s *LocalStorage) GetRoot() (model.FileObject, error) {
-	info, err := os.Stat("/")
+func (s *LocalStorage) GetFile(path string) model.FileObject {
+	info, err := os.Stat(path)
 	if err != nil {
-		return nil, err
+		return nil
 	}
-	obj := FileObj{
-		path:  "/",
+	return &FileObj{
+		name:  info.Name(),
+		path:  path,
 		size:  info.Size(),
 		isDir: info.IsDir(),
 	}
-	return &obj, nil
 }
 
 func (s *LocalStorage) List(obj model.FileObject) ([]model.FileObject, error) {
@@ -83,6 +83,13 @@ func (s *LocalStorage) CreateFile(obj model.FileObject, reader io.Reader) error 
 	_, err = io.Copy(file, reader)
 	return err
 }
+func (s *LocalStorage) ReadFile(obj model.FileObject) (io.ReadCloser, error) {
+	fileObj, ok := obj.(*FileObj)
+	if !ok {
+		return nil, model.ErrNoSupport
+	}
+	return os.Open(fileObj.GetPath())
+}
 
 func (s *LocalStorage) Delete(obj model.FileObject) error {
 	fileObj, ok := obj.(*FileObj)
@@ -130,12 +137,12 @@ func (s *LocalStorage) Mkdir(obj model.FileObject) error {
 	return os.MkdirAll(fileObj.GetPath(), os.ModePerm)
 }
 
-func (s *LocalStorage) Copy(src model.FileObject, dst model.FileObject, dstFS model.FileSystem) error {
+func (s *LocalStorage) Copy(src model.FileObject, dst model.FileObject, dstFS model.StorageBackend) error {
 	srcFile, ok := src.(*FileObj)
 	if !ok {
 		return model.ErrNoSupport
 	}
-	reader, err := srcFile.ReadContent()
+	reader, err := dstFS.ReadFile(srcFile)
 	if err != nil {
 		return err
 	}
@@ -143,7 +150,7 @@ func (s *LocalStorage) Copy(src model.FileObject, dst model.FileObject, dstFS mo
 	return dstFS.CreateFile(dst, reader)
 }
 
-func (s *LocalStorage) Move(src model.FileObject, dst model.FileObject, dstFS model.FileSystem) error {
+func (s *LocalStorage) Move(src model.FileObject, dst model.FileObject, dstFS model.StorageBackend) error {
 	_, ok1 := src.(*FileObj)
 	_, ok2 := dst.(*FileObj)
 	if ok1 && ok2 {
@@ -196,4 +203,4 @@ func (s *LocalStorage) SoftLink(src model.FileObject, dst model.FileObject) erro
 	return os.Symlink(srcFile.GetPath(), dstFile.GetPath())
 }
 
-var _ model.FileSystem = (*LocalStorage)(nil)
+var _ model.StorageBackend = (*LocalStorage)(nil)

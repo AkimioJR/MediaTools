@@ -1,9 +1,7 @@
 package local
 
 import (
-	"MediaTools/internal/pkg/filesystem/model"
-	"io"
-	"os"
+	"MediaTools/internal/pkg/storage/model"
 )
 
 type FileObj struct {
@@ -31,10 +29,6 @@ func (f *FileObj) IsDir() bool {
 
 func (f *FileObj) GetSize() int64 {
 	return f.size
-}
-
-func (f *FileObj) ReadContent() (reader io.ReadCloser, err error) {
-	return os.Open(f.path)
 }
 
 var _ model.FileObject = (*FileObj)(nil)
