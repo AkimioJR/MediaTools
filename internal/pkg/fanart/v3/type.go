@@ -39,3 +39,11 @@ type SeasonImage struct {
 	Image
 	Season string `json:"season"`
 }
+
+func (img Image) getLang() string {
+	return img.Lang
+}
+
+type img interface {
+	getLang() string
+}
