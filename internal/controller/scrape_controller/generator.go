@@ -238,7 +238,7 @@ func GenMetaDataNFO(infoType InfoType, mediaInfo *schemas.MediaInfo) ([]byte, er
 		if mediaInfo.MediaType != meta.MediaTypeTV || mediaInfo.TMDBInfo.TVInfo.SeriesInfo == nil {
 			return nil, fmt.Errorf("媒体信息不完整，无法生成电视剧 NFO")
 		}
-		nfoData = genTVSeriesMetaInfo(mediaInfo)
+		nfoData = genTVSerieMetaInfo(mediaInfo)
 	case InfoTypeTVSeason:
 		if mediaInfo.MediaType != meta.MediaTypeTV ||
 			mediaInfo.TMDBInfo.TVInfo.SeasonInfo == nil ||
