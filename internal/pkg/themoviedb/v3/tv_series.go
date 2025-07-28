@@ -252,6 +252,38 @@ func (tmdb *TMDB) GetTVSerieEpisodeGroup(seriesID int) (*TVSerieEpisodeGroup, er
 	return &resp, nil
 }
 
+type TVSerieExternalID struct {
+	ID          int    `json:"id"`
+	ImdbID      string `json:"imdb_id"`
+	FreebaseMid string `json:"freebase_mid"`
+	FreebaseID  string `json:"freebase_id"`
+	TvdbID      int    `json:"tvdb_id"`
+	TvrageID    int    `json:"tvrage_id"`
+	WikidataID  string `json:"wikidata_id"`
+	FacebookID  string `json:"facebook_id"`
+	InstagramID string `json:"instagram_id"`
+	TwitterID   string `json:"twitter_id"`
+}
+
+// 获取已添加到一部电视剧中的外部 ID 列表。
+// Get a list of external IDs that have been added to a TV show.
+// https://api.themoviedb.org/3/tv/{series_id}/external_ids
+// https://developer.themoviedb.org/reference/tv-series-external-ids
+func (tmdb *TMDB) GetTVSerieExternalID(seriesID int) (*TVSerieExternalID, error) {
+	var resp TVSerieExternalID
+	err := tmdb.DoRequest(
+		http.MethodGet,
+		"/tv/"+strconv.Itoa(seriesID)+"/external_ids",
+		url.Values{},
+		nil,
+		&resp,
+	)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d」外部ID失败：%v", seriesID, err))
+	}
+	return &resp, nil
+}
+
 type TVSerieImage struct {
 	Backdrops []struct {
 		AspectRatio float64     `json:"aspect_ratio"`

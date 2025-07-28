@@ -148,6 +148,34 @@ func (tmdb *TMDB) GetTVSeasonCredit(seriesID int, seasonNumber int, language *st
 	return &resp, nil
 }
 
+type TVSeasonExternalID struct {
+	ID          int    `json:"id"`
+	FreebaseMid string `json:"freebase_mid"`
+	FreebaseID  string `json:"freebase_id"`
+	TvdbID      int    `json:"tvdb_id"`
+	TvrageID    string `json:"tvrage_id"`
+	WikidataID  string `json:"wikidata_id"`
+}
+
+// 获取已添加到一季电视剧中的外部 ID 列表。
+// Get a list of external IDs that have been added to a TV season.
+// https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/external_ids
+// https://developer.themoviedb.org/reference/tv-season-external-ids
+func (tmdb *TMDB) GetTVSeasonExternalID(seriesID int, seasonNumber int) (*TVSeasonExternalID, error) {
+	var resp TVSeasonExternalID
+	err := tmdb.DoRequest(
+		http.MethodGet,
+		"/tv/"+strconv.Itoa(seriesID)+"/season/"+strconv.Itoa(seasonNumber)+"/external_ids",
+		url.Values{},
+		nil,
+		&resp,
+	)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d 第 %d 季」外部 ID 列表失败：%v", seriesID, seasonNumber, err))
+	}
+	return &resp, nil
+}
+
 type TVSeasonImage struct {
 	Backdrops []struct {
 		AspectRatio float64     `json:"aspect_ratio"`

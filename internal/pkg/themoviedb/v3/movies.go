@@ -151,6 +151,33 @@ func (tmdb *TMDB) GetMovieCredit(movieID int, language *string) (*MovieCredit, e
 	return &response, nil
 }
 
+type MovieExternalID struct {
+	ID         int    `json:"id"`
+	ImdbID     string `json:"imdb_id"`
+	WikidataID string `json:"wikidata_id"`
+	FacebookID string `json:"facebook_id"`
+	TwitterID  string `json:"twitter_id"`
+}
+
+// 获取一部电影的外部ID。
+// Get the external IDs for a movie by its ID.
+// https://api.themoviedb.org/3/movie/{movie_id}/external_ids
+// https://developer.themoviedb.org/reference/movie-external-ids
+func (tmdb *TMDB) GetMovieExternalID(movieID int) (*MovieExternalID, error) {
+	var resp MovieExternalID
+	err := tmdb.DoRequest(
+		http.MethodGet,
+		"/movie/"+strconv.Itoa(movieID)+"/external_ids",
+		url.Values{},
+		nil,
+		&resp,
+	)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电影「%d」外部ID失败：%v", movieID, err))
+	}
+	return &resp, nil
+}
+
 type MovieImage struct {
 	Backdrops []struct {
 		AspectRatio float64     `json:"aspect_ratio"`

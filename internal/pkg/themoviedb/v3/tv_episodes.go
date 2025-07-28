@@ -144,6 +144,36 @@ func (tmdb *TMDB) GetTVEpisodeCredit(seriesID int, seasonNumber int, episodeNumb
 	return &resp, nil
 }
 
+type TVEpisodeExternalID struct {
+	ID          int    `json:"id"`
+	ImdbID      string `json:"imdb_id"`
+	FreebaseMid string `json:"freebase_mid"`
+	FreebaseID  string `json:"freebase_id"`
+	TvdbID      int    `json:"tvdb_id"`
+	TvrageID    int    `json:"tvrage_id"`
+	WikidataID  string `json:"wikidata_id"`
+}
+
+// 获取已添加到一集电视剧中的外部 ID 列表。
+// Get a list of external IDs that have been added to a TV episode.
+// https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/episode/{episode_number}/external_ids
+// https://developer.themoviedb.org/reference/tv-episode-external-ids
+func (tmdb *TMDB) GetTVEpisodeExternalID(seriesID int, seasonNumber int, episodeNumber int) (*TVEpisodeExternalID, error) {
+	var resp TVEpisodeExternalID
+
+	err := tmdb.DoRequest(
+		http.MethodGet,
+		"/tv/"+strconv.Itoa(seriesID)+"/season/"+strconv.Itoa(seasonNumber)+"/episode/"+strconv.Itoa(episodeNumber)+"/external_ids",
+		url.Values{},
+		nil,
+		&resp,
+	)
+	if err != nil {
+		return nil, NewTMDBError(err, fmt.Sprintf("获取电视剧「%d 第 %d 季 第 %d 集」外部 ID 列表失败：%v", seriesID, seasonNumber, episodeNumber, err))
+	}
+	return &resp, nil
+}
+
 type TVEpisodeImage struct {
 	ID     int `json:"id"`
 	Stills []struct {
