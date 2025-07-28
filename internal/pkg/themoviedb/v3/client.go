@@ -99,6 +99,7 @@ func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body i
 		}
 	}
 
+	tmdb.limiter.Acquire()
 	query.Set("api_key", tmdb.apiKey)
 	url := tmdb.apiURL + "/3" + path + "?" + query.Encode()
 	req, err := http.NewRequest(method, url, body)
