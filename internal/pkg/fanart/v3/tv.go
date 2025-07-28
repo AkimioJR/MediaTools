@@ -36,7 +36,7 @@ func (client *FanartClient) GetTVImagesData(thetvdbID int) (*TVImagesData, error
 		&resp,
 	)
 	if err != nil {
-		return nil, NewFanartError(err, fmt.Sprintf("获取剧集「%d」图片数据失败：%v", thetvdbID, err))
+		return nil, NewFanartError(fmt.Sprintf("获取剧集「%d」图片数据失败", thetvdbID), err)
 	}
 	return &resp, nil
 }

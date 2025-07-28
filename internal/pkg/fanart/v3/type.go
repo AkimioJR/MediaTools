@@ -21,7 +21,7 @@ func (e *FanartError) Error() string {
 	return fmt.Sprintf("Fanart 错误: %s - %s", e.msg, e.err.Error())
 }
 
-func NewFanartError(err error, msg string) *FanartError {
+func NewFanartError(msg string, err error) *FanartError {
 	return &FanartError{
 		err: err,
 		msg: msg,

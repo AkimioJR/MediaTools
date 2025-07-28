@@ -33,7 +33,7 @@ func (client *FanartClient) GetMovieImagesData(imdbID string) (*MovieImagesData,
 		&resp,
 	)
 	if err != nil {
-		return nil, NewFanartError(err, fmt.Sprintf("获取电影「%s」图片数据失败：%v", imdbID, err))
+		return nil, NewFanartError(fmt.Sprintf("获取电影「%s」图片数据失败", imdbID), err)
 	}
 	return &resp, nil
 }
