@@ -85,7 +85,7 @@ func genMovieMetaInfo(mediaInfo *schemas.MediaInfo) *MovieMetaData {
 	return &data
 }
 
-func genTVSeriesMetaInfo(mediaInfo *schemas.MediaInfo) *TVSeriesMetaData {
+func genTVSerieMetaInfo(mediaInfo *schemas.MediaInfo) *TVSeriesMetaData {
 	year, err := strconv.Atoi(mediaInfo.TMDBInfo.TVInfo.SeriesInfo.FirstAirDate[:4])
 	if err != nil {
 		logrus.Warningf("获取电视剧「%s」发行年份失败: %v", mediaInfo.TMDBInfo.TVInfo.SeriesInfo.Name, err)
