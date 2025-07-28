@@ -4,6 +4,7 @@ import (
 	"MediaTools/pkg/limiter"
 	"encoding/json"
 	"fmt"
+	"image"
 	"io"
 	"net/http"
 	"net/url"
@@ -85,4 +86,21 @@ func (client *FanartClient) DoRequest(method string, path string, query url.Valu
 		}
 	}
 	return nil
+}
+
+func (client *FanartClient) DownloadImage(url string) (image.Image, error) {
+	resp, err := client.client.Get(url)
+	if err != nil {
+		return nil, NewFanartError(fmt.Sprintf("下载图片「%s」失败", url), err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, NewFanartError(fmt.Sprintf("下载图片「%s」失败，HTTP code: %d", url, resp.StatusCode), nil)
+	}
+	defer resp.Body.Close()
+	img, _, err := image.Decode(resp.Body)
+	if err != nil {
+		return nil, NewFanartError(fmt.Sprintf("解码图片「%s」失败", url), err)
+	}
+	return img, nil
 }
