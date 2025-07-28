@@ -39,16 +39,27 @@ func SaveImage(imgPath string, img image.Image) error {
 	}
 }
 
+// 判断文件或目录是否存在
+func Exist(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil || os.IsExist(err)
+}
+
 // 下载 TMDB 图片并保存到指定路径
 // 自动根据 TMDB 图片的扩展名决定保存格式
 // p: TMDB 中图片地址
 // target: 目标路径，不带后缀名
 func DownloadTMDBImageAndSave(p string, target string) error {
+	target += path.Ext(p)
+	if Exist(target) {
+		return nil // 如果文件已存在，则不下载
+	}
+
 	img, err := tmdb_controller.DownloadImage(p)
 	if err != nil {
 		return err
 	}
-	return SaveImage(target+path.Ext(p), img)
+	return SaveImage(target, img)
 }
 
 // 下载 Fanart 图片并保存到指定路径
@@ -56,9 +67,14 @@ func DownloadTMDBImageAndSave(p string, target string) error {
 // url: Fanart 中图片地址
 // target: 目标路径，不带后缀名
 func DownloadFanartImageAndSave(url string, target string) error {
+	target += path.Ext(url)
+	if Exist(target) {
+		return nil // 如果文件已存在，则不下载
+	}
+
 	img, err := fanart_controller.DownloadImage(url)
 	if err != nil {
 		return err
 	}
-	return SaveImage(target+path.Ext(url), img)
+	return SaveImage(target, img)
 }
