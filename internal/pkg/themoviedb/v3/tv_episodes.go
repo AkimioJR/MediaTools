@@ -177,13 +177,13 @@ func (tmdb *TMDB) GetTVEpisodeExternalID(seriesID int, seasonNumber int, episode
 type TVEpisodeImage struct {
 	ID     int `json:"id"`
 	Stills []struct {
-		AspectRatio float64     `json:"aspect_ratio"`
-		Height      int         `json:"height"`
-		Iso6391     interface{} `json:"iso_639_1"`
-		FilePath    string      `json:"file_path"`
-		VoteAverage float64     `json:"vote_average"`
-		VoteCount   int         `json:"vote_count"`
-		Width       int         `json:"width"`
+		AspectRatio float64 `json:"aspect_ratio"`
+		Height      int     `json:"height"`
+		Iso6391     string  `json:"iso_639_1"`
+		FilePath    string  `json:"file_path"`
+		VoteAverage float64 `json:"vote_average"`
+		VoteCount   int     `json:"vote_count"`
+		Width       int     `json:"width"`
 	} `json:"stills"`
 }
 

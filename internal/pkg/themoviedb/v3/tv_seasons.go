@@ -103,14 +103,14 @@ type TVSeasonCredit struct {
 		Order             int `json:"order"`
 	} `json:"cast"`
 	Crew []struct {
-		Adult              bool        `json:"adult"`
-		Gender             int         `json:"gender"`
-		ID                 int         `json:"id"`
-		KnownForDepartment string      `json:"known_for_department"`
-		Name               string      `json:"name"`
-		OriginalName       string      `json:"original_name"`
-		Popularity         float64     `json:"popularity"`
-		ProfilePath        interface{} `json:"profile_path"`
+		Adult              bool    `json:"adult"`
+		Gender             int     `json:"gender"`
+		ID                 int     `json:"id"`
+		KnownForDepartment string  `json:"known_for_department"`
+		Name               string  `json:"name"`
+		OriginalName       string  `json:"original_name"`
+		Popularity         float64 `json:"popularity"`
+		ProfilePath        string  `json:"profile_path"`
 		Jobs               []struct {
 			CreditID     string `json:"credit_id"`
 			Job          string `json:"job"`
@@ -178,13 +178,13 @@ func (tmdb *TMDB) GetTVSeasonExternalID(seriesID int, seasonNumber int) (*TVSeas
 
 type TVSeasonImage struct {
 	Backdrops []struct {
-		AspectRatio float64     `json:"aspect_ratio"`
-		Height      int         `json:"height"`
-		Iso6391     interface{} `json:"iso_639_1"`
-		FilePath    string      `json:"file_path"`
-		VoteAverage float64     `json:"vote_average"`
-		VoteCount   int         `json:"vote_count"`
-		Width       int         `json:"width"`
+		AspectRatio float64 `json:"aspect_ratio"`
+		Height      int     `json:"height"`
+		Iso6391     string  `json:"iso_639_1"`
+		FilePath    string  `json:"file_path"`
+		VoteAverage float64 `json:"vote_average"`
+		VoteCount   int     `json:"vote_count"`
+		Width       int     `json:"width"`
 	} `json:"backdrops"`
 	ID    int `json:"id"`
 	Logos []struct {

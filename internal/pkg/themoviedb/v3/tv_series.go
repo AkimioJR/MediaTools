@@ -42,9 +42,22 @@ type TVSerieDetail struct {
 		ShowID         int     `json:"show_id"`
 		StillPath      string  `json:"still_path"`
 	} `json:"last_episode_to_air"`
-	Name             string      `json:"name"`
-	NextEpisodeToAir interface{} `json:"next_episode_to_air"`
-	Networks         []struct {
+	Name             string `json:"name"`
+	NextEpisodeToAir struct {
+		ID             int     `json:"id"`
+		Name           string  `json:"name"`
+		Overview       string  `json:"overview"`
+		VoteAverage    float64 `json:"vote_average"`
+		VoteCount      int     `json:"vote_count"`
+		AirDate        string  `json:"air_date"`
+		EpisodeNumber  int     `json:"episode_number"`
+		ProductionCode string  `json:"production_code"`
+		Runtime        int     `json:"runtime"`
+		SeasonNumber   int     `json:"season_number"`
+		ShowID         int     `json:"show_id"`
+		StillPath      string  `json:"still_path"`
+	} `json:"next_episode_to_air"`
+	Networks []struct {
 		ID            int    `json:"id"`
 		LogoPath      string `json:"logo_path"`
 		Name          string `json:"name"`
@@ -286,13 +299,13 @@ func (tmdb *TMDB) GetTVSerieExternalID(seriesID int) (*TVSerieExternalID, error)
 
 type TVSerieImage struct {
 	Backdrops []struct {
-		AspectRatio float64     `json:"aspect_ratio"`
-		Height      int         `json:"height"`
-		Iso6391     interface{} `json:"iso_639_1"`
-		FilePath    string      `json:"file_path"`
-		VoteAverage float64     `json:"vote_average"`
-		VoteCount   int         `json:"vote_count"`
-		Width       int         `json:"width"`
+		AspectRatio float64 `json:"aspect_ratio"`
+		Height      int     `json:"height"`
+		Iso6391     string  `json:"iso_639_1"`
+		FilePath    string  `json:"file_path"`
+		VoteAverage float64 `json:"vote_average"`
+		VoteCount   int     `json:"vote_count"`
+		Width       int     `json:"width"`
 	} `json:"backdrops"`
 	ID    int `json:"id"`
 	Logos []struct {
