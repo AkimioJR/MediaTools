@@ -4,7 +4,6 @@ import (
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/pkg/storage/model"
 	"MediaTools/internal/schemas"
-	"log"
 	"path/filepath"
 
 	"github.com/sirupsen/logrus"
@@ -26,13 +25,12 @@ func TransferMedia(
 	transferLock.Lock()
 	defer transferLock.Unlock()
 
-	log.Printf("开始转移媒体文件：%s 到 %s，类型：%s", srcPath, targetDir, transferType)
-
 	targetName, err := item.Format()
 	if err != nil {
 		return err
 	}
 	targetPath := filepath.Join(targetDir, targetName)
+	logrus.Infof("开始转移媒体文件：%s -> %s，类型：%s", srcPath, targetPath, transferType)
 
 	err = TransferFile(srcPath, targetPath, transferType)
 	if err != nil {
