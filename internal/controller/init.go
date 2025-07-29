@@ -4,6 +4,7 @@ import (
 	"MediaTools/internal/controller/fanart_controller"
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/controller/tmdb_controller"
+	"MediaTools/internal/controller/transfer_controller"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
@@ -15,6 +16,7 @@ var initFuncs = []InitFunc{
 	tmdb_controller.Init,
 	fanart_controller.Init,
 	scrape_controller.Init,
+	transfer_controller.Init,
 }
 
 func InitAllControllers() error {
