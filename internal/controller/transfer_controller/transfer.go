@@ -59,17 +59,12 @@ func TransferMedia(
 				srcFilePath := filepath.Join(srcDir, entry.Name())
 				dstFilePath := utils.ChangeExt(targetPath, filepath.Ext(entry.Name()))
 				logrus.Debugf("转移字幕/音轨文件：%s -> %s", srcFilePath, dstFilePath)
-				err = TransferFile(
-					srcFilePath,
-					dstFilePath,
-					model.TransferCopy, // 复制字幕/音轨文件
-				)
+				err = CopyFile(srcFilePath, dstFilePath) // 复制字幕/音轨文件
 				if err != nil {
 					logrus.Warningf("转移字幕/音轨文件失败：%v", err)
 				}
 			}
 		}
-
 	}
 
 	if info != nil {
