@@ -1,6 +1,7 @@
 package fanart_controller
 
 import (
+	"MediaTools/internal/config"
 	"MediaTools/internal/pkg/fanart/v3"
 	"sync"
 )
@@ -10,11 +11,11 @@ var (
 	lock   sync.RWMutex
 )
 
-func Init(apikey string) error {
+func Init() error {
 	lock.Lock()
 	defer lock.Unlock()
 
-	c, err := fanart.NewClient(apikey)
+	c, err := fanart.NewClient(config.Fanart.ApiKey)
 	if err != nil {
 		return err
 	}
