@@ -15,17 +15,18 @@ func Init() error {
 	lock.Lock()
 	defer lock.Unlock()
 
-	var otps []themoviedb.TMDBOptions
+	var opts []themoviedb.TMDBOptions
 	if config.TMDB.Language != "" {
-		otps = append(otps, themoviedb.CustomLanguage(config.TMDB.Language))
+		opts = append(opts, themoviedb.CustomLanguage(config.TMDB.Language))
 	}
 	if config.TMDB.ApiURL != "" {
-		otps = append(otps, themoviedb.CustomAPIURL(config.TMDB.ApiURL))
+		opts = append(opts, themoviedb.CustomAPIURL(config.TMDB.ApiURL))
 	}
 	if config.TMDB.ImageURL != "" {
-		otps = append(otps, themoviedb.CustomImageURL(config.TMDB.ImageURL))
+		opts = append(opts, themoviedb.CustomImageURL(config.TMDB.ImageURL))
 	}
-	client = themoviedb.NewTMDB(config.TMDB.ApiKey, otps...)
+
+	client = themoviedb.NewTMDB(config.TMDB.ApiKey, opts...)
 	return nil
 
 }
