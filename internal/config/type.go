@@ -14,6 +14,7 @@ type TMDBConfig struct {
 
 type FanartConfig struct {
 	ApiKey    string   `yaml:"api_key"`
+	ApiURL    string   `yaml:"api_url"`
 	Languages []string `yaml:"languages"` // 语言顺序
 }
 
