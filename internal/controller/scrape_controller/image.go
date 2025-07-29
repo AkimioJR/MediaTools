@@ -5,6 +5,7 @@ import (
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
+	"MediaTools/utils"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -50,7 +51,7 @@ func ScrapeMovieInfo(dstPath string, info *schemas.MediaInfo) {
 }
 
 func ScrapeMovieImage(dstPath string, info *schemas.MediaInfo) {
-	err := DownloadTMDBImageAndSave(info.TMDBInfo.MovieInfo.PosterPath, ChangeExt(dstPath, "")+"-poster")
+	err := DownloadTMDBImageAndSave(info.TMDBInfo.MovieInfo.PosterPath, utils.ChangeExt(dstPath, "")+"-poster")
 	if err != nil {
 		logrus.Errorf("刮削电影「%s」海报失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 	}
@@ -137,7 +138,7 @@ func ScrapeTVInfo(dstPath string, info *schemas.MediaInfo) {
 		logrus.Errorf("生成电视剧「%s」元数据 XML 失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 	} else {
 		infoPath := filepath.Join(tvSerieDir, "tv.info")
-		file, err := CreateFile(infoPath)
+		file, err := utils.CreateFile(infoPath)
 		if err != nil {
 			logrus.Errorf("创建电视剧「%s」元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 		} else {
@@ -155,7 +156,7 @@ func ScrapeTVInfo(dstPath string, info *schemas.MediaInfo) {
 		logrus.Errorf("生成电视剧「%s」第 %d 季元数据 XML 失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, err)
 	} else {
 		infoPath := filepath.Join(tvSeasonDir, "season.info")
-		file, err := CreateFile(infoPath)
+		file, err := utils.CreateFile(infoPath)
 		if err != nil {
 			logrus.Errorf("创建电视剧「%s」第 %d 季元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, err)
 		} else {
@@ -172,8 +173,8 @@ func ScrapeTVInfo(dstPath string, info *schemas.MediaInfo) {
 	if err != nil {
 		logrus.Errorf("生成电视剧「%s」第 %d 季第 %d 集元数据 XML 失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, info.TMDBInfo.TVInfo.EpisodeInfo.EpisodeNumber, err)
 	} else {
-		infoPath := ChangeExt(dstPath, ".info")
-		file, err := CreateFile(infoPath)
+		infoPath := utils.ChangeExt(dstPath, ".info")
+		file, err := utils.CreateFile(infoPath)
 		if err != nil {
 			logrus.Errorf("创建电视剧「%s」第 %d 季第 %d 集元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, info.TMDBInfo.TVInfo.EpisodeInfo.EpisodeNumber, err)
 		} else {
@@ -190,7 +191,7 @@ func ScrapeTVImage(dstPath string, info *schemas.MediaInfo) {
 	tvSeasonDir := filepath.Dir(dstPath)
 	tvSerieDir := filepath.Dir(tvSeasonDir)
 	{ // 集照片
-		err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.EpisodeInfo.StillPath, ChangeExt(dstPath, ""))
+		err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.EpisodeInfo.StillPath, utils.ChangeExt(dstPath, ""))
 		if err != nil {
 			logrus.Errorf("刮削电视剧「%s」第 %d 季第 %d 集剧照失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, info.TMDBInfo.TVInfo.EpisodeInfo.EpisodeNumber, err)
 		}

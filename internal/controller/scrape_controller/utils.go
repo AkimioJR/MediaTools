@@ -9,7 +9,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 )
 
 // 保存为 JPEG
@@ -78,18 +77,4 @@ func DownloadFanartImageAndSave(url string, target string) error {
 		return err
 	}
 	return SaveImage(target, img)
-}
-
-func ChangeExt(filename, newExt string) string {
-	base := filepath.Base(filename)
-	ext := filepath.Ext(base)
-	return strings.TrimSuffix(filename, ext) + newExt
-}
-
-func CreateFile(filePath string) (*os.File, error) {
-	err := os.MkdirAll(filepath.Dir(filePath), 0755)
-	if err != nil {
-		return nil, err
-	}
-	return os.Create(filePath)
 }
