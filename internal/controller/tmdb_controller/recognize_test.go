@@ -1,6 +1,7 @@
 package tmdb_controller_test
 
 import (
+	"MediaTools/internal/config"
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/pkg/meta"
 	"testing"
@@ -13,7 +14,8 @@ import (
 const TMDBApiKey = "db55323b8d3e4154498498a75642b381"
 
 func init() {
-	tmdb_controller.Init(TMDBApiKey)
+	config.TMDB.ApiKey = TMDBApiKey
+	tmdb_controller.Init()
 }
 
 func TestGetInfo(t *testing.T) {
