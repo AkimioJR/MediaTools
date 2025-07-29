@@ -6,14 +6,14 @@ type LogConfig struct {
 }
 
 type TMDBConfig struct {
-	APIURL   string `yaml:"api_url"`
+	ApiURL   string `yaml:"api_url"`
 	ImageURL string `yaml:"image_url"`
-	APIKey   string `yaml:"api_key"`
+	ApiKey   string `yaml:"api_key"`
 	Language string `yaml:"language"`
 }
 
 type FanartConfig struct {
-	APIKey    string   `yaml:"api_key"`
+	ApiKey    string   `yaml:"api_key"`
 	Languages []string `yaml:"languages"` // 语言顺序
 }
 
