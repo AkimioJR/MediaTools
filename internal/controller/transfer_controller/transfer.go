@@ -1,10 +1,15 @@
 package transfer_controller
 
 import (
+	"MediaTools/extensions"
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/pkg/storage/model"
 	"MediaTools/internal/schemas"
+	"MediaTools/utils"
+	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -35,6 +40,36 @@ func TransferMedia(
 	err = TransferFile(srcPath, targetPath, transferType)
 	if err != nil {
 		return err
+	}
+
+	{
+		logrus.Info("开始转移字幕/音轨文件")
+		srcDir := filepath.Dir(srcPath)
+		entries, err := os.ReadDir(srcDir)
+		if err != nil {
+			logrus.Warningf("读取目录失败，跳过转移字幕/音轨文件：%v", err)
+		}
+		exts := append(extensions.SubtitleExtensions, extensions.AudioTrackExtensions...)
+		for _, entry := range entries {
+			if entry.IsDir() || entry.Name() == filepath.Base(srcPath) {
+				continue // 跳过目录和源文件本身
+			}
+
+			if slices.Contains(exts, strings.ToLower(filepath.Ext(entry.Name()))) {
+				srcFilePath := filepath.Join(srcDir, entry.Name())
+				dstFilePath := utils.ChangeExt(targetPath, filepath.Ext(entry.Name()))
+				logrus.Debugf("转移字幕/音轨文件：%s -> %s", srcFilePath, dstFilePath)
+				err = TransferFile(
+					srcFilePath,
+					dstFilePath,
+					model.TransferCopy, // 复制字幕/音轨文件
+				)
+				if err != nil {
+					logrus.Warningf("转移字幕/音轨文件失败：%v", err)
+				}
+			}
+		}
+
 	}
 
 	if info != nil {
