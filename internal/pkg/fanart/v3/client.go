@@ -21,16 +21,24 @@ type FanartClient struct {
 	cache   *bigcache.BigCache
 }
 
-func NewClient(apiKey string) (*FanartClient, error) {
+func NewClient(apiKey string, opts ...Options) (*FanartClient, error) {
+	opt := &options{
+		apiURL: "https://webservice.fanart.tv",
+		client: &http.Client{},
+	}
+	for _, o := range opts {
+		o(opt)
+	}
+
 	cache, err := bigcache.NewBigCache(bigcache.DefaultConfig(10 * time.Minute))
 	if err != nil {
 		return nil, fmt.Errorf("create cache for FanartClient failed: %w", err)
 	}
 
 	client := FanartClient{
-		api:     "https://webservice.fanart.tv",
+		api:     opt.apiURL,
 		apiKey:  apiKey,
-		client:  &http.Client{},
+		client:  opt.client,
 		limiter: limiter.NewLimiter(1*time.Second, 20), // 每秒最多20次请求
 		cache:   cache,
 	}
