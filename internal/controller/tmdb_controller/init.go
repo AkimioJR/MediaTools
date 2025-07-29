@@ -2,6 +2,7 @@ package tmdb_controller
 
 import (
 	"MediaTools/internal/config"
+	"MediaTools/internal/outbound"
 	"MediaTools/internal/pkg/themoviedb/v3"
 	"sync"
 )
@@ -25,6 +26,7 @@ func Init() error {
 	if config.TMDB.ImageURL != "" {
 		opts = append(opts, themoviedb.CustomImageURL(config.TMDB.ImageURL))
 	}
+	opts = append(opts, themoviedb.CustomHTTPClient(outbound.GetHTTPClient()))
 
 	client = themoviedb.NewTMDB(config.TMDB.ApiKey, opts...)
 	return nil
