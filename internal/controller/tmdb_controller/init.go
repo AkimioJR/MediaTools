@@ -3,11 +3,18 @@ package tmdb_controller
 import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/pkg/themoviedb/v3"
+	"sync"
 )
 
-var client *themoviedb.TMDB
+var (
+	client *themoviedb.TMDB
+	lock   = sync.RWMutex{}
+)
 
 func Init() error {
+	lock.Lock()
+	defer lock.Unlock()
+
 	var otps []themoviedb.TMDBOptions
 	if config.TMDB.Language != "" {
 		otps = append(otps, themoviedb.CustomLanguage(config.TMDB.Language))

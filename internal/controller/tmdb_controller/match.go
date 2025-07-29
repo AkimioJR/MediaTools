@@ -16,6 +16,9 @@ import (
 // name 查询的名称
 // mType 优先返回的媒体类型，如果为 nil 则电影优先
 func MatchMulti(name string, mType *meta.MediaType) (*schemas.MediaInfo, error) {
+	lock.RLock()
+	defer lock.RUnlock()
+
 	var page uint32 = 1
 	var params themoviedb.SearchMultiParams
 	params.Query = name
@@ -142,6 +145,8 @@ match:
 // seasonYear 当前季集年份(可选)
 // seasonNumber 当前季集数(可选)
 func Match(name string, mType meta.MediaType, year *int, seasonYear *int, seasonNumber *int) (*schemas.MediaInfo, error) {
+	lock.RLock()
+	defer lock.RUnlock()
 
 	switch mType {
 	case meta.MediaTypeMovie:
@@ -172,6 +177,9 @@ func Match(name string, mType meta.MediaType, year *int, seasonYear *int, season
 // seasonYear 当前季集年份(可选)
 // seasonNumber 当前季集数(可选)
 func MatchWithFallback(name string, mType meta.MediaType, year *int, seasonYear *int, seasonNumber *int) (*schemas.MediaInfo, error) {
+	lock.RLock()
+	defer lock.RUnlock()
+
 	// 1. 首次严格匹配
 	info, err := Match(name, mType, year, seasonYear, seasonNumber)
 	if err == nil {

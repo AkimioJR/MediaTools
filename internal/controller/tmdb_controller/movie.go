@@ -16,6 +16,9 @@ import (
 // name: 电影名称
 // year: 电影年份，传入 nil 则不限制年份
 func SearchMovieByName(name string, year *int) (*schemas.MediaInfo, error) {
+	lock.RLock()
+	defer lock.RUnlock()
+	
 	var params themoviedb.SearchMovieParams
 	params.Query = name
 	if year != nil && *year > 0 {

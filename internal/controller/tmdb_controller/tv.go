@@ -18,8 +18,10 @@ import (
 // seasonYear: 季的年份
 // seasonNumber: 季的序号
 func SearchTVBySeason(name string, seasonYear int, seasonNumber int) (*schemas.MediaInfo, error) {
-	logrus.Infof("正在搜索「%s (%d) 第 %d 季」...", name, seasonYear, seasonNumber)
+	lock.RLock()
+	defer lock.RUnlock()
 
+	logrus.Infof("正在搜索「%s (%d) 第 %d 季」...", name, seasonYear, seasonNumber)
 	matchSeasonFN := func(tv themoviedb.SearchTVResponse) bool {
 		detail, err := client.GetTVSerieDetail(tv.ID, nil)
 		if err != nil {
@@ -87,6 +89,9 @@ func SearchTVBySeason(name string, seasonYear int, seasonNumber int) (*schemas.M
 }
 
 func SearchTVByName(name string, year *int) (*schemas.MediaInfo, error) {
+	lock.RLock()
+	defer lock.RUnlock()
+
 	var params themoviedb.SearchTVSParams
 	params.Query = name
 	if year != nil && *year > 0 {

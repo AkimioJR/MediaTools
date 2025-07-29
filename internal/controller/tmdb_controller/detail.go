@@ -10,6 +10,8 @@ import (
 
 // 搜索tmdb中所有的标题和译名
 func getNames(tmdbID int, mtype meta.MediaType) ([]string, error) {
+	lock.RLock()
+	defer lock.RUnlock()
 
 	var names []string
 
@@ -51,6 +53,9 @@ func getNames(tmdbID int, mtype meta.MediaType) ([]string, error) {
 }
 
 func GetMovieDetail(movieID int) (*schemas.MediaInfo, error) {
+	lock.RLock()
+	defer lock.RUnlock()
+
 	logrus.Infof("获取电影详情，TMDB ID: %d", movieID)
 
 	detail, err := client.GetMovieDetail(movieID, nil)
@@ -73,8 +78,10 @@ func GetMovieDetail(movieID int) (*schemas.MediaInfo, error) {
 }
 
 func GetTVSeriesDetail(seriesID int) (*schemas.MediaInfo, error) {
-	logrus.Infof("获取电视剧详情，TMDB ID: %d", seriesID)
+	lock.RLock()
+	defer lock.RUnlock()
 
+	logrus.Infof("获取电视剧详情，TMDB ID: %d", seriesID)
 	detail, err := client.GetTVSerieDetail(seriesID, nil)
 	if err != nil {
 		return nil, fmt.Errorf("获取电视剧详情失败，TMDB ID: %d, 错误: %v", seriesID, err)
@@ -102,8 +109,10 @@ func GetTVSeriesDetail(seriesID int) (*schemas.MediaInfo, error) {
 }
 
 func GetTVSeasonDetail(seriesID int, seasonNumber int) (*schemas.MediaInfo, error) {
-	logrus.Infof("获取电视剧季集详情，TMDB ID: %d, 季集数: %d", seriesID, seasonNumber)
+	lock.RLock()
+	defer lock.RUnlock()
 
+	logrus.Infof("获取电视剧季集详情，TMDB ID: %d, 季集数: %d", seriesID, seasonNumber)
 	seasonDetail, err := client.GetTVSeasonDetail(seriesID, seasonNumber, nil)
 	if err != nil {
 		return nil, fmt.Errorf("获取电视剧季集详情失败，TMDB ID: %d, 季集数: %d, 错误: %v", seriesID, seasonNumber, err)
@@ -129,8 +138,10 @@ func GetTVSeasonDetail(seriesID int, seasonNumber int) (*schemas.MediaInfo, erro
 }
 
 func GetTVEpisodeDetail(seriesID int, seasonNumber int, episodeNumber int) (*schemas.MediaInfo, error) {
-	logrus.Infof("获取电视剧集详情，TMDB ID: %d, 季集数: %d, 集数: %d", seriesID, seasonNumber, episodeNumber)
+	lock.RLock()
+	defer lock.RUnlock()
 
+	logrus.Infof("获取电视剧集详情，TMDB ID: %d, 季集数: %d, 集数: %d", seriesID, seasonNumber, episodeNumber)
 	episodeDetail, err := client.GetTVEpisodeDetail(seriesID, seasonNumber, episodeNumber, nil)
 	if err != nil {
 		return nil, fmt.Errorf("获取电视剧集详情失败，TMDB ID: %d, 季集数: %d, 集数: %d, 错误: %v", seriesID, seasonNumber, episodeNumber, err)
