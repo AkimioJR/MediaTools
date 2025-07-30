@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	ErrNoImplement = errors.New("filesystem not implement")
-	ErrNoSupport   = errors.New("filesystem not support this operation")
+	ErrNoImplement             = errors.New("storage provider not implement")
+	ErrNoSupport               = errors.New("storage provider not support this operation")
+	ErrStorageProviderNotFound = errors.New("storage provider not found")
 )
 
 type StorageType uint8
@@ -70,21 +71,6 @@ type FileInfo struct {
 	IsDir       bool
 	ModTime     time.Time
 }
-
-type ExistsFunc func(path string) (bool, error)         // 判断文件或目录是否存在函数类型
-type MkdirFunc func(path string) error                  // 创建目录函数类型
-type DeleteFunc func(path string) error                 // 删除文件或目录函数类型
-type RenameFunc func(path string, newName string) error // 重命名文件或目录函数类型
-
-type CreateFileFunc func(path string, reader io.Reader) error // 创建文件函数类型
-type ReadFileFunc func(path string) (io.ReadCloser, error)    // 读取文件函数类型
-
-type ListFunc func(path string) ([]FileInfo, error) // 列出目录下的文件函数类型
-
-type CopyFunc func(srcPath string, dstPath string) error     // 复制文件函数类型
-type MoveFunc func(srcPath string, dstPath string) error     // 移动文件函数类型
-type LinkFunc func(srcPath string, dstPath string) error     // 硬链接文件函数类型
-type SoftLinkFunc func(srcPath string, dstPath string) error // 软链接文件函数类型
 
 type StorageProvider interface {
 	Init(config map[string]any) error // 初始化文件系统
