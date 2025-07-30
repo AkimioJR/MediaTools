@@ -3,7 +3,6 @@ package transfer_controller
 import (
 	"MediaTools/extensions"
 	"MediaTools/internal/controller/scrape_controller"
-	"MediaTools/internal/pkg/storage/model"
 	"MediaTools/internal/schemas"
 	"MediaTools/utils"
 	"os"
@@ -23,7 +22,7 @@ import (
 func TransferMedia(
 	srcPath string,
 	targetDir string,
-	transferType model.TransferType,
+	transferType schemas.TransferType,
 	item *schemas.MediaItem,
 	info *schemas.MediaInfo,
 ) error {
