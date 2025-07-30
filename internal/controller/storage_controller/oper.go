@@ -97,15 +97,15 @@ func ReadFile(file *schemas.FileInfo) (io.ReadCloser, error) {
 	return provider.ReadFile(file.Path)
 }
 
-func List(path string, storageType schemas.StorageType) ([]schemas.FileInfo, error) {
+func List(dir *schemas.FileInfo) ([]schemas.FileInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	provider, exists := getStorageProvider(storageType)
+	provider, exists := getStorageProvider(dir.StorageType)
 	if !exists {
 		return nil, schemas.ErrStorageProviderNotFound
 	}
-	return provider.List(path)
+	return provider.List(dir.Path)
 }
 
 func Copy(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo) error {
