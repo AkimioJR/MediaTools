@@ -31,6 +31,18 @@ func GetParent(file *schemas.FileInfo) *schemas.FileInfo {
 	}
 }
 
+func Join(file *schemas.FileInfo, elem ...string) *schemas.FileInfo {
+	paths := make([]string, len(elem)+1)
+	paths = append(paths, file.Path)
+	paths = append(paths, elem...)
+	path := filepath.Join(paths...)
+	return &schemas.FileInfo{
+		StorageType: file.StorageType,
+		Name:        filepath.Base(path),
+		Path:        path,
+	}
+}
+
 func Exists(file *schemas.FileInfo) (bool, error) {
 	lock.RLock()
 	defer lock.RUnlock()
