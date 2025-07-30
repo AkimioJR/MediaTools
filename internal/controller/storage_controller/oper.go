@@ -22,6 +22,15 @@ func GetFile(path string, storageType schemas.StorageType) (*schemas.FileInfo, e
 	return &fi, nil
 }
 
+func GetParent(file *schemas.FileInfo) *schemas.FileInfo {
+	parentPath := filepath.Dir(file.Path)
+	return &schemas.FileInfo{
+		StorageType: file.StorageType,
+		Name:        filepath.Base(parentPath),
+		Path:        parentPath,
+	}
+}
+
 func Exists(file *schemas.FileInfo) (bool, error) {
 	lock.RLock()
 	defer lock.RUnlock()
