@@ -90,6 +90,10 @@ func (s *LocalStorage) List(path string) ([]schemas.FileInfo, error) {
 }
 
 func (s *LocalStorage) Copy(srcPath string, dstPath string) error {
+	err := s.Mkdir(filepath.Dir(dstPath))
+	if err != nil {
+		return err
+	}
 	srcFile, err := os.Open(srcPath)
 	if err != nil {
 		return err
@@ -100,14 +104,26 @@ func (s *LocalStorage) Copy(srcPath string, dstPath string) error {
 }
 
 func (s *LocalStorage) Move(srcPath string, dstPath string) error {
+	err := s.Mkdir(filepath.Dir(dstPath))
+	if err != nil {
+		return err
+	}
 	return os.Rename(srcPath, dstPath)
 }
 
 func (s *LocalStorage) Link(srcPath string, dstPath string) error {
+	err := s.Mkdir(filepath.Dir(dstPath))
+	if err != nil {
+		return err
+	}
 	return os.Link(srcPath, dstPath)
 }
 
 func (s *LocalStorage) SoftLink(srcPath string, dstPath string) error {
+	err := s.Mkdir(filepath.Dir(dstPath))
+	if err != nil {
+		return err
+	}
 	return os.Symlink(srcPath, dstPath)
 }
 
