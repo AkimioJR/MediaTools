@@ -99,3 +99,28 @@ func RecognizeMedia(videoMeta *meta.VideoMeta, mType *meta.MediaType, tmdbID *in
 	return nil, fmt.Errorf("无法识别媒体信息，未找到匹配结果")
 
 }
+
+// RecognizeAndEnrichMedia 识别媒体信息并补充详细信息
+// videoMeta 识别的元数据
+// mType 媒体类型
+// tmdbID TMDB ID
+// 返回识别后的媒体信息，如果是电视剧类型，还会补充季和集的详细信息
+func RecognizeAndEnrichMedia(videoMeta *meta.VideoMeta, mType *meta.MediaType, tmdbID *int) (*schemas.MediaInfo, error) {
+	info, err := RecognizeMedia(videoMeta, nil, nil)
+	if err != nil {
+		return nil, fmt.Errorf("识别媒体信息失败: %v", err)
+	}
+	if info.MediaType == meta.MediaTypeTV {
+		seasonDetail, err := GetTVSeasonDetail(info.TMDBID, videoMeta.Season)
+		if err != nil {
+			return nil, fmt.Errorf("获取电视剧季信息失败: %v", err)
+		}
+		info.TMDBInfo.TVInfo.SeasonInfo = seasonDetail.TMDBInfo.TVInfo.SeasonInfo
+		episodeDetail, err := GetTVEpisodeDetail(info.TMDBID, videoMeta.Season, videoMeta.Episode)
+		if err != nil {
+			return nil, fmt.Errorf("获取电视剧集信息失败: %v", err)
+		}
+		info.TMDBInfo.TVInfo.EpisodeInfo = episodeDetail.TMDBInfo.TVInfo.EpisodeInfo
+	}
+	return info, nil
+}
