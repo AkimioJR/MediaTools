@@ -1,6 +1,9 @@
 package encode
 
-import "strings"
+import (
+	"encoding/json"
+	"strings"
+)
 
 // AudioEncode 音频编码类型枚举
 type AudioEncode uint8
@@ -114,4 +117,18 @@ func ParseAudioEncode(s string) AudioEncode {
 	default:
 		return AudioEncodeUnknown
 	}
+}
+
+func (ae AudioEncode) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + ae.String() + `"`), nil
+}
+
+func (ae *AudioEncode) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	*ae = ParseAudioEncode(s)
+	return nil
 }
