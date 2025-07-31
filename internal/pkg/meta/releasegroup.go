@@ -83,7 +83,7 @@ func findReleaseGroups(title string) []string {
 	title += " "
 	matches := releaseGroupsRe.FindAllStringSubmatch(title, -1)
 
-	var groups []string
+	groups := make([]string, 0, 2)
 	for _, match := range matches {
 		if len(match) > 1 && match[1] != "" {
 			groups = append(groups, match[1])
