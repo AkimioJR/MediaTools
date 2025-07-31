@@ -1,6 +1,9 @@
 package encode
 
-import "strings"
+import (
+	"encoding/json"
+	"strings"
+)
 
 // VideoEncode 视频编码类型枚举
 type VideoEncode uint8
@@ -134,4 +137,18 @@ func (ve VideoEncode) GetBaseEncode() VideoEncode {
 	default:
 		return ve
 	}
+}
+
+func (ve VideoEncode) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + ve.String() + `"`), nil
+}
+
+func (ve *VideoEncode) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	*ve = ParseVideoEncode(s)
+	return nil
 }
