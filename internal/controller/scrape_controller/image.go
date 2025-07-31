@@ -2,26 +2,26 @@ package scrape_controller
 
 import (
 	"MediaTools/internal/controller/fanart_controller"
+	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
 	"MediaTools/utils"
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/sirupsen/logrus"
 )
 
-func Scrape(dstPath string, info *schemas.MediaInfo) error {
+func Scrape(dstFile *schemas.FileInfo, info *schemas.MediaInfo) error {
 	switch info.MediaType {
 	case meta.MediaTypeMovie:
-		ScrapeMovieInfo(dstPath, info)
-		ScrapeMovieImage(dstPath, info)
+		ScrapeMovieInfo(dstFile, info)
+		ScrapeMovieImage(dstFile, info)
 
 	case meta.MediaTypeTV:
-		ScrapeTVInfo(dstPath, info)
-		ScrapeTVImage(dstPath, info)
+		ScrapeTVInfo(dstFile, info)
+		ScrapeTVImage(dstFile, info)
 
 	default:
 		return fmt.Errorf("不支持的媒体类型: %s", info.MediaType)
@@ -30,28 +30,27 @@ func Scrape(dstPath string, info *schemas.MediaInfo) error {
 	return nil
 }
 
-func ScrapeMovieInfo(dstPath string, info *schemas.MediaInfo) {
+func ScrapeMovieInfo(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 	metaData := genMovieMetaInfo(info)
 	xmlData, err := metaData.XML()
 	if err != nil {
 		logrus.Errorf("生成电影「%s」元数据 XML 失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 	} else {
-		infoPath := filepath.Join(filepath.Dir(dstPath), "movie.info")
-		file, err := os.Create(infoPath)
+		infoFile := storage_controller.Join(storage_controller.GetParent(dstFile), "movie.info")
+		reader, err := bytes2Reader(xmlData)
+		if err != nil {
+			logrus.Warning("创建 reader 失败: %w", err)
+			return
+		}
+		err = storage_controller.CreateFile(infoFile, reader)
 		if err != nil {
 			logrus.Errorf("创建电影「%s」元数据文件失败: %v", info.TMDBInfo.MovieInfo.Title, err)
-		} else {
-			defer file.Close()
-			_, err = file.Write(xmlData)
-			if err != nil {
-				logrus.Errorf("写入电影「%s」元数据文件失败: %v", info.TMDBInfo.MovieInfo.Title, err)
-			}
 		}
 	}
 }
 
-func ScrapeMovieImage(dstPath string, info *schemas.MediaInfo) {
-	err := DownloadTMDBImageAndSave(info.TMDBInfo.MovieInfo.PosterPath, utils.ChangeExt(dstPath, "")+"-poster")
+func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
+	err := DownloadTMDBImageAndSave(info.TMDBInfo.MovieInfo.PosterPath, utils.ChangeExt(dstFile.Path, "")+"-poster", dstFile.StorageType)
 	if err != nil {
 		logrus.Errorf("刮削电影「%s」海报失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 	}
@@ -62,21 +61,21 @@ func ScrapeMovieImage(dstPath string, info *schemas.MediaInfo) {
 	}
 
 	if len(movieImage.Backdrops) > 0 { // 剧照
-		err = DownloadTMDBImageAndSave(movieImage.Backdrops[0].FilePath, filepath.Join(filepath.Dir(dstPath), "backdrop"))
+		err = DownloadTMDBImageAndSave(movieImage.Backdrops[0].FilePath, filepath.Join(filepath.Dir(dstFile.Path), "backdrop"), dstFile.StorageType)
 		if err != nil {
 			logrus.Errorf("刮削电影「%s」剧照失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 		}
 	}
 
 	if len(movieImage.Posters) > 0 { // 海报
-		err = DownloadTMDBImageAndSave(movieImage.Posters[0].FilePath, filepath.Join(filepath.Dir(dstPath), "poster"))
+		err = DownloadTMDBImageAndSave(movieImage.Posters[0].FilePath, filepath.Join(filepath.Dir(dstFile.Path), "poster"), dstFile.StorageType)
 		if err != nil {
 			logrus.Errorf("刮削电影「%s」海报失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 		}
 	}
 
 	if len(movieImage.Logos) > 0 { // Logo
-		err = DownloadTMDBImageAndSave(movieImage.Logos[0].FilePath, filepath.Join(filepath.Dir(dstPath), "logo"))
+		err = DownloadTMDBImageAndSave(movieImage.Logos[0].FilePath, filepath.Join(filepath.Dir(dstFile.Path), "logo"), dstFile.StorageType)
 		if err != nil {
 			logrus.Errorf("刮削电影「%s」Logo 失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 		}
@@ -89,38 +88,38 @@ func ScrapeMovieImage(dstPath string, info *schemas.MediaInfo) {
 		}
 
 		if len(fanartImagesData.MovieBackground) > 0 { // 背景图
-			err = DownloadFanartImageAndSave(fanartImagesData.MovieBackground[0].URL, filepath.Join(filepath.Dir(dstPath), "background"))
+			err = DownloadFanartImageAndSave(fanartImagesData.MovieBackground[0].URL, filepath.Join(filepath.Dir(dstFile.Path), "background"), dstFile.StorageType)
 			if err != nil {
 				logrus.Errorf("刮削电影「%s」Fanart 背景图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 			}
 		}
 
 		if len(fanartImagesData.MovieBanner) > 0 { // 横幅
-			err = DownloadFanartImageAndSave(fanartImagesData.MovieBanner[0].URL, filepath.Join(filepath.Dir(dstPath), "banner"))
+			err = DownloadFanartImageAndSave(fanartImagesData.MovieBanner[0].URL, filepath.Join(filepath.Dir(dstFile.Path), "banner"), dstFile.StorageType)
 			if err != nil {
 				logrus.Errorf("刮削电影「%s」Fanart 横幅图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 			}
 		}
 
-		fanartClearArtPath := filepath.Join(filepath.Dir(dstPath), "clearart")
+		fanartClearArtPath := filepath.Join(filepath.Dir(dstFile.Path), "clearart")
 		if len(fanartImagesData.HDMovieClearArt) > 0 { // Clear Art
-			err = DownloadFanartImageAndSave(fanartImagesData.HDMovieClearArt[0].URL, fanartClearArtPath)
+			err = DownloadFanartImageAndSave(fanartImagesData.HDMovieClearArt[0].URL, fanartClearArtPath, dstFile.StorageType)
 		} else if len(fanartImagesData.MovieArt) > 0 { // Clear Art
-			err = DownloadFanartImageAndSave(fanartImagesData.MovieArt[0].URL, fanartClearArtPath)
+			err = DownloadFanartImageAndSave(fanartImagesData.MovieArt[0].URL, fanartClearArtPath, dstFile.StorageType)
 		}
 		if err != nil {
 			logrus.Errorf("刮削电影「%s」Fanart Clear Art 图片失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 		}
 
 		if len(fanartImagesData.MovieDisc) > 0 { // 光盘
-			err = DownloadFanartImageAndSave(fanartImagesData.MovieDisc[0].URL, filepath.Join(filepath.Dir(dstPath), "disc"))
+			err = DownloadFanartImageAndSave(fanartImagesData.MovieDisc[0].URL, filepath.Join(filepath.Dir(dstFile.Path), "disc"), dstFile.StorageType)
 			if err != nil {
 				logrus.Errorf("刮削电影「%s」Fanart 光盘图片失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 			}
 		}
 
 		if len(fanartImagesData.MovieThumb) > 0 { // 缩略图
-			err = DownloadFanartImageAndSave(fanartImagesData.MovieThumb[0].URL, filepath.Join(filepath.Dir(dstPath), "thumb"))
+			err = DownloadFanartImageAndSave(fanartImagesData.MovieThumb[0].URL, filepath.Join(filepath.Dir(dstFile.Path), "thumb"), dstFile.StorageType)
 			if err != nil {
 				logrus.Errorf("刮削电影「%s」Fanart 缩略图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 			}
@@ -128,24 +127,23 @@ func ScrapeMovieImage(dstPath string, info *schemas.MediaInfo) {
 	}
 }
 
-func ScrapeTVInfo(dstPath string, info *schemas.MediaInfo) {
-	tvSeasonDir := filepath.Dir(dstPath)
-	tvSerieDir := filepath.Dir(tvSeasonDir)
+func ScrapeTVInfo(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
+	tvSeasonDir := storage_controller.GetParent(dstFile)
+	tvSerieDir := storage_controller.GetParent(tvSeasonDir)
 
 	serieMetaData := genTVSerieMetaInfo(info)
 	xmlData, err := serieMetaData.XML()
 	if err != nil {
 		logrus.Errorf("生成电视剧「%s」元数据 XML 失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 	} else {
-		infoPath := filepath.Join(tvSerieDir, "tv.info")
-		file, err := utils.CreateFile(infoPath)
+		infoFile := storage_controller.Join(tvSerieDir, "tv.info")
+		reader, err := bytes2Reader(xmlData)
 		if err != nil {
-			logrus.Errorf("创建电视剧「%s」元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
+			logrus.Warningf("创建 reader 失败: %v", err)
 		} else {
-			defer file.Close()
-			_, err = file.Write(xmlData)
+			err = storage_controller.CreateFile(infoFile, reader)
 			if err != nil {
-				logrus.Errorf("写入电视剧「%s」元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
+				logrus.Errorf("创建电视剧「%s」元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 			}
 		}
 	}
@@ -155,15 +153,14 @@ func ScrapeTVInfo(dstPath string, info *schemas.MediaInfo) {
 	if err != nil {
 		logrus.Errorf("生成电视剧「%s」第 %d 季元数据 XML 失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, err)
 	} else {
-		infoPath := filepath.Join(tvSeasonDir, "season.info")
-		file, err := utils.CreateFile(infoPath)
+		infoFile := storage_controller.Join(tvSeasonDir, "season.info")
+		reader, err := bytes2Reader(xmlData)
 		if err != nil {
-			logrus.Errorf("创建电视剧「%s」第 %d 季元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, err)
+			logrus.Warning("创建 reader 失败: %w", err)
 		} else {
-			defer file.Close()
-			_, err = file.Write(xmlData)
+			err = storage_controller.CreateFile(infoFile, reader)
 			if err != nil {
-				logrus.Errorf("写入电视剧「%s」第 %d 季元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, err)
+				logrus.Errorf("创建电视剧「%s」第 %d 季元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, err)
 			}
 		}
 	}
@@ -173,25 +170,30 @@ func ScrapeTVInfo(dstPath string, info *schemas.MediaInfo) {
 	if err != nil {
 		logrus.Errorf("生成电视剧「%s」第 %d 季第 %d 集元数据 XML 失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, info.TMDBInfo.TVInfo.EpisodeInfo.EpisodeNumber, err)
 	} else {
-		infoPath := utils.ChangeExt(dstPath, ".info")
-		file, err := utils.CreateFile(infoPath)
+		infoPath := utils.ChangeExt(dstFile.Path, ".info")
+		infoFile, err := storage_controller.GetFile(infoPath, dstFile.StorageType)
 		if err != nil {
-			logrus.Errorf("创建电视剧「%s」第 %d 季第 %d 集元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, info.TMDBInfo.TVInfo.EpisodeInfo.EpisodeNumber, err)
+			logrus.Warningf("获取 %s:/%s 句柄失败:%v", dstFile.StorageType, infoPath, err)
 		} else {
-			defer file.Close()
-			_, err = file.Write(xmlData)
+			reader, err := bytes2Reader(xmlData)
 			if err != nil {
-				logrus.Errorf("写入电视剧「%s」第 %d 季第 %d 集元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, info.TMDBInfo.TVInfo.EpisodeInfo.EpisodeNumber, err)
+				logrus.Warning("创建 reader 失败: %w", err)
+			} else {
+				err = storage_controller.CreateFile(infoFile, reader)
+				if err != nil {
+					logrus.Errorf("创建电视剧「%s」第 %d 季第 %d 集元数据文件失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, info.TMDBInfo.TVInfo.EpisodeInfo.EpisodeNumber, err)
+				}
 			}
 		}
 	}
 }
 
-func ScrapeTVImage(dstPath string, info *schemas.MediaInfo) {
-	tvSeasonDir := filepath.Dir(dstPath)
-	tvSerieDir := filepath.Dir(tvSeasonDir)
+func ScrapeTVImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
+	tvSeasonDir := storage_controller.GetParent(dstFile)
+	tvSerieDir := storage_controller.GetParent(tvSeasonDir)
+
 	{ // 集照片
-		err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.EpisodeInfo.StillPath, utils.ChangeExt(dstPath, ""))
+		err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.EpisodeInfo.StillPath, utils.ChangeExt(dstFile.Path, ""), dstFile.StorageType)
 		if err != nil {
 			logrus.Errorf("刮削电视剧「%s」第 %d 季第 %d 集剧照失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, info.TMDBInfo.TVInfo.EpisodeInfo.EpisodeNumber, err)
 		}
@@ -205,14 +207,14 @@ func ScrapeTVImage(dstPath string, info *schemas.MediaInfo) {
 		default:
 			seasonPosterName = fmt.Sprintf("season%02d-poster", info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber)
 		}
-		seasonPosterPath := filepath.Join(tvSerieDir, seasonPosterName)
-		err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.SeasonInfo.PosterPath, seasonPosterPath)
+		seasonPosterFile := storage_controller.Join(tvSerieDir, seasonPosterName)
+		err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.SeasonInfo.PosterPath, seasonPosterFile.Path, seasonPosterFile.StorageType)
 		if err != nil {
 			logrus.Errorf("刮削电视剧「%s」第 %d 季海报失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, err)
 		}
 	}
 
-	err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.SerieInfo.BackdropPath, filepath.Join(tvSerieDir, "backdrop"))
+	err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.SerieInfo.BackdropPath, storage_controller.Join(tvSerieDir, "backdrop").Path, tvSerieDir.StorageType)
 	if err != nil {
 		logrus.Errorf("刮削电视剧「%s」剧照失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 	}
@@ -223,14 +225,14 @@ func ScrapeTVImage(dstPath string, info *schemas.MediaInfo) {
 			logrus.Errorf("获取电视剧「%s」图片信息失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 		} else {
 			if len(serieImages.Posters) > 0 { // 海报
-				err = DownloadTMDBImageAndSave(serieImages.Posters[0].FilePath, filepath.Join(tvSerieDir, "poster"))
+				err = DownloadTMDBImageAndSave(serieImages.Posters[0].FilePath, filepath.Join(tvSerieDir.Path, "poster"), tvSerieDir.StorageType)
 				if err != nil {
 					logrus.Errorf("刮削电视剧「%s」海报失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 				}
 			}
 
 			if len(serieImages.Logos) > 0 { // Logo
-				err = DownloadTMDBImageAndSave(serieImages.Logos[0].FilePath, filepath.Join(tvSerieDir, "logo"))
+				err = DownloadTMDBImageAndSave(serieImages.Logos[0].FilePath, filepath.Join(tvSerieDir.Path, "logo"), tvSerieDir.StorageType)
 				if err != nil {
 					logrus.Errorf("刮削电视剧「%s」Logo 失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 				}
@@ -244,38 +246,38 @@ func ScrapeTVImage(dstPath string, info *schemas.MediaInfo) {
 			logrus.Errorf("获取电视剧「%s」Fanart 图片信息失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 		} else {
 			if len(fanartImagesData.ShowBackground) > 0 { // 背景图
-				err = DownloadFanartImageAndSave(fanartImagesData.ShowBackground[0].URL, filepath.Join(tvSerieDir, "background"))
+				err = DownloadFanartImageAndSave(fanartImagesData.ShowBackground[0].URL, filepath.Join(tvSerieDir.Path, "background"), tvSerieDir.StorageType)
 				if err != nil {
 					logrus.Errorf("刮削电视剧「%s」Fanart 背景图失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 				}
 			}
 
 			if len(fanartImagesData.TVBanner) > 0 { // 横幅
-				err = DownloadFanartImageAndSave(fanartImagesData.TVBanner[0].URL, filepath.Join(tvSerieDir, "banner"))
+				err = DownloadFanartImageAndSave(fanartImagesData.TVBanner[0].URL, filepath.Join(tvSerieDir.Path, "banner"), tvSerieDir.StorageType)
 				if err != nil {
 					logrus.Errorf("刮削电视剧「%s」Fanart 横幅图失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 				}
 			}
 
 			if len(fanartImagesData.CharacterArt) > 0 { // 角色图
-				err = DownloadFanartImageAndSave(fanartImagesData.CharacterArt[0].URL, filepath.Join(tvSerieDir, "characterart"))
+				err = DownloadFanartImageAndSave(fanartImagesData.CharacterArt[0].URL, filepath.Join(tvSerieDir.Path, "characterart"), tvSerieDir.StorageType)
 				if err != nil {
 					logrus.Errorf("刮削电视剧「%s」Fanart 角色图失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 				}
 			}
 
-			cleanArtPath := filepath.Join(tvSerieDir, "clearart")
+			cleanArtPath := filepath.Join(tvSerieDir.Path, "clearart")
 			if len(fanartImagesData.HDClearArt) > 0 { // HD clearart
-				err = DownloadFanartImageAndSave(fanartImagesData.HDClearArt[0].URL, cleanArtPath)
+				err = DownloadFanartImageAndSave(fanartImagesData.HDClearArt[0].URL, cleanArtPath, tvSerieDir.StorageType)
 			} else if len(fanartImagesData.ClearArt) > 0 { // clearart
-				err = DownloadFanartImageAndSave(fanartImagesData.ClearArt[0].URL, cleanArtPath)
+				err = DownloadFanartImageAndSave(fanartImagesData.ClearArt[0].URL, cleanArtPath, tvSerieDir.StorageType)
 			}
 			if err != nil {
 				logrus.Errorf("刮削电视剧「%s」Fanart 清晰艺术图失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 			}
 
 			if len(fanartImagesData.TVThumb) > 0 { // 缩略图
-				err = DownloadFanartImageAndSave(fanartImagesData.TVThumb[0].URL, filepath.Join(tvSerieDir, "thumb"))
+				err = DownloadFanartImageAndSave(fanartImagesData.TVThumb[0].URL, filepath.Join(tvSerieDir.Path, "thumb"), tvSerieDir.StorageType)
 				if err != nil {
 					logrus.Errorf("刮削电视剧「%s」Fanart 缩略图失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 				}

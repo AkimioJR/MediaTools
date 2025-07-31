@@ -1,6 +1,8 @@
 package scrape_controller
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+)
 
 // 唯一标识（多类型ID，如IMDb、TMDB、TVDB等）
 type UniqueID struct {
