@@ -1,6 +1,9 @@
 package meta
 
-import "strings"
+import (
+	"encoding/json"
+	"strings"
+)
 
 // ResourcePix 分辨率类型枚举
 type ResourcePix uint8
@@ -53,6 +56,20 @@ func ParseResourcePix(s string) ResourcePix {
 	default:
 		return ResourcePixUnknown
 	}
+}
+
+func (rp ResourcePix) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + rp.String() + `"`), nil
+}
+
+func (rp *ResourcePix) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	*rp = ParseResourcePix(s)
+	return nil
 }
 
 // ResourceEffect 资源效果枚举
@@ -138,6 +155,20 @@ func ParseResourceEffect(s string) ResourceEffect {
 	}
 }
 
+func (re ResourceEffect) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + re.String() + `"`), nil
+}
+
+func (re *ResourceEffect) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	*re = ParseResourceEffect(s)
+	return nil
+}
+
 // ResourceType 资源类型枚举
 type ResourceType uint8
 
@@ -199,6 +230,20 @@ func (rt ResourceType) String() string {
 	default:
 		return "Unknown"
 	}
+}
+
+func (rt ResourceType) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + rt.String() + `"`), nil
+}
+
+func (rt *ResourceType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	*rt = ParseResourceType(s)
+	return nil
 }
 
 // ParseResourceType 从字符串解析资源类型
