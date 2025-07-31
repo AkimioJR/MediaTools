@@ -72,6 +72,10 @@ type FileInfo struct {
 	ModTime     time.Time
 }
 
+func (fi *FileInfo) String() string {
+	return fi.StorageType.String() + ":" + fi.Path
+}
+
 type StorageProvider interface {
 	Init(config map[string]any) error // 初始化文件系统
 	GetType() StorageType             // 获取文件系统类型
