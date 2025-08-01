@@ -6,9 +6,7 @@ import (
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/schemas"
 	"MediaTools/utils"
-	"path/filepath"
 	"slices"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -54,8 +52,8 @@ func ArchiveMedia(
 					continue // 跳过目录和源文件本身
 				}
 
-				if slices.Contains(exts, strings.ToLower(filepath.Ext(fi.Name))) {
-					otherDstFilePath := utils.ChangeExt(dstFile.Path, filepath.Ext(fi.Name))
+				if slices.Contains(exts, fi.LowerExt()) {
+					otherDstFilePath := utils.ChangeExt(dstFile.Path, fi.Ext())
 					otherDstFile, err := storage_controller.GetFile(otherDstFilePath, dstFile.StorageType)
 					if err != nil {
 						logrus.Warningf("获取文件 %s:%s 失败: %v", dstFile.StorageType, otherDstFilePath, err)

@@ -16,7 +16,6 @@ func GetFile(path string, storageType schemas.StorageType) (*schemas.FileInfo, e
 	}
 	fi := schemas.FileInfo{
 		StorageType: storageType,
-		Name:        filepath.Base(path),
 		Path:        path,
 	}
 	return &fi, nil
@@ -26,7 +25,6 @@ func GetParent(file *schemas.FileInfo) *schemas.FileInfo {
 	parentPath := filepath.Dir(file.Path)
 	return &schemas.FileInfo{
 		StorageType: file.StorageType,
-		Name:        filepath.Base(parentPath),
 		Path:        parentPath,
 	}
 }
@@ -38,7 +36,6 @@ func Join(file *schemas.FileInfo, elem ...string) *schemas.FileInfo {
 	path := filepath.Join(paths...)
 	return &schemas.FileInfo{
 		StorageType: file.StorageType,
-		Name:        filepath.Base(path),
 		Path:        path,
 	}
 }

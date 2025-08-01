@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -107,11 +108,22 @@ func ParseTransferType(s string) TransferType {
 
 type FileInfo struct {
 	StorageType StorageType
-	Name        string
 	Path        string
 	Size        int64
 	IsDir       bool
 	ModTime     time.Time
+}
+
+func (fi *FileInfo) Name() string {
+	return filepath.Base(fi.Path)
+}
+
+func (fi *FileInfo) Ext() string {
+	return filepath.Ext(fi.Path)
+}
+
+func (fi *FileInfo) LowerExt() string {
+	return strings.ToLower(fi.Ext())
 }
 
 func (fi *FileInfo) String() string {

@@ -368,7 +368,7 @@ func StorageDownloadFile(ctx *gin.Context) {
 	defer reader.Close()
 
 	// 设置下载响应头
-	ctx.Header("Content-Disposition", "attachment; filename="+fileInfo.Name)
+	ctx.Header("Content-Disposition", "attachment; filename="+fileInfo.Name())
 	ctx.Header("Content-Type", "application/octet-stream")
 
 	// 流式传输文件内容

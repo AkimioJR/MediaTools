@@ -76,7 +76,6 @@ func (s *LocalStorage) List(path string) ([]schemas.FileInfo, error) {
 			return nil, err
 		}
 		fileInfos = append(fileInfos, schemas.FileInfo{
-			Name:    info.Name(),
 			Size:    info.Size(),
 			IsDir:   info.IsDir(),
 			ModTime: info.ModTime(),

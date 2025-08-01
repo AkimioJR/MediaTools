@@ -4,7 +4,6 @@ import (
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/schemas"
 	"net/http"
-	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -37,7 +36,6 @@ func ScrapeVideo(ctx *gin.Context) {
 
 	dstFile := schemas.FileInfo{
 		StorageType: req.DstFile.StorageType,
-		Name:        filepath.Base(req.DstFile.Path),
 		Path:        req.DstFile.Path,
 	}
 
