@@ -76,17 +76,6 @@ func Delete(file *schemas.FileInfo) error {
 	return provider.Delete(file.Path)
 }
 
-func Rename(file *schemas.FileInfo, newName string) error {
-	lock.RLock()
-	defer lock.RUnlock()
-
-	provider, exists := getStorageProvider(file.StorageType)
-	if !exists {
-		return schemas.ErrStorageProviderNotFound
-	}
-	return provider.Rename(file.Path, newName)
-}
-
 func CreateFile(file *schemas.FileInfo, reader io.Reader) error {
 	lock.RLock()
 	defer lock.RUnlock()

@@ -41,10 +41,6 @@ func (s *LocalStorage) Delete(path string) error {
 	return os.RemoveAll(path)
 }
 
-func (s *LocalStorage) Rename(path string, newName string) error {
-	return os.Rename(path, filepath.Join(filepath.Dir(path), newName))
-}
-
 func (s *LocalStorage) CreateFile(path string, reader io.Reader) error {
 	err := s.Mkdir(filepath.Dir(path))
 	if err != nil {

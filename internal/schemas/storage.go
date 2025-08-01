@@ -124,10 +124,9 @@ type StorageProvider interface {
 	GetTransferType() []TransferType  // 获取支持的传输类型
 
 	// 路径级操作
-	Exists(path string) (bool, error)         // 判断文件是否存在
-	Mkdir(path string) error                  // 创建目录（如果父目录不存在也需要创建）
-	Delete(path string) error                 // 删除文件或目录
-	Rename(path string, newName string) error // 重命名文件或目录
+	Exists(path string) (bool, error) // 判断文件是否存在
+	Mkdir(path string) error          // 创建目录（如果父目录不存在也需要创建）
+	Delete(path string) error         // 删除文件或目录
 
 	// 文件内容操作
 	CreateFile(path string, reader io.Reader) error // 创建文件并写入内容（如果父目录不存在也需要创建）
