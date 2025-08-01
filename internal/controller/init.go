@@ -2,10 +2,10 @@ package controller
 
 import (
 	"MediaTools/internal/controller/fanart_controller"
+	"MediaTools/internal/controller/library_controller"
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
-	"MediaTools/internal/controller/transfer_controller"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
@@ -18,7 +18,7 @@ var initFuncs = []InitFunc{
 	fanart_controller.Init,
 	scrape_controller.Init,
 	storage_controller.Init,
-	transfer_controller.Init,
+	library_controller.Init,
 }
 
 func InitAllControllers() error {

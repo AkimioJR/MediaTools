@@ -1,4 +1,4 @@
-package transfer_controller
+package library_controller
 
 import (
 	"MediaTools/extensions"
@@ -13,13 +13,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// 识别并整理一个文件
+// 整理一个视频文件及其相关的字幕和音轨文件到指定目录
 // srcFile: 源文件
 // dstDir: 目标目录
 // transferType: 传输类型（复制、移动、链接等）
 // item: 媒体项（包含元数据）
 // info: 识别到的媒体信息（为nil代表无需刮削）
-func TransferMedia(
+func ArchiveMedia(
 	srcFile *schemas.FileInfo,
 	dstDir *schemas.FileInfo,
 	transferType schemas.TransferType,
