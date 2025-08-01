@@ -60,10 +60,24 @@ func genMovieMetaInfo(mediaInfo *schemas.MediaInfo) *MovieMetaData {
 	}
 
 	var uniqueIDs []UniqueID
-	uniqueIDs = append(uniqueIDs, UniqueID{
-		Type:  "tmdb",
-		Value: strconv.Itoa(mediaInfo.TMDBID),
-	})
+	if mediaInfo.TMDBID != 0 {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "tmdbid",
+			Value: strconv.Itoa(mediaInfo.TMDBID),
+		})
+	}
+	if mediaInfo.IMDBID != "" {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "imdbid",
+			Value: mediaInfo.IMDBID,
+		})
+	}
+	if mediaInfo.TVDBID != 0 {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "tvdbid",
+			Value: strconv.Itoa(mediaInfo.TVDBID),
+		})
+	}
 
 	data := MovieMetaData{
 		Title:         mediaInfo.TMDBInfo.MovieInfo.Title,         // 电影标题
@@ -114,10 +128,24 @@ func genTVSerieMetaInfo(mediaInfo *schemas.MediaInfo) *TVSeriesMetaData {
 	}
 
 	var uniqueIDs []UniqueID
-	uniqueIDs = append(uniqueIDs, UniqueID{
-		Type:  "tmdb",
-		Value: strconv.Itoa(mediaInfo.TMDBID),
-	})
+	if mediaInfo.TMDBID != 0 {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "tmdbid",
+			Value: strconv.Itoa(mediaInfo.TMDBID),
+		})
+	}
+	if mediaInfo.IMDBID != "" {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "imdbid",
+			Value: mediaInfo.IMDBID,
+		})
+	}
+	if mediaInfo.TVDBID != 0 {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "tvdbid",
+			Value: strconv.Itoa(mediaInfo.TVDBID),
+		})
+	}
 
 	data := TVSeriesMetaData{
 		Title:         mediaInfo.TMDBInfo.TVInfo.SerieInfo.Name,         // 电视剧标题
@@ -145,10 +173,24 @@ func genTVSeasonMetaInfo(mediaInfo *schemas.MediaInfo) *TVSeasonMetaData {
 	}
 
 	var uniqueIDs []UniqueID
-	uniqueIDs = append(uniqueIDs, UniqueID{
-		Type:  "tmdb",
-		Value: strconv.Itoa(mediaInfo.TMDBID),
-	})
+	if mediaInfo.TMDBID != 0 {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "tmdbid",
+			Value: strconv.Itoa(mediaInfo.TMDBID),
+		})
+	}
+	if mediaInfo.IMDBID != "" {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "imdbid",
+			Value: mediaInfo.IMDBID,
+		})
+	}
+	if mediaInfo.TVDBID != 0 {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "tvdbid",
+			Value: strconv.Itoa(mediaInfo.TVDBID),
+		})
+	}
 
 	data := TVSeasonMetaData{
 		Title:        mediaInfo.TMDBInfo.TVInfo.SeasonInfo.Name,         // 季名称
@@ -204,10 +246,24 @@ func genTVEpisodeMetaInfo(mediaInfo *schemas.MediaInfo) *TVEpisodeMetaData {
 	}
 
 	var uniqueIDs []UniqueID
-	uniqueIDs = append(uniqueIDs, UniqueID{
-		Type:  "tmdb",
-		Value: strconv.Itoa(mediaInfo.TMDBID),
-	})
+	if mediaInfo.TMDBID != 0 {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "tmdbid",
+			Value: strconv.Itoa(mediaInfo.TMDBID),
+		})
+	}
+	if mediaInfo.IMDBID != "" {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "imdbid",
+			Value: mediaInfo.IMDBID,
+		})
+	}
+	if mediaInfo.TVDBID != 0 {
+		uniqueIDs = append(uniqueIDs, UniqueID{
+			Type:  "tvdbid",
+			Value: strconv.Itoa(mediaInfo.TVDBID),
+		})
+	}
 
 	data := TVEpisodeMetaData{
 		Title:     mediaInfo.TMDBInfo.TVInfo.EpisodeInfo.Name,          // 集名称
