@@ -11,14 +11,14 @@ import (
 )
 
 // @BasePath /media
-// @Route GET /recognize
+// @Route /recognize [get]
 // @Summary 识别媒体信息
 // @Description 根据提供的标题识别媒体信息，并返回 MediaItem 对象
 // @Tags media
 // @Param title query string true "媒体标题"
 // @Success 200 {object} Response[*schemas.MediaItem]
-// @Failure 400 {object} Response
-// @Failure 500 {object} Response
+// @Failure 400 {object} Response[*schemas.MediaItem]
+// @Failure 500 {object} Response[*schemas.MediaItem]
 func MediaRecognize(ctx *gin.Context) {
 	var resp Response[*schemas.MediaItem]
 	title := ctx.Query("title")

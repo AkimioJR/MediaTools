@@ -11,7 +11,7 @@ import (
 )
 
 // @BasePath /storage
-// @Route GET /list
+// @Route /list [get]
 // @Summary 获取存储提供者列表
 // @Description 返回所有已注册的存储提供者列表
 // @Tags storage
@@ -28,7 +28,7 @@ func StorageProviderList(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route GET /:storage_type/info
+// @Route /:storage_type/info [get]
 // @Summary 获取文件/目录信息
 // @Description 根据路径和存储类型获取文件或目录的详细信息
 // @Tags storage
@@ -36,8 +36,8 @@ func StorageProviderList(ctx *gin.Context) {
 // @Param path query string true "文件或目录路径"
 // @Products json
 // @Success 200 {object} Response[*schemas.FileInfo]
-// @Failure 400 {object} Response
-// @Failure 500 {object} Response
+// @Failure 400 {object} Response[*schemas.FileInfo]
+// @Failure 500 {object} Response[*schemas.FileInfo]
 func StorageGetFileInfo(ctx *gin.Context) {
 	var resp Response[*schemas.FileInfo]
 
@@ -69,7 +69,7 @@ func StorageGetFileInfo(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route GET /:storage_type/exists
+// @Route /:storage_type/exists [get]
 // @Summary 检查文件/目录是否存在
 // @Description 根据路径和存储类型检查文件或目录是否存在
 // @Tags storage
@@ -77,8 +77,8 @@ func StorageGetFileInfo(ctx *gin.Context) {
 // @Param path query string true "文件或目录路径"
 // @Products json
 // @Success 200 {object} Response[bool]
-// @Failure 400 {object} Response
-// @Failure 500 {object} Response
+// @Failure 400 {object} Response[bool]
+// @Failure 500 {object} Response[bool]
 func StorageCheckExists(ctx *gin.Context) {
 	var resp Response[bool]
 
@@ -115,7 +115,7 @@ func StorageCheckExists(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route GET /:storage_type/list
+// @Route /:storage_type/list [get]
 // @Summary 列出目录内容
 // @Description 根据存储类型和路径列出目录下的所有文件和子目录
 // @Tags storage
@@ -123,8 +123,8 @@ func StorageCheckExists(ctx *gin.Context) {
 // @Param path query string true "目录路径"
 // @Products json
 // @Success 200 {object} Response[[]schemas.FileInfo]
-// @Failure 400 {object} Response
-// @Failure 500 {object} Response
+// @Failure 400 {object} Response[[]schemas.FileInfo]
+// @Failure 500 {object} Response[[]schemas.FileInfo]
 func StorageList(ctx *gin.Context) {
 	var resp Response[[]schemas.FileInfo]
 
@@ -163,7 +163,7 @@ func StorageList(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route POST /:storage_type/mkdir
+// @Route /:storage_type/mkdir [post]
 // @Summary 创建目录
 // @Description 根据存储类型和路径创建一个新目录
 // @Tags storage
@@ -213,7 +213,7 @@ func StorageMkdir(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route DELETE /:storage_type/delete
+// @Route /:storage_type/delete [delete]
 // @Summary 删除文件或目录
 // @Description 根据存储类型和路径删除指定的文件或目录
 // @Tags storage
@@ -263,7 +263,7 @@ func StorageDelete(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route POST /:storage_type/upload
+// @Route /:storage_type/upload [post]
 // @Summary 上传文件
 // @Description 根据存储类型和路径上传文件
 // @Tags storage
@@ -327,7 +327,7 @@ func StorageUploadFile(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route GET /:storage_type/download
+// @Route /:storage_type/download [get]
 // @Summary 下载文件
 // @Description 根据存储类型和路径下载文件
 // @Tags storage
@@ -428,7 +428,7 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferT
 }
 
 // @BasePath /storage
-// @Route POST /copy
+// @Route /copy [post]
 // @Summary 复制文件
 // @Description 将文件从源位置复制到目标位置
 // @Tags storage
@@ -443,7 +443,7 @@ func StorageCopyFile(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route POST /move
+// @Route /move [post]
 // @Summary 移动文件
 // @Description 将文件从源位置移动到目标位置
 // @Tags storage
@@ -458,7 +458,7 @@ func StorageMoveFile(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route POST /link
+// @Route /link [post]
 // @Summary 创建硬链接
 // @Description 为文件创建硬链接
 // @Tags storage
@@ -473,7 +473,7 @@ func StorageLinkFile(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route POST /softlink
+// @Route /softlink [post]
 // @Summary 创建软链接
 // @Description 为文件创建软链接（符号链接）
 // @Tags storage
@@ -488,7 +488,7 @@ func StorageSoftLinkFile(ctx *gin.Context) {
 }
 
 // @BasePath /storage
-// @Route POST /transfer
+// @Route /transfer [post]
 // @Summary 通用文件传输接口
 // @Description 根据传输类型执行文件传输操作（复制、移动、硬链接、软链接）
 // @Tags storage
