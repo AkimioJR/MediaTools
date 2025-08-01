@@ -4,12 +4,18 @@ import "github.com/gin-gonic/gin"
 
 func InitRouter() *gin.Engine {
 	ginRouter := gin.Default()
-	mediaRouter := ginRouter.Group("/media")
+
+	mediaRouter := ginRouter.Group("/media") // 媒体相关接口
 	{
 		mediaRouter.GET("/recognize", MediaRecognize)
 	}
 
-	storageRouter := ginRouter.Group("/storage")
+	scrapeRouter := ginRouter.Group("/scrape") // 刮削相关接口
+	{
+		scrapeRouter.POST("/video", ScrapeVideo) // 刮削视频
+	}
+
+	storageRouter := ginRouter.Group("/storage") // 存储相关接口
 	{
 		// 基础信息接口
 		storageRouter.GET("/list", StorageProviderList)

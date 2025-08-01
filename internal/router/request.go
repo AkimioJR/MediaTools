@@ -1,6 +1,9 @@
 package router
 
-import "MediaTools/internal/schemas"
+import (
+	"MediaTools/internal/pkg/meta"
+	"MediaTools/internal/schemas"
+)
 
 type PathRequest struct {
 	Path string `json:"path" binding:"required"`
@@ -14,4 +17,10 @@ type TransferRequest struct {
 	SrcFile      FileInfoRequest      `json:"src_file" binding:"required"`
 	DstFile      FileInfoRequest      `json:"dst_file" binding:"required"`
 	TransferType schemas.TransferType `json:"transfer_type"`
+}
+
+type ScrapeRequest struct {
+	DstFile   FileInfoRequest `json:"dst_file" binding:"required"`
+	MediaType *meta.MediaType `json:"media_type,omitempty"`
+	TMDBID    *int            `json:"tmdb_id,omitempty"`
 }
