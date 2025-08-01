@@ -38,6 +38,19 @@ func ParseStorageType(s string) StorageType {
 	}
 }
 
+func (t StorageType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.String())
+}
+
+func (t *StorageType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	*t = ParseStorageType(s)
+	return nil
+}
+
 type TransferType uint8
 
 const (
@@ -60,6 +73,34 @@ func (t TransferType) String() string {
 		return "SoftLink"
 	default:
 		return "Unknown"
+	}
+}
+
+func (t TransferType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.String())
+}
+
+func (t *TransferType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	*t = ParseTransferType(s)
+	return nil
+}
+
+func ParseTransferType(s string) TransferType {
+	switch strings.ToLower(s) {
+	case "copy":
+		return TransferCopy
+	case "move":
+		return TransferMove
+	case "link":
+		return TransferLink
+	case "softlink":
+		return TransferSoftLink
+	default:
+		return TransferUnknown
 	}
 }
 
