@@ -1,6 +1,7 @@
 package schemas
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
 	"strings"
@@ -140,4 +141,16 @@ type StorageProvider interface {
 	Move(srcPath string, dstPath string) error     // 移动文件
 	Link(srcPath string, dstPath string) error     // 硬链接文件
 	SoftLink(srcPath string, dstPath string) error // 软链接文件
+}
+
+type StorageProviderItem struct {
+	StorageType  StorageType    `json:"storage_type"`
+	TransferType []TransferType `json:"transfer_type"`
+}
+
+func NewStorageProviderItem(provider StorageProvider) StorageProviderItem {
+	return StorageProviderItem{
+		StorageType:  provider.GetType(),
+		TransferType: provider.GetTransferType(),
+	}
 }

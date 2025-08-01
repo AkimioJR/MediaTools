@@ -33,3 +33,14 @@ func getStorageProvider(storageType schemas.StorageType) (schemas.StorageProvide
 	provider, exists := storageProviders[storageType]
 	return provider, exists
 }
+
+func ListStorageProviders() []schemas.StorageProviderItem {
+	lock.RLock()
+	defer lock.RUnlock()
+
+	providers := make([]schemas.StorageProviderItem, 0, len(storageProviders))
+	for _, provider := range storageProviders {
+		providers = append(providers, schemas.NewStorageProviderItem(provider))
+	}
+	return providers
+}
