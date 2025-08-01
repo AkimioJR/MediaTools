@@ -17,11 +17,9 @@ func InitRouter() *gin.Engine {
 
 	storageRouter := ginRouter.Group("/storage") // 存储相关接口
 	{
-		// 基础信息接口
-		storageRouter.GET("/list", StorageProviderList)
+		storageRouter.GET("/list", StorageProviderList) // 基础信息接口
 
-		// 按存储类型分组的API
-		storageTypeRouter := storageRouter.Group("/:storage_type")
+		storageTypeRouter := storageRouter.Group("/:storage_type") // 按存储类型分组的API
 		{
 			// 基础操作接口
 			storageTypeRouter.GET("/info", StorageGetFileInfo)
@@ -37,11 +35,11 @@ func InitRouter() *gin.Engine {
 			storageTypeRouter.GET("/download", StorageDownloadFile)
 		}
 
-		storageRouter.POST("/copy", StorageCopyFile)
-		storageRouter.POST("/move", StorageMoveFile)
-		storageRouter.POST("/link", StorageLinkFile)
-		storageRouter.POST("/softlink", StorageSoftLinkFile)
-		storageRouter.POST("/transfer", StorageTransferFile)
+		storageRouter.POST("/copy", StorageCopyFile)         // 复制文件
+		storageRouter.POST("/move", StorageMoveFile)         // 移动文件
+		storageRouter.POST("/link", StorageLinkFile)         // 创建硬链接
+		storageRouter.POST("/softlink", StorageSoftLinkFile) // 创建软链接
+		storageRouter.POST("/transfer", StorageTransferFile) // 通用文件传输接口
 	}
 
 	return ginRouter
