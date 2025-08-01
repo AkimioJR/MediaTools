@@ -3,6 +3,7 @@ package controller
 import (
 	"MediaTools/internal/controller/fanart_controller"
 	"MediaTools/internal/controller/scrape_controller"
+	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/controller/transfer_controller"
 	"fmt"
@@ -16,6 +17,7 @@ var initFuncs = []InitFunc{
 	tmdb_controller.Init,
 	fanart_controller.Init,
 	scrape_controller.Init,
+	storage_controller.Init,
 	transfer_controller.Init,
 }
 
