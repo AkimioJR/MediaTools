@@ -17,26 +17,27 @@ import (
 // transferType: 传输类型（复制、移动、链接等）
 // item: 媒体项（包含元数据）
 // info: 识别到的媒体信息（为nil代表无需刮削）
+// 返回值: 目标文件信息和可能的错误
 func ArchiveMedia(
 	srcFile *schemas.FileInfo,
 	dstDir *schemas.FileInfo,
 	transferType schemas.TransferType,
 	item *schemas.MediaItem,
 	info *schemas.MediaInfo,
-) error {
+) (*schemas.FileInfo, error) {
 	transferLock.Lock()
 	defer transferLock.Unlock()
 
 	targetName, err := item.Format()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	dstFile := storage_controller.Join(dstDir, targetName)
 	logrus.Infof("开始转移媒体文件：%s -> %s，转移类型类型：%s", srcFile, dstFile, transferType)
 
 	err = storage_controller.TransferFile(srcFile, dstFile, transferType)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	{
@@ -77,5 +78,5 @@ func ArchiveMedia(
 			logrus.Warningf("刮削数据失败：%v", err)
 		}
 	}
-	return nil
+	return dstFile, nil
 }
