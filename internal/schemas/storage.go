@@ -27,7 +27,7 @@ func (t StorageType) String() string {
 	case StorageLocal:
 		return "LocalStorage"
 	default:
-		return "unknown"
+		return "UnknownStorage"
 	}
 }
 
@@ -74,7 +74,7 @@ func (t TransferType) String() string {
 	case TransferSoftLink:
 		return "SoftLink"
 	default:
-		return "Unknown"
+		return "UnknownTransferType"
 	}
 }
 
