@@ -15,6 +15,11 @@ func InitRouter() *gin.Engine {
 		scrapeRouter.POST("/video", ScrapeVideo) // 刮削视频
 	}
 
+	libraryRouter := ginRouter.Group("/library") // 媒体库相关接口
+	{
+		libraryRouter.POST("/archive", LibraryArchiveMedia) // 归档媒体文件
+	}
+
 	storageRouter := ginRouter.Group("/storage") // 存储相关接口
 	{
 		storageRouter.GET("/list", StorageProviderList) // 基础信息接口

@@ -24,3 +24,10 @@ type ScrapeRequest struct {
 	MediaType *meta.MediaType `json:"media_type,omitempty"`
 	TMDBID    *int            `json:"tmdb_id,omitempty"`
 }
+
+type LibraryArchiveMediaRequest struct {
+	SrcFile      FileInfoRequest      `json:"src_file" binding:"required"`
+	DstDir       FileInfoRequest      `json:"dst_dir" binding:"required"`
+	TransferType schemas.TransferType `json:"transfer_type"`
+	NeedScrape   bool                 `json:"need_scrape"`
+}
