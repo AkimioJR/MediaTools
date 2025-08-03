@@ -22,7 +22,7 @@ func SaveImage(imgFile *schemas.FileInfo, img image.Image) error {
 		buff bytes.Buffer
 		err  error
 	)
-	switch filepath.Ext(imgFile.Name()) {
+	switch filepath.Ext(imgFile.Name) {
 	case ".jpg", ".jpeg": // 保存为 JPEG
 		err = png.Encode(&buff, img)
 	default: // 保存为 PNG

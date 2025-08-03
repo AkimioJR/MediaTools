@@ -54,7 +54,7 @@ func ArchiveMedia(
 				}
 
 				if slices.Contains(exts, fi.LowerExt()) {
-					otherDstFilePath := utils.ChangeExt(dstFile.Path, fi.Ext())
+					otherDstFilePath := utils.ChangeExt(dstFile.Path, fi.Ext)
 					otherDstFile, err := storage_controller.GetFile(otherDstFilePath, dstFile.StorageType)
 					if err != nil {
 						logrus.Warningf("获取文件 %s:%s 失败: %v", dstFile.StorageType, otherDstFilePath, err)

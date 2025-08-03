@@ -13,19 +13,13 @@ func GetFile(path string, storageType schemas.StorageType) (*schemas.FileInfo, e
 	if !exists {
 		return nil, schemas.ErrStorageProviderNotFound
 	}
-	fi := schemas.FileInfo{
-		StorageType: storageType,
-		Path:        path,
-	}
-	return &fi, nil
+	fi := schemas.NewBasicFileInfo(storageType, path)
+	return fi, nil
 }
 
 func GetParent(file *schemas.FileInfo) *schemas.FileInfo {
 	parentPath := filepath.Dir(file.Path)
-	return &schemas.FileInfo{
-		StorageType: file.StorageType,
-		Path:        parentPath,
-	}
+	return schemas.NewBasicFileInfo(file.StorageType, parentPath)
 }
 
 func Join(file *schemas.FileInfo, elem ...string) *schemas.FileInfo {
@@ -33,8 +27,5 @@ func Join(file *schemas.FileInfo, elem ...string) *schemas.FileInfo {
 	paths = append(paths, file.Path)
 	paths = append(paths, elem...)
 	path := filepath.Join(paths...)
-	return &schemas.FileInfo{
-		StorageType: file.StorageType,
-		Path:        path,
-	}
+	return schemas.NewBasicFileInfo(file.StorageType, path)
 }

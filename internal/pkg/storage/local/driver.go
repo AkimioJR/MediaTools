@@ -76,13 +76,13 @@ func (s *LocalStorage) List(path string) ([]schemas.FileInfo, error) {
 			return nil, err
 		}
 		filePath := filepath.Join(path, file.Name())
-		fileInfos = append(fileInfos, schemas.FileInfo{
-			StorageType: schemas.StorageLocal,
-			Path:        filePath,
-			Size:        info.Size(),
-			IsDir:       info.IsDir(),
-			ModTime:     info.ModTime(),
-		})
+		fileInfos = append(fileInfos, *schemas.NewFileInfo(
+			schemas.StorageLocal,
+			filePath,
+			info.Size(),
+			info.IsDir(),
+			info.ModTime(),
+		))
 	}
 	return fileInfos, nil
 }

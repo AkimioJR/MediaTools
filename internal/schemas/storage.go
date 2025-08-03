@@ -107,23 +107,34 @@ func ParseTransferType(s string) TransferType {
 }
 
 type FileInfo struct {
-	StorageType StorageType
-	Path        string
-	Size        int64
-	IsDir       bool
-	ModTime     time.Time
+	StorageType StorageType // 存储系统类型
+	Path        string      // 文件路径
+	Name        string      // 文件名
+	Ext         string      // 文件扩展名
+	Size        int64       // 文件大小
+	IsDir       bool        // 是否为目录
+	ModTime     time.Time   // 文件修改时间
 }
 
-func (fi *FileInfo) Name() string {
-	return filepath.Base(fi.Path)
+func NewBasicFileInfo(storageType StorageType, path string) *FileInfo {
+	return &FileInfo{
+		StorageType: storageType,
+		Path:        path,
+		Name:        filepath.Base(path),
+		Ext:         filepath.Ext(path),
+	}
 }
 
-func (fi *FileInfo) Ext() string {
-	return filepath.Ext(fi.Path)
+func NewFileInfo(storageType StorageType, path string, size int64, isDir bool, modTime time.Time) *FileInfo {
+	fi := NewBasicFileInfo(storageType, path)
+	fi.Size = size
+	fi.IsDir = isDir
+	fi.ModTime = modTime
+	return fi
 }
 
 func (fi *FileInfo) LowerExt() string {
-	return strings.ToLower(fi.Ext())
+	return strings.ToLower(fi.Ext)
 }
 
 func (fi *FileInfo) String() string {

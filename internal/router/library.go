@@ -49,8 +49,8 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 		return
 	}
 
-	logrus.Info("正在解析视频元数据：", srcFile.Name())
-	videoMeta := meta.ParseVideoMeta(srcFile.Name())
+	logrus.Info("正在解析视频元数据：", srcFile.Name)
+	videoMeta := meta.ParseVideoMeta(srcFile.Name)
 	info, err := tmdb_controller.RecognizeMedia(videoMeta, nil, nil)
 	if err != nil {
 		resp.Message = "识别媒体信息失败: " + err.Error()

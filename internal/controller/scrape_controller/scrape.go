@@ -33,7 +33,7 @@ func Scrape(dstFile *schemas.FileInfo, info *schemas.MediaInfo) error {
 // RecognizeAndScrape 识别并刮削媒体信息
 // 识别目标文件的元数据，查询 TMDB 获取媒体信息，并在该文件夹进行刮削
 func RecognizeAndScrape(dstFile *schemas.FileInfo, mediaType *meta.MediaType, tmdbID *int) error {
-	videoMeta := meta.ParseVideoMeta(dstFile.Name())
+	videoMeta := meta.ParseVideoMeta(dstFile.Name)
 	info, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta, mediaType, nil)
 	if err != nil {
 		return fmt.Errorf("识别媒体信息失败: %v", err)
