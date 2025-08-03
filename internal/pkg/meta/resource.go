@@ -119,7 +119,7 @@ func (re ResourceEffect) String() string {
 	case ResourceEffectHQ:
 		return "HQ"
 	default:
-		return "Unknown"
+		return ""
 	}
 }
 
@@ -228,7 +228,7 @@ func (rt ResourceType) String() string {
 	case ResourceTypeBluRayRemux:
 		return "BluRay REMUX"
 	default:
-		return "Unknown"
+		return ""
 	}
 }
 
