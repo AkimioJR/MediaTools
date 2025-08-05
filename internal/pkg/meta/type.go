@@ -1,6 +1,7 @@
 package meta
 
 import (
+	"encoding/json"
 	"regexp"
 )
 
@@ -27,6 +28,26 @@ func (mtype MediaType) String() string {
 	default:
 		return "未知"
 	}
+}
+
+func (mtype MediaType) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + mtype.String() + `"`), nil
+}
+
+func (mtype *MediaType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	switch s {
+	case "电影":
+		*mtype = MediaTypeMovie
+	case "电视剧":
+		*mtype = MediaTypeTV
+	default:
+		*mtype = MediaTypeUnknown
+	}
+	return nil
 }
 
 var (
