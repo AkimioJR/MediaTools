@@ -77,7 +77,7 @@ func GetMovieDetail(movieID int) (*schemas.MediaInfo, error) {
 	return &mediaInfo, nil
 }
 
-func GetTVSeriesDetail(seriesID int) (*schemas.MediaInfo, error) {
+func GetTVSerieDetail(seriesID int) (*schemas.MediaInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 

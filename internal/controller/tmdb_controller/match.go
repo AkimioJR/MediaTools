@@ -105,7 +105,7 @@ func MatchMulti(name string, mType *meta.MediaType) (*schemas.MediaInfo, error) 
 			}
 		case "tv":
 			if utils.FuzzyMatching(name, result.Title, result.OriginalTitle) {
-				info, err = GetTVSeriesDetail(result.ID)
+				info, err = GetTVSerieDetail(result.ID)
 				if err != nil {
 					logrus.Warningf("获取电视剧「%d」详情失败: %v", result.ID, err)
 					continue
@@ -118,7 +118,7 @@ func MatchMulti(name string, mType *meta.MediaType) (*schemas.MediaInfo, error) 
 				continue
 			}
 			if utils.FuzzyMatching(name, names...) {
-				info, err = GetTVSeriesDetail(result.ID)
+				info, err = GetTVSerieDetail(result.ID)
 				if err != nil {
 					logrus.Warningf("获取电视剧「%d」详情失败: %v", result.ID, err)
 					continue
