@@ -6,10 +6,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var (
+	recentLogsHook = NewRecentLogsHook(10)
+)
+
 func init() {
 	setting := &serviceLoggerSetting{}
 	logrus.SetFormatter(setting)
 	logrus.AddHook(setting)
+	logrus.AddHook(recentLogsHook)
 	logrus.SetReportCaller(true) // 启用调用者信息
 	err := SetLogLevel(config.Log.Level)
 	if err != nil {
@@ -25,4 +30,8 @@ func SetLogLevel(level string) error {
 	}
 	logrus.SetLevel(logLevel)
 	return nil
+}
+
+func GetRecentLogs() []string {
+	return recentLogsHook.GetRecentLogs()
 }
