@@ -22,11 +22,11 @@ const (
 func (mtype MediaType) String() string {
 	switch mtype {
 	case MediaTypeMovie:
-		return "电影"
+		return "Movie"
 	case MediaTypeTV:
-		return "电视剧"
+		return "TV"
 	default:
-		return "未知"
+		return "UnknownMediaType"
 	}
 }
 
