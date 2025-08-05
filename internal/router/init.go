@@ -5,6 +5,11 @@ import "github.com/gin-gonic/gin"
 func InitRouter() *gin.Engine {
 	ginRouter := gin.Default()
 
+	logRouter := ginRouter.Group("/log") // 日志相关接口
+	{
+		logRouter.GET("/recent", GetRecentLogs) // 获取最近日志
+	}
+
 	tmdbRouter := ginRouter.Group("/tmdb") // TMDB 相关接口
 	{
 		imgRouter := tmdbRouter.Group("/image") // 图片相关接口
