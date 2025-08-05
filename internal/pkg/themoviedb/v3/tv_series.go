@@ -342,6 +342,8 @@ func (tmdb *TMDB) GetTVSerieImage(seriesID int, IncludeImageLanguage *string, la
 
 	if IncludeImageLanguage != nil {
 		params.Set("include_image_language", *IncludeImageLanguage)
+	} else {
+		params.Set("include_image_language", tmdb.imageLanguage)
 	}
 
 	var resp TVSerieImage

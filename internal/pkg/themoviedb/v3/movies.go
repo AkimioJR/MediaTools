@@ -223,6 +223,8 @@ func (tmdb *TMDB) GetMovieImage(movieID int, language *string, IncludeImageLangu
 
 	if IncludeImageLanguage != nil {
 		params.Set("include_image_language", *IncludeImageLanguage)
+	} else {
+		params.Set("include_image_language", tmdb.imageLanguage)
 	}
 
 	img := MovieImage{}
