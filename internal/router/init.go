@@ -5,6 +5,14 @@ import "github.com/gin-gonic/gin"
 func InitRouter() *gin.Engine {
 	ginRouter := gin.Default()
 
+	tmdbRouter := ginRouter.Group("/tmdb") // TMDB 相关接口
+	{
+		imgRouter := tmdbRouter.Group("/image") // 图片相关接口
+		{
+			imgRouter.GET("/poster/:media_type/:tmdb_id", TMDBPosterImage) // 获取媒体海报图片
+		}
+	}
+
 	mediaRouter := ginRouter.Group("/media") // 媒体相关接口
 	{
 		mediaRouter.GET("/recognize", MediaRecognize)
