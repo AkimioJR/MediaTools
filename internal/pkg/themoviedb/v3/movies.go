@@ -8,10 +8,10 @@ import (
 )
 
 type MovieDetail struct {
-	Adult               bool        `json:"adult"`
-	BackdropPath        string      `json:"backdrop_path"`
-	BelongsToCollection interface{} `json:"belongs_to_collection"`
-	Budget              int         `json:"budget"`
+	Adult               bool   `json:"adult"`
+	BackdropPath        string `json:"backdrop_path"`
+	BelongsToCollection string `json:"belongs_to_collection"`
+	Budget              int    `json:"budget"`
 	Genres              []struct {
 		ID   int    `json:"id"`
 		Name string `json:"name"`
@@ -180,13 +180,13 @@ func (tmdb *TMDB) GetMovieExternalID(movieID int) (*MovieExternalID, error) {
 
 type MovieImage struct {
 	Backdrops []struct {
-		AspectRatio float64     `json:"aspect_ratio"`
-		Height      int         `json:"height"`
-		Iso6391     interface{} `json:"iso_639_1"`
-		FilePath    string      `json:"file_path"`
-		VoteAverage float64     `json:"vote_average"`
-		VoteCount   int         `json:"vote_count"`
-		Width       int         `json:"width"`
+		AspectRatio float64 `json:"aspect_ratio"`
+		Height      int     `json:"height"`
+		Iso6391     string  `json:"iso_639_1"`
+		FilePath    string  `json:"file_path"`
+		VoteAverage float64 `json:"vote_average"`
+		VoteCount   int     `json:"vote_count"`
+		Width       int     `json:"width"`
 	} `json:"backdrops"`
 	ID    int `json:"id"`
 	Logos []struct {
