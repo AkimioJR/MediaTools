@@ -65,14 +65,16 @@ func CustomLimiter(d time.Duration, maxCount uint64) TMDBOptions {
 	}
 }
 
-func NewClient(apiKey string, opts ...TMDBOptions) *Client {
+func NewClient(apiKey string, opts ...TMDBOptions) (*Client, error) {
 	config := &tmdbConfig{
 		apiURL: "https://api.themoviedb.org",
 		client: &http.Client{},
 	}
 
-	cache, _ := bigcache.NewBigCache(bigcache.DefaultConfig(10 * time.Minute))
-
+	cache, err := bigcache.NewBigCache(bigcache.DefaultConfig(10 * time.Minute))
+	if err != nil {
+		return nil, fmt.Errorf("创建 TMDB 缓存失败: %w", err)
+	}
 	for _, opt := range opts {
 		opt(config)
 	}
@@ -86,7 +88,7 @@ func NewClient(apiKey string, opts ...TMDBOptions) *Client {
 		limiter:       limiter.NewLimiter(time.Second, 20),
 		cache:         cache,
 	}
-	return &client
+	return &client, nil
 }
 
 func (c *Client) DoRequest(method string, path string, query url.Values, body io.Reader, resp any) error {

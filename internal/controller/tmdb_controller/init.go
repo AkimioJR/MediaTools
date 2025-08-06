@@ -28,7 +28,8 @@ func Init() error {
 	}
 	opts = append(opts, themoviedb.CustomHTTPClient(outbound.GetHTTPClient()))
 
-	client = themoviedb.NewClient(config.TMDB.ApiKey, opts...)
-	return nil
+	var err error
+	client, err = themoviedb.NewClient(config.TMDB.ApiKey, opts...)
+	return err
 
 }
