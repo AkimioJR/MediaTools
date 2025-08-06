@@ -1,0 +1,71 @@
+package wordmatch
+
+import (
+	"MediaTools/utils"
+	"strconv"
+	"strings"
+)
+
+type WordsMatcher struct {
+	words []*CustomWord
+}
+
+func NewWordsMatcher(words []string) (*WordsMatcher, error) {
+	var matcher WordsMatcher
+	matcher.words = make([]*CustomWord, 0, len(words))
+	for _, w := range words {
+		if strings.HasPrefix(w, "#") || strings.TrimSpace(w) == "" { // 跳过注释和空行
+			continue
+		}
+		cw, err := ParseLine(w)
+		if err != nil {
+			return nil, err
+		}
+		matcher.words = append(matcher.words, cw)
+	}
+	return &matcher, nil
+}
+
+func (wm *WordsMatcher) MatchAndProcess(title string) string {
+	for _, word := range wm.words {
+		if word.replaceFromRe != nil { // 替换被替换词
+			title = word.replaceFromRe.ReplaceAllString(title, word.ReplaceTo)
+		}
+		if word.PrefixWord != "" && word.SuffixWord != "" && word.OffsetExpr != "" { // 前后定位词和偏移量表达式
+			prefixIndex := strings.Index(title, word.PrefixWord)
+			suffixIndex := strings.Index(title, word.SuffixWord)
+			if prefixIndex != -1 && suffixIndex != -1 && suffixIndex > prefixIndex {
+				episodeStr := title[prefixIndex+len(word.PrefixWord) : suffixIndex]
+				var episode int
+				var err error
+				switch {
+				case utils.IsDigits(episodeStr):
+					episode, err = strconv.Atoi(episodeStr)
+					if err != nil {
+						continue
+					}
+				case utils.IsAllChinese(episodeStr):
+					episode, err = utils.ChineseToInt(episodeStr)
+					if err != nil {
+						continue
+					}
+				case utils.IsRomanNumeral(episodeStr):
+					episode, err = utils.RomanToInt(episodeStr)
+					if err != nil {
+						continue
+					}
+				default:
+					continue
+				}
+				if episode > 0 {
+					newEpisode, err := ParseOffsetExpr(word.OffsetExpr, episode)
+					if err != nil {
+						continue
+					}
+					title = strings.Replace(title, episodeStr, strconv.Itoa(newEpisode), 1)
+				}
+			}
+		}
+	}
+	return title
+}
