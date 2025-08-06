@@ -6,7 +6,6 @@ import (
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
-	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
 	"MediaTools/utils"
 	"fmt"
@@ -100,7 +99,7 @@ func ArchiveMediaSmart(src *schemas.FileInfo) error {
 		}
 
 		logrus.Info("正在解析视频元数据：", src.Name)
-		videoMeta := meta.ParseVideoMeta(src.Name)
+		videoMeta := media_controller.ParseVideoMeta(src.Name)
 		info, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta, nil, nil)
 		if err != nil {
 			return fmt.Errorf("识别媒体信息失败：%w", err)

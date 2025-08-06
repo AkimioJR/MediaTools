@@ -1,8 +1,8 @@
 package router
 
 import (
+	"MediaTools/internal/controller/media_controller"
 	"MediaTools/internal/controller/tmdb_controller"
-	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
 	"net/http"
 
@@ -28,7 +28,7 @@ func MediaRecognize(ctx *gin.Context) {
 		return
 	}
 	logrus.Infof("正在识别媒体：%s", title)
-	videoMeta := meta.ParseVideoMeta(title)
+	videoMeta := media_controller.ParseVideoMeta(title)
 	mediaInfo, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta, nil, nil)
 	if err != nil {
 		resp.Message = "识别失败: " + err.Error()
