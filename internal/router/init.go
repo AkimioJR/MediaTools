@@ -16,6 +16,7 @@ func InitRouter() *gin.Engine {
 		{
 			imgRouter.GET("/poster/:media_type/:tmdb_id", TMDBPosterImage) // 获取媒体海报图片
 		}
+		tmdbRouter.GET("/overview/:media_type/:tmdb_id", TMDBOverview) // 获取概述
 	}
 
 	mediaRouter := ginRouter.Group("/media") // 媒体相关接口
