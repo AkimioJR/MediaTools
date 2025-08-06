@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
+
+	"github.com/sirupsen/logrus"
 )
 
 func FormatVideo(item *schemas.MediaItem) (string, error) {
@@ -26,4 +28,40 @@ func FormatVideo(item *schemas.MediaItem) (string, error) {
 		return "", fmt.Errorf("渲染模板失败: %v", err)
 	}
 	return buffer.String(), nil
+}
+
+// MatchAndProcessVideoTitle 匹配并处理视频标题
+// 返回处理后的标题和匹配到的规则
+// 如果未匹配到规则，则返回原始标题和空规则
+func MatchAndProcessVideoTitle(title string) (string, string) {
+	loock.RLock()
+	defer loock.RUnlock()
+
+	title, rule := wm.MatchAndProcess(title)
+	if rule == "" {
+		logrus.Infof("标题 「%s」 未匹配到的规则", title)
+	} else {
+		logrus.Infof("标题 「%s」 匹配到的规则: 「%s」", title, rule)
+	}
+	return title, rule
+}
+
+func MatchCustomizationWordWord(title string) []string {
+	loock.RLock()
+	defer loock.RUnlock()
+
+	matchedWords := customizationWordRe.FindAllString(title, -1)
+	if len(matchedWords) == 0 {
+		return []string{}
+	}
+	return matchedWords
+}
+
+func ParseVideoMeta(title string) *meta.VideoMeta {
+	loock.RLock()
+	defer loock.RUnlock()
+	title, _ = MatchAndProcessVideoTitle(title)
+	vm := meta.ParseVideoMeta(title)
+	vm.Customization = MatchCustomizationWordWord(title)
+	return vm
 }
