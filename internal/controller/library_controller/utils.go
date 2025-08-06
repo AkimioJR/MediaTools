@@ -105,7 +105,7 @@ func GenFloder(libConfig *config.LibraryConfig, info *schemas.MediaInfo) []strin
 			for _, genre := range info.TMDBInfo.TVInfo.SerieInfo.Genres {
 				genres = append(genres, genre.ID)
 			}
-			categoryStr = MatchCategory(categoryConfig.MovieCategories, countries, language, genres)
+			categoryStr = MatchCategory(categoryConfig.TVCategories, countries, language, genres)
 		}
 		if categoryStr != "" {
 			floderNames = append(floderNames, categoryStr)
