@@ -3,7 +3,7 @@ package library_controller
 import "sync"
 
 var (
-	transferLock = sync.Mutex{} // 锁定转移操作，防止并发冲突
+	lock = sync.RWMutex{} // 锁定转移操作，防止并发冲突
 )
 
 func Init() error {

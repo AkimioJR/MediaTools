@@ -26,8 +26,8 @@ func ArchiveMedia(
 	item *schemas.MediaItem,
 	info *schemas.MediaInfo,
 ) (*schemas.FileInfo, error) {
-	transferLock.Lock()
-	defer transferLock.Unlock()
+	lock.RLock()
+	defer lock.RUnlock()
 
 	targetName, err := format_controller.FormatVideo(item)
 	if err != nil {
