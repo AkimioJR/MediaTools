@@ -138,3 +138,29 @@ func SoftLink(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo) error {
 	}
 	return provider.SoftLink(srcFile.Path, dstFile.Path)
 }
+
+func IterFiles(dir *schemas.FileInfo, fn func(file *schemas.FileInfo) error) error {
+	lock.RLock()
+	defer lock.RUnlock()
+
+	provider, exists := getStorageProvider(dir.StorageType)
+	if !exists {
+		return schemas.ErrStorageProviderNotFound
+	}
+
+	files, err := provider.List(dir.Path)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		if file.IsDir {
+			IterFiles(&file, fn)
+		}
+		err := fn(&file)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
