@@ -101,7 +101,7 @@ func ArchiveMediaSmart(src *schemas.FileInfo) error {
 
 		logrus.Info("正在解析视频元数据：", src.Name)
 		videoMeta := meta.ParseVideoMeta(src.Name)
-		info, err := tmdb_controller.RecognizeMedia(videoMeta, nil, nil)
+		info, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta, nil, nil)
 		if err != nil {
 			return fmt.Errorf("识别媒体信息失败：%w", err)
 		}
@@ -110,8 +110,8 @@ func ArchiveMediaSmart(src *schemas.FileInfo) error {
 		if err != nil {
 			return err
 		}
-
 		dstDir := storage_controller.Join(libraryBaseDir, GenFloder(libConfig, info)...)
+
 		item, err := schemas.NewMediaItem(videoMeta, info)
 		if err != nil {
 			return fmt.Errorf("创建媒体项失败：%w", err)
