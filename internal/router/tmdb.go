@@ -15,7 +15,7 @@ import (
 // @Description 根据媒体类型和 TMDB ID 获取对应的海报图片 URL
 // @Tags TMDB
 // @Param media_type path string true "媒体类型" Enums(Movie, TV)
-// @Param tmdb_id path int true "TMDB ID"
+// @Param tmdb_id path uint true "TMDB ID"
 // @Success 200 {object} Response[*string] "成功响应，返回图片 URL"
 // @Failure 400 {object} Response[*string] "请求参数错误"
 // @Failure 500 {object} Response[*string] "服务器错误"
