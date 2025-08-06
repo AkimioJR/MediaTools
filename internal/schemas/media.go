@@ -49,6 +49,8 @@ type MediaItem struct {
 	Platform      meta.StreamingPlatform `json:"platform"`       // 流媒体平台
 	FileExtension string                 `json:"file_extension"` // 文件扩展名
 
+	Customization []string // 自定义词
+
 	// ID 信息
 	TMDBID int    `json:"tmdb_id"` // TMDB ID
 	IMDBID string `json:"imdb_id"` // IMDb ID
@@ -84,6 +86,7 @@ func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error
 		VideoEncode:    videoMeta.VideoEncode,
 		AudioEncode:    videoMeta.AudioEncode,
 		FileExtension:  path.Ext(videoMeta.OrginalTitle),
+		Customization:  videoMeta.Customization,
 
 		TMDBID: info.TMDBID,
 		IMDBID: info.IMDBID,

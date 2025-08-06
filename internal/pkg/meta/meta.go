@@ -33,7 +33,7 @@ type VideoMeta struct {
 	ReleaseGroups  []string           // 发布组
 	Part           string             // 分段
 	Version        uint8              // 版本号
-	// customization  string                      // 自定义词
+	Customization  []string           // 自定义词
 
 	// 电视剧相关·
 	Season       int // 季
@@ -139,6 +139,7 @@ func ParseVideoMeta(title string) *VideoMeta {
 		EndSeason:      -1,
 		Episode:        -1,
 		EndEpisode:     -1,
+		Customization:  make([]string, 0),
 	}
 
 	if utils.IsMediaExtension(path.Ext(title)) {
