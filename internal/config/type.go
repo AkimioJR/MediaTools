@@ -21,10 +21,11 @@ type FanartConfig struct {
 }
 
 type Configuration struct {
-	Log    LogConfig    `yaml:"log"`
-	TMDB   TMDBConfig   `yaml:"tmdb"`
-	Fanart FanartConfig `yaml:"fanart"`
-	Media  MediaConfig  `yaml:"media"`
+	Log        LogConfig        `yaml:"log"`
+	TMDB       TMDBConfig       `yaml:"tmdb"`
+	Fanart     FanartConfig     `yaml:"fanart"`
+	Media      MediaConfig      `yaml:"media"`
+	CustomWord CustomWordConfig `yaml:"custom_word"`
 }
 
 type MediaConfig struct {
@@ -46,4 +47,10 @@ type LibraryConfig struct {
 	TransferType       schemas.TransferType `yaml:"transfer_type"`        // 传输类型
 	OrganizeByType     bool                 `yaml:"organize_by_type"`     // 是否按类型分文件夹
 	OrganizeByCategory bool                 `yaml:"organize_by_category"` // 是否按分类分文件夹
+}
+
+type CustomWordConfig struct {
+	IdentifyWord  []string `yaml:"identify_word"` // 自定义识别词
+	Customization []string `yaml:"customization"` // 自定义占位置词
+	ExcludeWords  []string `yaml:"exclude_words"` // 自定义排除词
 }
