@@ -34,36 +34,39 @@ func (wm *WordsMatcher) MatchAndProcess(title string) string {
 		if word.PrefixWord != "" && word.SuffixWord != "" && word.OffsetExpr != "" { // 前后定位词和偏移量表达式
 			prefixIndex := strings.Index(title, word.PrefixWord)
 			suffixIndex := strings.Index(title, word.SuffixWord)
-			if prefixIndex != -1 && suffixIndex != -1 && suffixIndex > prefixIndex {
-				episodeStr := title[prefixIndex+len(word.PrefixWord) : suffixIndex]
-				var episode int
-				var err error
-				switch {
-				case utils.IsDigits(episodeStr):
-					episode, err = strconv.Atoi(episodeStr)
-					if err != nil {
-						continue
-					}
-				case utils.IsAllChinese(episodeStr):
-					episode, err = utils.ChineseToInt(episodeStr)
-					if err != nil {
-						continue
-					}
-				case utils.IsRomanNumeral(episodeStr):
-					episode, err = utils.RomanToInt(episodeStr)
-					if err != nil {
-						continue
-					}
-				default:
+
+			if prefixIndex == -1 || suffixIndex == -1 || suffixIndex <= prefixIndex {
+				continue // 如果没有找到前后定位词，或者后缀在前缀之前，则跳过
+			}
+
+			episodeStr := strings.TrimSpace(title[prefixIndex+len(word.PrefixWord) : suffixIndex])
+			var episode int
+			var err error
+			switch {
+			case utils.IsDigits(episodeStr):
+				episode, err = strconv.Atoi(episodeStr)
+				if err != nil {
 					continue
 				}
-				if episode > 0 {
-					newEpisode, err := ParseOffsetExpr(word.OffsetExpr, episode)
-					if err != nil {
-						continue
-					}
-					title = strings.Replace(title, episodeStr, strconv.Itoa(newEpisode), 1)
+			case utils.IsAllChinese(episodeStr):
+				episode, err = utils.ChineseToInt(episodeStr)
+				if err != nil {
+					continue
 				}
+			case utils.IsRomanNumeral(episodeStr):
+				episode, err = utils.RomanToInt(episodeStr)
+				if err != nil {
+					continue
+				}
+			default:
+				continue
+			}
+			if episode > 0 {
+				newEpisode, err := ParseOffsetExpr(word.OffsetExpr, episode)
+				if err != nil {
+					continue
+				}
+				title = strings.Replace(title, episodeStr, strconv.Itoa(newEpisode), 1)
 			}
 		}
 	}
