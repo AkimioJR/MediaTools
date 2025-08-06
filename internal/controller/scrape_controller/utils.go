@@ -12,6 +12,8 @@ import (
 	"io"
 	"path"
 	"path/filepath"
+	"slices"
+	"strings"
 )
 
 // 保存图片到指定路径
@@ -91,4 +93,16 @@ func bytes2Reader(p []byte) (io.Reader, error) {
 		return nil, err
 	}
 	return &buffer, nil
+}
+
+var supportImgExts = []string{".jpg", ".jpeg", ".png"}
+
+func getSupportImage(arr []string) string {
+	for i := range arr {
+		ext := strings.ToLower(path.Ext(arr[i]))
+		if slices.Contains(supportImgExts, ext) {
+			return arr[i]
+		}
+	}
+	return ""
 }
