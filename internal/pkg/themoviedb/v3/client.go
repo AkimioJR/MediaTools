@@ -16,22 +16,23 @@ import (
 )
 
 type Client struct {
+	apiURL        string             // API base URL
+	imgURL        string             // Image base URL
+	apiKey        string             // API key for authentication
+	language      string             // Default language for requests
+	imageLanguage string             // Default language for images
+	client        *http.Client       // HTTP client for making requests
+	limiter       *limiter.Limiter   // Rate limiter to control request frequency
+	cache         *bigcache.BigCache // Cache for storing responses
+}
+
+type clientConfig struct {
 	apiURL        string
 	imgURL        string
-	apiKey        string
 	language      string
 	imageLanguage string
 	client        *http.Client
 	limiter       *limiter.Limiter
-	cache         *bigcache.BigCache
-}
-
-type clientConfig struct {
-	apiURL   string
-	imgURL   string
-	language string
-	client   *http.Client
-	limiter  *limiter.Limiter
 }
 type ClientOptions func(c *clientConfig)
 
@@ -59,6 +60,12 @@ func CustomLanguage(language string) ClientOptions {
 	}
 }
 
+func CustomImageLanguage(imageLanguage string) ClientOptions {
+	return func(c *clientConfig) {
+		c.imageLanguage = imageLanguage
+	}
+}
+
 func CustomLimiter(d time.Duration, maxCount uint64) ClientOptions {
 	return func(c *clientConfig) {
 		c.limiter = limiter.NewLimiter(d, maxCount)
@@ -66,9 +73,13 @@ func CustomLimiter(d time.Duration, maxCount uint64) ClientOptions {
 }
 
 func NewClient(apiKey string, opts ...ClientOptions) (*Client, error) {
-	config := &clientConfig{
-		apiURL: "https://api.themoviedb.org",
-		client: &http.Client{},
+	c := &clientConfig{
+		apiURL:        "https://api.themoviedb.org",
+		imgURL:        "https://image.tmdb.org",
+		language:      "zh-CN",
+		imageLanguage: "zh",
+		client:        &http.Client{},
+		limiter:       limiter.NewLimiter(time.Second, 20), // 默认每秒20次请求
 	}
 
 	cache, err := bigcache.NewBigCache(bigcache.DefaultConfig(10 * time.Minute))
@@ -76,16 +87,16 @@ func NewClient(apiKey string, opts ...ClientOptions) (*Client, error) {
 		return nil, fmt.Errorf("创建 TMDB 缓存失败: %w", err)
 	}
 	for _, opt := range opts {
-		opt(config)
+		opt(c)
 	}
 	client := Client{
-		apiURL:        config.apiURL,
-		imgURL:        "https://image.tmdb.org",
 		apiKey:        apiKey,
-		language:      "zh-CN",
-		imageLanguage: "zh",
-		client:        config.client,
-		limiter:       limiter.NewLimiter(time.Second, 20),
+		apiURL:        c.apiURL,
+		imgURL:        c.imgURL,
+		language:      c.language,
+		imageLanguage: c.imageLanguage,
+		client:        c.client,
+		limiter:       c.limiter,
 		cache:         cache,
 	}
 	return &client, nil
