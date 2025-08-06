@@ -45,6 +45,46 @@ func IsRomanNumeral(s string) bool {
 	return romanNumeralsRe.MatchString(strings.ToUpper(s))
 }
 
+var romanMap = map[rune]int{ // 罗马数字到整数的映射
+	'I': 1,
+	'V': 5,
+	'X': 10,
+	'L': 50,
+	'C': 100,
+	'D': 500,
+	'M': 1000,
+}
+
+// RomanToInt 将罗马数字转换为整数
+func RomanToInt(s string) (int, error) {
+	if s == "" {
+		return 0, ErrInvalidCharacter
+	}
+
+	upper := strings.ToUpper(s)
+
+	total := 0
+	prevValue := 0
+
+	// 从右向左处理罗马数字
+	for i := len(upper) - 1; i >= 0; i-- {
+		current := rune(upper[i])
+		currentValue, exists := romanMap[current]
+		if !exists {
+			return 0, ErrInvalidCharacter
+		}
+		// 如果当前值小于前一个值，表示是减法组合（如 IV=4）
+		if currentValue < prevValue {
+			total -= currentValue
+		} else {
+			total += currentValue
+		}
+		prevValue = currentValue
+	}
+
+	return total, nil
+}
+
 // IsMediaExtension 判断是否为媒体文件扩展名
 func IsMediaExtension(s string) bool {
 	return slices.Contains(extensions.MediaExtensions, strings.ToLower(s))

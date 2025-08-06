@@ -82,3 +82,45 @@ func TestChineseToInt(t *testing.T) {
 		}
 	}
 }
+func TestRomanToInt(t *testing.T) {
+	tests := []struct {
+		input     string
+		expectInt int
+		expectErr error
+	}{
+		{"I", 1, nil},
+		{"II", 2, nil},
+		{"III", 3, nil},
+		{"IV", 4, nil},
+		{"V", 5, nil},
+		{"VI", 6, nil},
+		{"VII", 7, nil},
+		{"VIII", 8, nil},
+		{"IX", 9, nil},
+		{"X", 10, nil},
+		{"XI", 11, nil},
+		{"XIV", 14, nil},
+		{"XV", 15, nil},
+		{"XIX", 19, nil},
+		{"XX", 20, nil},
+		{"XL", 40, nil},
+		{"L", 50, nil},
+		{"XC", 90, nil},
+		{"C", 100, nil},
+		{"CD", 400, nil},
+		{"D", 500, nil},
+		{"CM", 900, nil},
+		{"M", 1000, nil},
+		{"MCMXCIV", 1994, nil},
+		{"MMXXIV", 2024, nil},
+		{"", 0, utils.ErrInvalidCharacter},
+		{"invalid", 0, utils.ErrInvalidCharacter},
+	}
+	for _, tc := range tests {
+		result, err := utils.RomanToInt(tc.input)
+		require.Equal(t, tc.expectErr, err, "输入: %s", tc.input)
+		if tc.expectErr == nil {
+			require.Equal(t, tc.expectInt, result, "输入: %s", tc.input)
+		}
+	}
+}
