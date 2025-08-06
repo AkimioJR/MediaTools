@@ -2,6 +2,7 @@ package library_controller
 
 import (
 	"MediaTools/extensions"
+	"MediaTools/internal/controller/format_controller"
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/schemas"
@@ -28,7 +29,7 @@ func ArchiveMedia(
 	transferLock.Lock()
 	defer transferLock.Unlock()
 
-	targetName, err := item.Format()
+	targetName, err := format_controller.FormatVideo(item)
 	if err != nil {
 		return nil, err
 	}

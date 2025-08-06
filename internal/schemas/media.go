@@ -2,14 +2,11 @@ package schemas
 
 import (
 	"MediaTools/encode"
-	"MediaTools/internal/config"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/pkg/themoviedb/v3"
 	"fmt"
-	"html/template"
 	"path"
 	"strconv"
-	"strings"
 )
 
 type TMDBTVInfo struct {
@@ -123,26 +120,4 @@ func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error
 	}
 
 	return &item, nil
-}
-
-func (item *MediaItem) Format() (string, error) {
-	var format string
-	switch item.MediaType {
-	case meta.MediaTypeMovie:
-		format = config.MediaLibrary.MovieFormat
-	case meta.MediaTypeTV:
-		format = config.MediaLibrary.TVFormat
-	default:
-		return "", fmt.Errorf("不支持的媒体类型: %s", item.MediaType.String())
-	}
-
-	tmpl, err := template.New("mediaName").Parse(format)
-	if err != nil {
-		return "", fmt.Errorf("解析模板字符串「%s」失败: %v", format, err)
-	}
-	var buffer strings.Builder
-	if err := tmpl.Execute(&buffer, item); err != nil {
-		return "", fmt.Errorf("渲染模板失败: %v", err)
-	}
-	return buffer.String(), nil
 }
