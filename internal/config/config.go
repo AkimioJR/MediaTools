@@ -12,10 +12,10 @@ const (
 )
 
 var (
-	Log          LogConfig
-	TMDB         TMDBConfig
-	Fanart       FanartConfig
-	MediaLibrary MediaLibraryConfig
+	Log    LogConfig
+	TMDB   TMDBConfig
+	Fanart FanartConfig
+	Media  MediaConfig
 )
 
 func Init() error {
@@ -31,7 +31,7 @@ func Init() error {
 	Log = c.Log
 	TMDB = c.TMDB
 	Fanart = c.Fanart
-	MediaLibrary = c.MediaLibrary
+	Media = c.Media
 	return nil
 }
 
@@ -40,7 +40,7 @@ func WriteConfig() error {
 	Log = c.Log
 	TMDB = c.TMDB
 	Fanart = c.Fanart
-	MediaLibrary = c.MediaLibrary
+	Media = c.Media
 	file, err := os.OpenFile(ConfigFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err

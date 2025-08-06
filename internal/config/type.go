@@ -21,16 +21,20 @@ type FanartConfig struct {
 }
 
 type Configuration struct {
-	Log          LogConfig          `yaml:"log"`
-	TMDB         TMDBConfig         `yaml:"tmdb"`
-	Fanart       FanartConfig       `yaml:"fanart"`
-	MediaLibrary MediaLibraryConfig `yaml:"media_library"`
+	Log    LogConfig    `yaml:"log"`
+	TMDB   TMDBConfig   `yaml:"tmdb"`
+	Fanart FanartConfig `yaml:"fanart"`
+	Media  MediaConfig  `yaml:"media"`
 }
 
-type MediaLibraryConfig struct {
-	Libraries   []LibraryConfig `yaml:"libraries"`    // 媒体库路径列表
-	MovieFormat string          `yaml:"movie_format"` // 电影格式
-	TVFormat    string          `yaml:"tv_format"`    // 电视剧格式
+type MediaConfig struct {
+	Libraries []LibraryConfig `yaml:"libraries"` // 媒体库路径列表
+	Format    FormatConfig    `yaml:"format"`    // 媒体格式配置
+}
+
+type FormatConfig struct {
+	Movie string `yaml:"movie"` // 电影格式
+	TV    string `yaml:"tv"`    // 电视剧格式
 }
 
 type LibraryConfig struct {

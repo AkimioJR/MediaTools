@@ -12,10 +12,10 @@ func MatchLibrary(fi *schemas.FileInfo) *config.LibraryConfig {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	for i, lib := range config.MediaLibrary.Libraries {
+	for i, lib := range config.Media.Libraries {
 		if lib.SrcType == fi.StorageType &&
 			strings.HasPrefix(fi.Path, lib.SrcPath) {
-			return &config.MediaLibrary.Libraries[i]
+			return &config.Media.Libraries[i]
 		}
 	}
 	return nil

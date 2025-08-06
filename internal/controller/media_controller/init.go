@@ -17,11 +17,11 @@ func Init() error {
 	defer loock.Unlock()
 
 	var err error
-	movieTemplate, err = template.New("movie").Parse(config.MediaLibrary.MovieFormat)
+	movieTemplate, err = template.New("movie").Parse(config.Media.Format.Movie)
 	if err != nil {
 		return err
 	}
-	tvTemplate, err = template.New("tv").Parse(config.MediaLibrary.TVFormat)
+	tvTemplate, err = template.New("tv").Parse(config.Media.Format.TV)
 	if err != nil {
 		return err
 	}
