@@ -54,16 +54,16 @@ type MovieDetail struct {
 // Get the top level details of a movie by ID.
 // https://api.themoviedb.org/3/movie/{movie_id}
 // https://developer.themoviedb.org/reference/movie-details
-func (tmdb *TMDB) GetMovieDetail(movieID int, language *string) (*MovieDetail, error) {
+func (c *Client) GetMovieDetail(movieID int, language *string) (*MovieDetail, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
 	} else {
-		params.Set("language", tmdb.language)
+		params.Set("language", c.language)
 	}
 
 	detail := MovieDetail{}
-	err := tmdb.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID), params, nil, &detail)
+	err := c.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID), params, nil, &detail)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电影详情失败：%v", err))
 	}
@@ -85,7 +85,7 @@ type MovieAlternativeTitle struct {
 // https://developer.themoviedb.org/reference/movie-alternative-titles
 //
 // country 可选，指定国家(指定一个 ISO-3166-1 值来筛选结果)
-func (tmdb *TMDB) GetMovieAlternativeTitle(movieID int, country *string) (*MovieAlternativeTitle, error) {
+func (c *Client) GetMovieAlternativeTitle(movieID int, country *string) (*MovieAlternativeTitle, error) {
 	params := url.Values{}
 	if country != nil {
 		params.Set("country", *country)
@@ -93,7 +93,7 @@ func (tmdb *TMDB) GetMovieAlternativeTitle(movieID int, country *string) (*Movie
 
 	var resp MovieAlternativeTitle
 
-	err := tmdb.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID)+"/alternative_titles", params, nil, &resp)
+	err := c.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID)+"/alternative_titles", params, nil, &resp)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电影「%d」别名失败：%v", movieID, err))
 	}
@@ -135,16 +135,16 @@ type MovieCredit struct {
 // Get the cast and crew for a movie by its ID.
 // https://api.themoviedb.org/3/movie/{movie_id}/credits
 // https://developer.themoviedb.org/reference/movie-credits
-func (tmdb *TMDB) GetMovieCredit(movieID int, language *string) (*MovieCredit, error) {
+func (c *Client) GetMovieCredit(movieID int, language *string) (*MovieCredit, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
 	} else {
-		params.Set("language", tmdb.language)
+		params.Set("language", c.language)
 	}
 
 	var response MovieCredit
-	err := tmdb.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID)+"/credits", params, nil, &response)
+	err := c.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID)+"/credits", params, nil, &response)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电影「%d」演员列表失败：%v", movieID, err))
 	}
@@ -163,9 +163,9 @@ type MovieExternalID struct {
 // Get the external IDs for a movie by its ID.
 // https://api.themoviedb.org/3/movie/{movie_id}/external_ids
 // https://developer.themoviedb.org/reference/movie-external-ids
-func (tmdb *TMDB) GetMovieExternalID(movieID int) (*MovieExternalID, error) {
+func (c *Client) GetMovieExternalID(movieID int) (*MovieExternalID, error) {
 	var resp MovieExternalID
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/movie/"+strconv.Itoa(movieID)+"/external_ids",
 		url.Values{},
@@ -213,22 +213,22 @@ type MovieImage struct {
 // Get the images that belong to a movie.
 // https://api.themoviedb.org/3/movie/{movie_id}/images
 // https://developer.themoviedb.org/reference/movie-images
-func (tmdb *TMDB) GetMovieImage(movieID int, language *string, IncludeImageLanguage *string) (*MovieImage, error) {
+func (c *Client) GetMovieImage(movieID int, language *string, IncludeImageLanguage *string) (*MovieImage, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
 	} else {
-		params.Set("language", tmdb.language)
+		params.Set("language", c.language)
 	}
 
 	if IncludeImageLanguage != nil {
 		params.Set("include_image_language", *IncludeImageLanguage)
 	} else {
-		params.Set("include_image_language", tmdb.imageLanguage)
+		params.Set("include_image_language", c.imageLanguage)
 	}
 
 	img := MovieImage{}
-	err := tmdb.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID)+"/images", params, nil, &img)
+	err := c.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID)+"/images", params, nil, &img)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电影「%d」图片失败：%v", movieID, err))
 	}
@@ -247,9 +247,9 @@ type MovieKeyword struct {
 // Get the keywords for a movie by its ID.
 // https://api.themoviedb.org/3/movie/{movie_id}/keywords
 // https://developer.themoviedb.org/reference/movie-keywords
-func (tmdb *TMDB) GetMovieKeyword(movieID int) (*MovieKeyword, error) {
+func (c *Client) GetMovieKeyword(movieID int) (*MovieKeyword, error) {
 	keyword := MovieKeyword{}
-	err := tmdb.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(int(movieID))+"/keywords", url.Values{}, nil, &keyword)
+	err := c.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(int(movieID))+"/keywords", url.Values{}, nil, &keyword)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电影「%d」关键词失败：%v", movieID, err))
 	}
@@ -280,10 +280,10 @@ type MovieTranslation struct {
 // Get the translations for a movie.
 // https://api.themoviedb.org/3/movie/{movie_id}/translations
 // https://developer.themoviedb.org/reference/movie-translations
-func (tmdb *TMDB) GetMovieTranslation(movieID int) (*MovieTranslation, error) {
+func (c *Client) GetMovieTranslation(movieID int) (*MovieTranslation, error) {
 	params := url.Values{}
 	var resp MovieTranslation
-	err := tmdb.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID)+"/translations", params, nil, &resp)
+	err := c.DoRequest(http.MethodGet, "/movie/"+strconv.Itoa(movieID)+"/translations", params, nil, &resp)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("获取电影「%d」翻译失败：%v", movieID, err))
 	}

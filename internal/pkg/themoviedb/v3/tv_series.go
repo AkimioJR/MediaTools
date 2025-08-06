@@ -107,16 +107,16 @@ type TVSerieDetail struct {
 // Get the details of a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}
 // https://developer.themoviedb.org/reference/tv-series-details
-func (tmdb *TMDB) GetTVSerieDetail(seriesID int, language *string) (*TVSerieDetail, error) {
+func (c *Client) GetTVSerieDetail(seriesID int, language *string) (*TVSerieDetail, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
 	} else {
-		params.Set("language", tmdb.language)
+		params.Set("language", c.language)
 	}
 
 	var resp TVSerieDetail
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(int(seriesID)),
 		params,
@@ -171,15 +171,15 @@ type TVSerieCredit struct {
 // Get the latest season credits of a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}/credits
 // https://developer.themoviedb.org/reference/tv-series-credits
-func (tmdb *TMDB) GetTVSerieCredit(seriesID int, language *string) (*TVSerieCredit, error) {
+func (c *Client) GetTVSerieCredit(seriesID int, language *string) (*TVSerieCredit, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
 	} else {
-		params.Set("language", tmdb.language)
+		params.Set("language", c.language)
 	}
 	var resp TVSerieCredit
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(seriesID),
 		params,
@@ -207,14 +207,14 @@ type TVSerieAlternativeTitle struct {
 // https://developer.themoviedb.org/reference/tv-series-alternative-titles
 //
 // country 可选，指定国家(指定一个 ISO-3166-1 值来筛选结果)
-func (tmdb *TMDB) GetTVSerieAlternativeTitle(seriesID int, country *string) (*TVSerieAlternativeTitle, error) {
+func (c *Client) GetTVSerieAlternativeTitle(seriesID int, country *string) (*TVSerieAlternativeTitle, error) {
 	params := url.Values{}
 	if country != nil {
 		params.Set("country", *country)
 	}
 
 	var resp TVSerieAlternativeTitle
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(int(seriesID))+"/alternative_titles",
 		params,
@@ -249,10 +249,10 @@ type TVSerieEpisodeGroup struct {
 // Get the episode groups that have been added to a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}/episode_groups
 // https://developer.themoviedb.org/reference/tv-series-episode-groups
-func (tmdb *TMDB) GetTVSerieEpisodeGroup(seriesID int) (*TVSerieEpisodeGroup, error) {
+func (c *Client) GetTVSerieEpisodeGroup(seriesID int) (*TVSerieEpisodeGroup, error) {
 	params := url.Values{}
 	var resp TVSerieEpisodeGroup
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(int(seriesID))+"/episode_groups",
 		params,
@@ -282,9 +282,9 @@ type TVSerieExternalID struct {
 // Get a list of external IDs that have been added to a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}/external_ids
 // https://developer.themoviedb.org/reference/tv-series-external-ids
-func (tmdb *TMDB) GetTVSerieExternalID(seriesID int) (*TVSerieExternalID, error) {
+func (c *Client) GetTVSerieExternalID(seriesID int) (*TVSerieExternalID, error) {
 	var resp TVSerieExternalID
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(seriesID)+"/external_ids",
 		url.Values{},
@@ -332,22 +332,22 @@ type TVSerieImage struct {
 // Get the images that belong to a TV series.
 // https://api.themoviedb.org/3/tv/{series_id}/images
 // https://developer.themoviedb.org/reference/tv-series-images
-func (tmdb *TMDB) GetTVSerieImage(seriesID int, IncludeImageLanguage *string, language *string) (*TVSerieImage, error) {
+func (c *Client) GetTVSerieImage(seriesID int, IncludeImageLanguage *string, language *string) (*TVSerieImage, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
 	} else {
-		params.Set("language", tmdb.language)
+		params.Set("language", c.language)
 	}
 
 	if IncludeImageLanguage != nil {
 		params.Set("include_image_language", *IncludeImageLanguage)
 	} else {
-		params.Set("include_image_language", tmdb.imageLanguage)
+		params.Set("include_image_language", c.imageLanguage)
 	}
 
 	var resp TVSerieImage
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(int(seriesID))+"/images",
 		params,
@@ -372,9 +372,9 @@ type TVSerieKeyword struct {
 // Get the keywords for a movie by its ID.
 // https://api.themoviedb.org/3/tv/{series_id}/keywords
 // https://developer.themoviedb.org/reference/movie-keywords
-func (tmdb *TMDB) GetTVSerieKeyword(seriesID int) (*TVSerieKeyword, error) {
+func (c *Client) GetTVSerieKeyword(seriesID int) (*TVSerieKeyword, error) {
 	var resp TVSerieKeyword
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(int(seriesID))+"/keywords",
 		url.Values{},
@@ -407,9 +407,9 @@ type TVSerieTranslation struct {
 // Get the translations that have been added to a TV show.
 // https://api.themoviedb.org/3/tv/{series_id}/translations
 // https://developer.themoviedb.org/reference/tv-series-translations
-func (tmdb *TMDB) GetTVSerieTranslation(seriesID int) (*TVSerieTranslation, error) {
+func (c *Client) GetTVSerieTranslation(seriesID int) (*TVSerieTranslation, error) {
 	var resp TVSerieTranslation
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(int(seriesID))+"/translations",
 		url.Values{},

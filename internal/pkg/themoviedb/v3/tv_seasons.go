@@ -62,16 +62,16 @@ type TVSeasonDetail struct {
 // Query the details of a TV season.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}
 // https://developer.themoviedb.org/reference/tv-season-details
-func (tmdb *TMDB) GetTVSeasonDetail(seriesID int, seasonNumber int, language *string) (*TVSeasonDetail, error) {
+func (c *Client) GetTVSeasonDetail(seriesID int, seasonNumber int, language *string) (*TVSeasonDetail, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
 	} else {
-		params.Set("language", tmdb.language)
+		params.Set("language", c.language)
 	}
 
 	var resp TVSeasonDetail
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(int(seriesID))+"/season/"+strconv.Itoa(int(seasonNumber)),
 		params,
@@ -126,16 +126,16 @@ type TVSeasonCredit struct {
 // Get the cast and crew for a TV season by its ID.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/credits
 // https://developer.themoviedb.org/reference/tv-season-credits
-func (tmdb *TMDB) GetTVSeasonCredit(seriesID int, seasonNumber int, language *string) (*TVSeasonCredit, error) {
+func (c *Client) GetTVSeasonCredit(seriesID int, seasonNumber int, language *string) (*TVSeasonCredit, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
 	} else {
-		params.Set("language", tmdb.language)
+		params.Set("language", c.language)
 	}
 
 	var resp TVSeasonCredit
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(seriesID)+"/season/"+strconv.Itoa(seasonNumber)+"/credits",
 		params,
@@ -161,9 +161,9 @@ type TVSeasonExternalID struct {
 // Get a list of external IDs that have been added to a TV season.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/external_ids
 // https://developer.themoviedb.org/reference/tv-season-external-ids
-func (tmdb *TMDB) GetTVSeasonExternalID(seriesID int, seasonNumber int) (*TVSeasonExternalID, error) {
+func (c *Client) GetTVSeasonExternalID(seriesID int, seasonNumber int) (*TVSeasonExternalID, error) {
 	var resp TVSeasonExternalID
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(seriesID)+"/season/"+strconv.Itoa(seasonNumber)+"/external_ids",
 		url.Values{},
@@ -211,16 +211,16 @@ type TVSeasonImage struct {
 // Get the images that belong to a TV season.
 // https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}/images
 // https://developer.themoviedb.org/reference/tv-season-images
-func (tmdb *TMDB) GetTVSeasonImage(series_id int, season_number int, language *string) (*TVSeasonImage, error) {
+func (c *Client) GetTVSeasonImage(series_id int, season_number int, language *string) (*TVSeasonImage, error) {
 	params := url.Values{}
 	if language != nil {
 		params.Set("language", *language)
 	} else {
-		params.Set("language", tmdb.language)
+		params.Set("language", c.language)
 	}
 
 	var resp TVSeasonImage
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/tv/"+strconv.Itoa(int(series_id))+"/season/"+strconv.Itoa(int(season_number))+"/images",
 		params,

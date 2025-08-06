@@ -15,7 +15,7 @@ import (
 	"github.com/allegro/bigcache"
 )
 
-type TMDB struct {
+type Client struct {
 	apiURL        string
 	imgURL        string
 	apiKey        string
@@ -65,7 +65,7 @@ func CustomLimiter(d time.Duration, maxCount uint64) TMDBOptions {
 	}
 }
 
-func NewTMDB(apiKey string, opts ...TMDBOptions) *TMDB {
+func NewClient(apiKey string, opts ...TMDBOptions) *Client {
 	config := &tmdbConfig{
 		apiURL: "https://api.themoviedb.org",
 		client: &http.Client{},
@@ -76,7 +76,7 @@ func NewTMDB(apiKey string, opts ...TMDBOptions) *TMDB {
 	for _, opt := range opts {
 		opt(config)
 	}
-	client := TMDB{
+	client := Client{
 		apiURL:        config.apiURL,
 		imgURL:        "https://image.tmdb.org",
 		apiKey:        apiKey,
@@ -89,28 +89,28 @@ func NewTMDB(apiKey string, opts ...TMDBOptions) *TMDB {
 	return &client
 }
 
-func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body io.Reader, resp any) error {
+func (c *Client) DoRequest(method string, path string, query url.Values, body io.Reader, resp any) error {
 	var (
 		data []byte
 		err  error
 	)
 	cacheKey := method + "|" + path + "|" + query.Encode()
 	if method == http.MethodGet && body == nil {
-		if data, err = tmdb.cache.Get(cacheKey); err == nil {
+		if data, err = c.cache.Get(cacheKey); err == nil {
 			return json.Unmarshal(data, resp)
 		}
 	}
 
-	tmdb.limiter.Acquire()
-	query.Set("api_key", tmdb.apiKey)
-	url := tmdb.apiURL + "/3" + path + "?" + query.Encode()
+	c.limiter.Acquire()
+	query.Set("api_key", c.apiKey)
+	url := c.apiURL + "/3" + path + "?" + query.Encode()
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return fmt.Errorf("create request failed: %w", err)
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	res, err := tmdb.client.Do(req)
+	res, err := c.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("do request failed: %w", err)
 	}
@@ -134,19 +134,19 @@ func (tmdb *TMDB) DoRequest(method string, path string, query url.Values, body i
 	// 写入缓存
 	if method == http.MethodGet && body == nil {
 		if data, err = json.Marshal(resp); err == nil {
-			_ = tmdb.cache.Set(cacheKey, data)
+			_ = c.cache.Set(cacheKey, data)
 		}
 	}
 	return nil
 }
 
-func (tmdb *TMDB) GetImageURL(path string) string {
-	return tmdb.imgURL + "/t/p/original" + path
+func (c *Client) GetImageURL(path string) string {
+	return c.imgURL + "/t/p/original" + path
 }
 
-func (tmdb *TMDB) DownloadImage(path string) (image.Image, error) {
-	url := tmdb.GetImageURL(path)
-	resp, err := tmdb.client.Get(url)
+func (c *Client) DownloadImage(path string) (image.Image, error) {
+	url := c.GetImageURL(path)
+	resp, err := c.client.Get(url)
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("下载图片「%s」失败", url))
 	}

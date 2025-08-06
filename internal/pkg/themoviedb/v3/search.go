@@ -178,12 +178,12 @@ type SearchPersonResponse struct {
 // 按收藏的原名、译名及别名进行搜索。
 // Search for collections by their original, translated and alternative names.
 // https://developer.themoviedb.org/reference/search-collection
-func (tmdb *TMDB) SearchCollection(params SearchCollectionParams) (*SearchResponse[SearchCollectionResponse], error) {
+func (c *Client) SearchCollection(params SearchCollectionParams) (*SearchResponse[SearchCollectionResponse], error) {
 	var resp SearchResponse[SearchCollectionResponse]
 	if params.Language == nil {
-		params.Language = &tmdb.language
+		params.Language = &c.language
 	}
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/search/collection",
 		utils.StructToQuery(params),
@@ -199,9 +199,9 @@ func (tmdb *TMDB) SearchCollection(params SearchCollectionParams) (*SearchRespon
 // 按公司的原名和别名搜索。
 // Search for companies by their original and alternative names.
 // https://developer.themoviedb.org/reference/search-company
-func (tmdb *TMDB) SearchCompany(params SearchCompanyParams) ([]SearchCompanyResponse, error) {
+func (c *Client) SearchCompany(params SearchCompanyParams) ([]SearchCompanyResponse, error) {
 	var resp SearchResponse[SearchCompanyResponse]
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/search/company",
 		utils.StructToQuery(params),
@@ -217,9 +217,9 @@ func (tmdb *TMDB) SearchCompany(params SearchCompanyParams) ([]SearchCompanyResp
 // 按名称搜索关键词。
 // Search for keywords by their name.
 // https://developer.themoviedb.org/reference/search-keyword
-func (tmdb *TMDB) SearchKeyword(params SearchKeywordParams) (*SearchResponse[SearchKeywordResponse], error) {
+func (c *Client) SearchKeyword(params SearchKeywordParams) (*SearchResponse[SearchKeywordResponse], error) {
 	var resp SearchResponse[SearchKeywordResponse]
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/search/keyword",
 		utils.StructToQuery(params),
@@ -235,12 +235,12 @@ func (tmdb *TMDB) SearchKeyword(params SearchKeywordParams) (*SearchResponse[Sea
 // 按电影的原名、译名和别名搜索。
 // Search for movies by their original, translated and alternative titles.
 // https://developer.themoviedb.org/reference/search-movie
-func (tmdb *TMDB) SearchMovie(params SearchMovieParams) (*SearchResponse[SearchMovieResponse], error) {
+func (c *Client) SearchMovie(params SearchMovieParams) (*SearchResponse[SearchMovieResponse], error) {
 	var resp SearchResponse[SearchMovieResponse]
 	if params.Language == nil {
-		params.Language = &tmdb.language
+		params.Language = &c.language
 	}
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/search/movie", utils.StructToQuery(params),
 		nil,
@@ -255,12 +255,12 @@ func (tmdb *TMDB) SearchMovie(params SearchMovieParams) (*SearchResponse[SearchM
 // 当你想在一次请求中搜索电影、电视节目和人物时，请使用多重搜索。
 // Use multi search when you want to search for movies, TV shows and people in a single request.
 // https://developer.themoviedb.org/reference/search-multi
-func (tmdb *TMDB) SearchMulti(params SearchMultiParams) (*SearchResponse[SearchMultiResponse], error) {
+func (c *Client) SearchMulti(params SearchMultiParams) (*SearchResponse[SearchMultiResponse], error) {
 	var resp SearchResponse[SearchMultiResponse]
 	if params.Language == nil {
-		params.Language = &tmdb.language
+		params.Language = &c.language
 	}
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/search/multi",
 		utils.StructToQuery(params),
@@ -276,12 +276,12 @@ func (tmdb *TMDB) SearchMulti(params SearchMultiParams) (*SearchResponse[SearchM
 // 按人名及其曾用名搜索人物。
 // Search for people by their name and also known as names.
 // https://developer.themoviedb.org/reference/search-person
-func (tmdb *TMDB) SearchPerson(params SearchPersonParams) (*SearchResponse[SearchPersonResponse], error) {
+func (c *Client) SearchPerson(params SearchPersonParams) (*SearchResponse[SearchPersonResponse], error) {
 	var resp SearchResponse[SearchPersonResponse]
 	if params.Language == nil {
-		params.Language = &tmdb.language
+		params.Language = &c.language
 	}
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/search/person",
 		utils.StructToQuery(params),
@@ -297,12 +297,12 @@ func (tmdb *TMDB) SearchPerson(params SearchPersonParams) (*SearchResponse[Searc
 // 按电视节目的原名、译名及别名搜索。
 // Search for TV shows by their original, translated and also known as names.
 // https://developer.themoviedb.org/reference/search-tv
-func (tmdb *TMDB) SearchTV(params SearchTVSParams) (*SearchResponse[SearchTVResponse], error) {
+func (c *Client) SearchTV(params SearchTVSParams) (*SearchResponse[SearchTVResponse], error) {
 	var resp SearchResponse[SearchTVResponse]
 	if params.Language == nil {
-		params.Language = &tmdb.language
+		params.Language = &c.language
 	}
-	err := tmdb.DoRequest(
+	err := c.DoRequest(
 		http.MethodGet,
 		"/search/tv",
 		utils.StructToQuery(params),

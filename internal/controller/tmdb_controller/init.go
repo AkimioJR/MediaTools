@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	client *themoviedb.TMDB
+	client *themoviedb.Client
 	lock   = sync.RWMutex{}
 )
 
@@ -28,7 +28,7 @@ func Init() error {
 	}
 	opts = append(opts, themoviedb.CustomHTTPClient(outbound.GetHTTPClient()))
 
-	client = themoviedb.NewTMDB(config.TMDB.ApiKey, opts...)
+	client = themoviedb.NewClient(config.TMDB.ApiKey, opts...)
 	return nil
 
 }
