@@ -2,8 +2,8 @@ package controller
 
 import (
 	"MediaTools/internal/controller/fanart_controller"
-	"MediaTools/internal/controller/format_controller"
 	"MediaTools/internal/controller/library_controller"
+	"MediaTools/internal/controller/media_controller"
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
@@ -20,7 +20,7 @@ var initFuncs = []InitFunc{
 	scrape_controller.Init,
 	storage_controller.Init,
 	library_controller.Init,
-	format_controller.Init,
+	media_controller.Init,
 }
 
 func InitAllControllers() error {

@@ -2,7 +2,7 @@ package library_controller
 
 import (
 	"MediaTools/extensions"
-	"MediaTools/internal/controller/format_controller"
+	"MediaTools/internal/controller/media_controller"
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
@@ -32,7 +32,7 @@ func ArchiveMedia(
 	lock.RLock()
 	defer lock.RUnlock()
 
-	targetName, err := format_controller.FormatVideo(item)
+	targetName, err := media_controller.FormatVideo(item)
 	if err != nil {
 		return nil, err
 	}

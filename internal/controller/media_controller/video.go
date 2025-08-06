@@ -1,4 +1,4 @@
-package format_controller
+package media_controller
 
 import (
 	"MediaTools/internal/pkg/meta"
