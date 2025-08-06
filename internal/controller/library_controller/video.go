@@ -62,7 +62,7 @@ func ArchiveMedia(
 						continue
 					}
 					logrus.Debugf("转移字幕/音轨文件：%s -> %s", fi.String(), otherDstFile)
-					err = storage_controller.Copy(&fi, otherDstFile) // 复制字幕/音轨文件
+					err = storage_controller.TransferFile(&fi, otherDstFile, transferType) // 转移字幕或音轨文件
 					if err != nil {
 						logrus.Warningf("转移字幕/音轨文件失败：%v", err)
 					}
