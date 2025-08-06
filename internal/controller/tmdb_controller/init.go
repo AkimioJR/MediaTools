@@ -16,7 +16,7 @@ func Init() error {
 	lock.Lock()
 	defer lock.Unlock()
 
-	var opts []themoviedb.TMDBOptions
+	var opts []themoviedb.ClientOptions
 	if config.TMDB.Language != "" {
 		opts = append(opts, themoviedb.CustomLanguage(config.TMDB.Language))
 	}

@@ -26,47 +26,47 @@ type Client struct {
 	cache         *bigcache.BigCache
 }
 
-type tmdbConfig struct {
+type clientConfig struct {
 	apiURL   string
 	imgURL   string
 	language string
 	client   *http.Client
 	limiter  *limiter.Limiter
 }
-type TMDBOptions func(c *tmdbConfig)
+type ClientOptions func(c *clientConfig)
 
-func CustomAPIURL(apiURL string) TMDBOptions {
-	return func(c *tmdbConfig) {
+func CustomAPIURL(apiURL string) ClientOptions {
+	return func(c *clientConfig) {
 		c.apiURL = apiURL
 	}
 }
 
-func CustomImageURL(imgURL string) TMDBOptions {
-	return func(c *tmdbConfig) {
+func CustomImageURL(imgURL string) ClientOptions {
+	return func(c *clientConfig) {
 		c.imgURL = imgURL
 	}
 }
 
-func CustomHTTPClient(client *http.Client) TMDBOptions {
-	return func(c *tmdbConfig) {
+func CustomHTTPClient(client *http.Client) ClientOptions {
+	return func(c *clientConfig) {
 		c.client = client
 	}
 }
 
-func CustomLanguage(language string) TMDBOptions {
-	return func(c *tmdbConfig) {
+func CustomLanguage(language string) ClientOptions {
+	return func(c *clientConfig) {
 		c.language = language
 	}
 }
 
-func CustomLimiter(d time.Duration, maxCount uint64) TMDBOptions {
-	return func(c *tmdbConfig) {
+func CustomLimiter(d time.Duration, maxCount uint64) ClientOptions {
+	return func(c *clientConfig) {
 		c.limiter = limiter.NewLimiter(d, maxCount)
 	}
 }
 
-func NewClient(apiKey string, opts ...TMDBOptions) (*Client, error) {
-	config := &tmdbConfig{
+func NewClient(apiKey string, opts ...ClientOptions) (*Client, error) {
+	config := &clientConfig{
 		apiURL: "https://api.themoviedb.org",
 		client: &http.Client{},
 	}
