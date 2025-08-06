@@ -13,6 +13,7 @@ type CustomWord struct {
 	OffsetExpr  string `json:"offset_expr"`  // 偏移量表达式
 
 	replaceFromRe *regexp.Regexp // 被替换词正则
+	originalStr   string         // 原始规则字符串
 }
 
 func (cw *CustomWord) Compile() error {

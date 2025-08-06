@@ -120,6 +120,7 @@ func ParseLine(s string) (*CustomWord, error) {
 		PrefixWord:  episodeStrs[0],
 		SuffixWord:  episodeStrs[1],
 		OffsetExpr:  episodeStrs[2],
+		originalStr: s,
 	}
 
 	if err := cw.Compile(); err != nil {

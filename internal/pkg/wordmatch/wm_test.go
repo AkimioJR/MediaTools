@@ -144,7 +144,7 @@ func TestWordsMatcher_MatchAndProcess(t *testing.T) {
 			matcher, err := wordmatch.NewWordsMatcher(test.words)
 			require.NoError(t, err, "Failed to create WordsMatcher")
 
-			result := matcher.MatchAndProcess(test.input)
+			result, _ := matcher.MatchAndProcess(test.input)
 			require.Equal(t, test.expected, result,
 				"Input: %s, Expected: %s, Got: %s", test.input, test.expected, result)
 		})

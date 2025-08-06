@@ -26,7 +26,8 @@ func NewWordsMatcher(words []string) (*WordsMatcher, error) {
 	return &matcher, nil
 }
 
-func (wm *WordsMatcher) MatchAndProcess(title string) string {
+func (wm *WordsMatcher) MatchAndProcess(title string) (string, string) {
+	var rule string // 匹配到的规则
 	for _, word := range wm.words {
 		if word.replaceFromRe != nil { // 替换被替换词
 			title = word.replaceFromRe.ReplaceAllString(title, word.ReplaceTo)
@@ -68,7 +69,8 @@ func (wm *WordsMatcher) MatchAndProcess(title string) string {
 				}
 				title = strings.Replace(title, episodeStr, strconv.Itoa(newEpisode), 1)
 			}
+			rule = word.originalStr
 		}
 	}
-	return title
+	return title, rule
 }
