@@ -9,6 +9,7 @@ import (
 	"MediaTools/utils"
 	"fmt"
 	"path/filepath"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 )
@@ -61,155 +62,212 @@ func ScrapeMovieInfo(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 }
 
 func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
-	err := DownloadTMDBImageAndSave(info.TMDBInfo.MovieInfo.PosterPath, utils.ChangeExt(dstFile.Path, "")+"-poster", dstFile.StorageType)
-	if err != nil {
-		logrus.Errorf("刮削电影「%s」海报失败: %v", info.TMDBInfo.MovieInfo.Title, err)
-	}
+	var (
+		wg    sync.WaitGroup
+		errCh = make(chan error, 10)
+	)
 
-	movieImage, err := tmdb_controller.GetMovieImage(info.TMDBID)
-	if err != nil {
-		logrus.Errorf("获取电影「%s」图片信息失败: %v", info.TMDBInfo.MovieInfo.Title, err)
-	}
-
-	if len(movieImage.Backdrops) > 0 { // 剧照
-		var paths []string
-		for _, backdrop := range movieImage.Backdrops {
-			paths = append(paths, backdrop.FilePath)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err := DownloadTMDBImageAndSave(info.TMDBInfo.MovieInfo.PosterPath, utils.ChangeExt(dstFile.Path, "")+"-poster", dstFile.StorageType)
+		if err != nil {
+			errCh <- fmt.Errorf("刮削电影「%s」海报失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 		}
-		path := getSupportImage(paths)
-		if path == "" {
-			logrus.Warningf("电影「%s」没有合适的剧照", info.TMDBInfo.MovieInfo.Title)
-		} else {
-			err = DownloadTMDBImageAndSave(path, filepath.Join(filepath.Dir(dstFile.Path), "backdrop"), dstFile.StorageType)
-			if err != nil {
-				logrus.Errorf("刮削电影「%s」剧照失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+	}()
+
+	go func() { // 刮削 TMDB 图片
+		defer wg.Done()
+		movieImage, err := tmdb_controller.GetMovieImage(info.TMDBID)
+		if err != nil {
+			errCh <- fmt.Errorf("获取电影「%s」图片信息失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+			return
+		}
+
+		var tmdbWG sync.WaitGroup
+		tmdbWG.Add(3)
+		go func() {
+			defer tmdbWG.Done()
+			if len(movieImage.Backdrops) > 0 { // 剧照
+				var paths []string
+				for _, backdrop := range movieImage.Backdrops {
+					paths = append(paths, backdrop.FilePath)
+				}
+				path := getSupportImage(paths)
+				if path == "" {
+					errCh <- fmt.Errorf("电影「%s」没有合适的剧照", info.TMDBInfo.MovieInfo.Title)
+				} else {
+					err = DownloadTMDBImageAndSave(path, filepath.Join(filepath.Dir(dstFile.Path), "backdrop"), dstFile.StorageType)
+					if err != nil {
+						errCh <- fmt.Errorf("刮削电影「%s」剧照失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+					}
+				}
 			}
-		}
-	}
+		}()
 
-	if len(movieImage.Posters) > 0 { // 海报
-		var paths []string
-		for _, poster := range movieImage.Posters {
-			paths = append(paths, poster.FilePath)
-		}
-		path := getSupportImage(paths)
-		if path == "" {
-			logrus.Warningf("电影「%s」没有合适的海报", info.TMDBInfo.MovieInfo.Title)
-		} else {
-			err = DownloadTMDBImageAndSave(path, filepath.Join(filepath.Dir(dstFile.Path), "poster"), dstFile.StorageType)
-			if err != nil {
-				logrus.Errorf("刮削电影「%s」海报失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+		go func() {
+			defer tmdbWG.Done()
+			if len(movieImage.Posters) > 0 { // 海报
+				var paths []string
+				for _, poster := range movieImage.Posters {
+					paths = append(paths, poster.FilePath)
+				}
+				path := getSupportImage(paths)
+				if path == "" {
+					errCh <- fmt.Errorf("电影「%s」没有合适的海报", info.TMDBInfo.MovieInfo.Title)
+				} else {
+					err = DownloadTMDBImageAndSave(path, filepath.Join(filepath.Dir(dstFile.Path), "poster"), dstFile.StorageType)
+					if err != nil {
+						errCh <- fmt.Errorf("刮削电影「%s」海报失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+					}
+				}
 			}
-		}
-	}
+		}()
 
-	if len(movieImage.Logos) > 0 { // Logo
-		var paths []string
-		for _, logo := range movieImage.Logos {
-			paths = append(paths, logo.FilePath)
-		}
-		path := getSupportImage(paths)
-		if path == "" {
-			logrus.Warningf("电影「%s」没有合适的 Logo", info.TMDBInfo.MovieInfo.Title)
-		} else {
-			err = DownloadTMDBImageAndSave(path, filepath.Join(filepath.Dir(dstFile.Path), "logo"), dstFile.StorageType)
-			if err != nil {
-				logrus.Errorf("刮削电影「%s」Logo 失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+		go func() {
+			defer tmdbWG.Done()
+			if len(movieImage.Logos) > 0 { // Logo
+				var paths []string
+				for _, logo := range movieImage.Logos {
+					paths = append(paths, logo.FilePath)
+				}
+				path := getSupportImage(paths)
+				if path == "" {
+					errCh <- fmt.Errorf("电影「%s」没有合适的 Logo", info.TMDBInfo.MovieInfo.Title)
+				} else {
+					err = DownloadTMDBImageAndSave(path, filepath.Join(filepath.Dir(dstFile.Path), "logo"), dstFile.StorageType)
+					if err != nil {
+						errCh <- fmt.Errorf("刮削电影「%s」Logo 失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+					}
+				}
 			}
-		}
-	}
+		}()
 
-	{ // 刮削 Fanart 图片
+		tmdbWG.Wait()
+	}()
+
+	wg.Add(1)
+	go func() { // 刮削 Fanart 图片
+		defer wg.Done()
 		fanartImagesData, err := fanart_controller.GetMovieImagesData(info.IMDBID)
 		if err != nil {
-			logrus.Errorf("获取电影「%s」Fanart 图片信息失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+			errCh <- fmt.Errorf("获取电影「%s」Fanart 图片信息失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+			return
 		}
 
-		if len(fanartImagesData.MovieBackground) > 0 { // 背景图
+		var fanartWG sync.WaitGroup
+		fanartWG.Add(5)
+		go func() {
+			defer fanartWG.Done()
+			if len(fanartImagesData.MovieBackground) > 0 { // 背景图
+				var urls []string
+				for _, bg := range fanartImagesData.MovieBackground {
+					urls = append(urls, bg.URL)
+				}
+				url := getSupportImage(urls)
+				if url == "" {
+					errCh <- fmt.Errorf("电影「%s」没有合适的 Fanart 背景图", info.TMDBInfo.MovieInfo.Title)
+				} else {
+					err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "background"), dstFile.StorageType)
+					if err != nil {
+						errCh <- fmt.Errorf("刮削电影「%s」Fanart 背景图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+					}
+				}
+			}
+		}()
+
+		go func() {
+			defer fanartWG.Done()
+			if len(fanartImagesData.MovieBanner) > 0 { // 横幅
+				var urls []string
+				for _, banner := range fanartImagesData.MovieBanner {
+					urls = append(urls, banner.URL)
+				}
+				url := getSupportImage(urls)
+				if url == "" {
+					errCh <- fmt.Errorf("电影「%s」没有合适的 Fanart 横幅图", info.TMDBInfo.MovieInfo.Title)
+				} else {
+					err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "banner"), dstFile.StorageType)
+					if err != nil {
+						errCh <- fmt.Errorf("刮削电影「%s」Fanart 横幅图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+					}
+				}
+			}
+		}()
+
+		go func() {
+			defer fanartWG.Done()
+			fanartClearArtPath := filepath.Join(filepath.Dir(dstFile.Path), "clearart")
 			var urls []string
-			for _, bg := range fanartImagesData.MovieBackground {
-				urls = append(urls, bg.URL)
+			if len(fanartImagesData.HDMovieClearArt) > 0 { // Clear Art
+				for _, clearArt := range fanartImagesData.HDMovieClearArt {
+					urls = append(urls, clearArt.URL)
+				}
+			} else if len(fanartImagesData.MovieArt) > 0 { // Clear Art
+				for _, clearArt := range fanartImagesData.MovieArt {
+					urls = append(urls, clearArt.URL)
+				}
 			}
 			url := getSupportImage(urls)
 			if url == "" {
-				logrus.Warningf("电影「%s」没有合适的 Fanart 背景图", info.TMDBInfo.MovieInfo.Title)
+				errCh <- fmt.Errorf("电影「%s」没有合适的 Fanart Clear Art 图", info.TMDBInfo.MovieInfo.Title)
 			} else {
-				err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "background"), dstFile.StorageType)
+				err = DownloadFanartImageAndSave(url, fanartClearArtPath, dstFile.StorageType)
 				if err != nil {
-					logrus.Errorf("刮削电影「%s」Fanart 背景图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+					errCh <- fmt.Errorf("刮削电影「%s」Fanart Clear Art 图片失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 				}
 			}
-		}
+		}()
 
-		if len(fanartImagesData.MovieBanner) > 0 { // 横幅
-			var urls []string
-			for _, banner := range fanartImagesData.MovieBanner {
-				urls = append(urls, banner.URL)
-			}
-			url := getSupportImage(urls)
-			if url == "" {
-				logrus.Warningf("电影「%s」没有合适的 Fanart 横幅图", info.TMDBInfo.MovieInfo.Title)
-			} else {
-				err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "banner"), dstFile.StorageType)
-				if err != nil {
-					logrus.Errorf("刮削电影「%s」Fanart 横幅图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+		go func() {
+			defer fanartWG.Done()
+			if len(fanartImagesData.MovieDisc) > 0 { // 光盘
+				var urls []string
+				for _, disc := range fanartImagesData.MovieDisc {
+					urls = append(urls, disc.URL)
+				}
+				url := getSupportImage(urls)
+				if url == "" {
+					errCh <- fmt.Errorf("电影「%s」没有合适的 Fanart 光盘图", info.TMDBInfo.MovieInfo.Title)
+				} else {
+
+					err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "disc"), dstFile.StorageType)
+					if err != nil {
+						errCh <- fmt.Errorf("刮削电影「%s」Fanart 光盘图片失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+					}
 				}
 			}
-		}
+		}()
 
-		fanartClearArtPath := filepath.Join(filepath.Dir(dstFile.Path), "clearart")
-		var urls []string
-		if len(fanartImagesData.HDMovieClearArt) > 0 { // Clear Art
-			for _, clearArt := range fanartImagesData.HDMovieClearArt {
-				urls = append(urls, clearArt.URL)
-			}
-		} else if len(fanartImagesData.MovieArt) > 0 { // Clear Art
-			for _, clearArt := range fanartImagesData.MovieArt {
-				urls = append(urls, clearArt.URL)
-			}
-		}
-		url := getSupportImage(urls)
-		if url == "" {
-			logrus.Warningf("电影「%s」没有合适的 Fanart Clear Art 图", info.TMDBInfo.MovieInfo.Title)
-		} else {
-			err = DownloadFanartImageAndSave(url, fanartClearArtPath, dstFile.StorageType)
-			if err != nil {
-				logrus.Errorf("刮削电影「%s」Fanart Clear Art 图片失败: %v", info.TMDBInfo.MovieInfo.Title, err)
-			}
-		}
-
-		if len(fanartImagesData.MovieDisc) > 0 { // 光盘
-			var urls []string
-			for _, disc := range fanartImagesData.MovieDisc {
-				urls = append(urls, disc.URL)
-			}
-			url := getSupportImage(urls)
-			if url == "" {
-				logrus.Warningf("电影「%s」没有合适的 Fanart 光盘图", info.TMDBInfo.MovieInfo.Title)
-			} else {
-
-				err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "disc"), dstFile.StorageType)
-				if err != nil {
-					logrus.Errorf("刮削电影「%s」Fanart 光盘图片失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+		go func() {
+			defer fanartWG.Done()
+			if len(fanartImagesData.MovieThumb) > 0 { // 缩略图
+				var urls []string
+				for _, thumb := range fanartImagesData.MovieThumb {
+					urls = append(urls, thumb.URL)
+				}
+				url := getSupportImage(urls)
+				if url == "" {
+					errCh <- fmt.Errorf("电影「%s」没有合适的 Fanart 缩略图", info.TMDBInfo.MovieInfo.Title)
+				} else {
+					err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "thumb"), dstFile.StorageType)
+					if err != nil {
+						errCh <- fmt.Errorf("刮削电影「%s」Fanart 缩略图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
+					}
 				}
 			}
-		}
+		}()
 
-		if len(fanartImagesData.MovieThumb) > 0 { // 缩略图
-			var urls []string
-			for _, thumb := range fanartImagesData.MovieThumb {
-				urls = append(urls, thumb.URL)
-			}
-			url := getSupportImage(urls)
-			if url == "" {
-				logrus.Warningf("电影「%s」没有合适的 Fanart 缩略图", info.TMDBInfo.MovieInfo.Title)
-			} else {
-				err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "thumb"), dstFile.StorageType)
-				if err != nil {
-					logrus.Errorf("刮削电影「%s」Fanart 缩略图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
-				}
-			}
-		}
+		fanartWG.Wait()
+	}()
+
+	go func() {
+		wg.Wait()
+		close(errCh)
+	}()
+
+	for err := range errCh {
+		logrus.Error(err)
 	}
 }
 
