@@ -1,5 +1,7 @@
 package config
 
+import "MediaTools/internal/schemas"
+
 type LogConfig struct {
 	Level string `yaml:"level"` // 日志级别
 	Path  string `yaml:"path"`  // 日志文件目录
@@ -26,7 +28,18 @@ type Configuration struct {
 }
 
 type MediaLibraryConfig struct {
-	Libraries   []string `yaml:"libraries"`    // 媒体库路径列表
-	MovieFormat string   `yaml:"movie_format"` // 电影格式
-	TVFormat    string   `yaml:"tv_format"`    // 电视剧格式
+	Libraries   []LibraryConfig `yaml:"libraries"`    // 媒体库路径列表
+	MovieFormat string          `yaml:"movie_format"` // 电影格式
+	TVFormat    string          `yaml:"tv_format"`    // 电视剧格式
+}
+
+type LibraryConfig struct {
+	Name               string               `yaml:"name"`                 // 媒体库名称
+	SrcPath            string               `yaml:"src_path"`             // 源路径
+	SrcType            schemas.StorageType  `yaml:"src_type"`             // 源类型
+	DstType            schemas.StorageType  `yaml:"dst_type"`             // 目标类型
+	DstPath            string               `yaml:"dst_path"`             // 目标路径
+	TransferType       schemas.TransferType `yaml:"transfer_type"`        // 传输类型
+	OrganizeByType     bool                 `yaml:"organize_by_type"`     // 是否按类型分文件夹
+	OrganizeByCategory bool                 `yaml:"organize_by_category"` // 是否按分类分文件夹
 }
