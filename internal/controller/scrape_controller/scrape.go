@@ -76,6 +76,7 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 		}
 	}()
 
+	wg.Add(1)
 	go func() { // 刮削 TMDB 图片
 		defer wg.Done()
 		movieImage, err := tmdb_controller.GetMovieImage(info.TMDBID)
@@ -84,10 +85,9 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 			return
 		}
 
-		var tmdbWG sync.WaitGroup
-		tmdbWG.Add(3)
+		wg.Add(3)
 		go func() {
-			defer tmdbWG.Done()
+			defer wg.Done()
 			if len(movieImage.Backdrops) > 0 { // 剧照
 				var paths []string
 				for _, backdrop := range movieImage.Backdrops {
@@ -106,7 +106,7 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 		}()
 
 		go func() {
-			defer tmdbWG.Done()
+			defer wg.Done()
 			if len(movieImage.Posters) > 0 { // 海报
 				var paths []string
 				for _, poster := range movieImage.Posters {
@@ -125,7 +125,7 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 		}()
 
 		go func() {
-			defer tmdbWG.Done()
+			defer wg.Done()
 			if len(movieImage.Logos) > 0 { // Logo
 				var paths []string
 				for _, logo := range movieImage.Logos {
@@ -142,8 +142,6 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 				}
 			}
 		}()
-
-		tmdbWG.Wait()
 	}()
 
 	wg.Add(1)
@@ -155,10 +153,9 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 			return
 		}
 
-		var fanartWG sync.WaitGroup
-		fanartWG.Add(5)
+		wg.Add(5)
 		go func() {
-			defer fanartWG.Done()
+			defer wg.Done()
 			if len(fanartImagesData.MovieBackground) > 0 { // 背景图
 				var urls []string
 				for _, bg := range fanartImagesData.MovieBackground {
@@ -177,7 +174,7 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 		}()
 
 		go func() {
-			defer fanartWG.Done()
+			defer wg.Done()
 			if len(fanartImagesData.MovieBanner) > 0 { // 横幅
 				var urls []string
 				for _, banner := range fanartImagesData.MovieBanner {
@@ -196,7 +193,7 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 		}()
 
 		go func() {
-			defer fanartWG.Done()
+			defer wg.Done()
 			fanartClearArtPath := filepath.Join(filepath.Dir(dstFile.Path), "clearart")
 			var urls []string
 			if len(fanartImagesData.HDMovieClearArt) > 0 { // Clear Art
@@ -220,7 +217,7 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 		}()
 
 		go func() {
-			defer fanartWG.Done()
+			defer wg.Done()
 			if len(fanartImagesData.MovieDisc) > 0 { // 光盘
 				var urls []string
 				for _, disc := range fanartImagesData.MovieDisc {
@@ -240,7 +237,7 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 		}()
 
 		go func() {
-			defer fanartWG.Done()
+			defer wg.Done()
 			if len(fanartImagesData.MovieThumb) > 0 { // 缩略图
 				var urls []string
 				for _, thumb := range fanartImagesData.MovieThumb {
@@ -257,8 +254,6 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 				}
 			}
 		}()
-
-		fanartWG.Wait()
 	}()
 
 	go func() {
@@ -267,7 +262,7 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 	}()
 
 	for err := range errCh {
-		logrus.Error(err)
+		logrus.Warning(err)
 	}
 }
 
