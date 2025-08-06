@@ -1,6 +1,15 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"os"
+
+	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
+)
+
+const (
+	ConfigFile = "config/config.yaml"
+)
 
 var (
 	Log          LogConfig
@@ -11,7 +20,7 @@ var (
 
 func Init() error {
 	var c Configuration
-	viper.SetConfigFile("config/config.yaml")
+	viper.SetConfigFile(ConfigFile)
 	if err := viper.ReadInConfig(); err != nil {
 		return err
 	}
@@ -23,5 +32,22 @@ func Init() error {
 	TMDB = c.TMDB
 	Fanart = c.Fanart
 	MediaLibrary = c.MediaLibrary
+	return nil
+}
+
+func WriteConfig() error {
+	var c Configuration
+	Log = c.Log
+	TMDB = c.TMDB
+	Fanart = c.Fanart
+	MediaLibrary = c.MediaLibrary
+	file, err := os.OpenFile(ConfigFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	if err := yaml.NewEncoder(file).Encode(&c); err != nil {
+		return err
+	}
 	return nil
 }
