@@ -49,7 +49,7 @@ type MediaItem struct {
 	Platform      meta.StreamingPlatform `json:"platform"`       // 流媒体平台
 	FileExtension string                 `json:"file_extension"` // 文件扩展名
 
-	Customization []string // 自定义词
+	Customization []string `json:"customization"` // 自定义词
 
 	// ID 信息
 	TMDBID int    `json:"tmdb_id"` // TMDB ID
