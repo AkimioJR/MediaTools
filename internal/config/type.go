@@ -1,10 +1,14 @@
 package config
 
-import "MediaTools/internal/schemas"
+import (
+	"MediaTools/internal/schemas"
+
+	"github.com/sirupsen/logrus"
+)
 
 type LogConfig struct {
-	Level string `json:"level"` // 日志级别
-	Path  string `json:"path"`  // 日志文件目录
+	Level logrus.Level `json:"level"` // 日志级别
+	Path  string       `json:"path"`  // 日志文件目录
 }
 
 type TMDBConfig struct {

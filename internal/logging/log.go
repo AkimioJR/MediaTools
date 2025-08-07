@@ -10,26 +10,18 @@ var (
 	recentLogsHook = NewRecentLogsHook(10)
 )
 
-func init() {
+func Init() error {
 	setting := &serviceLoggerSetting{}
 	logrus.SetFormatter(setting)
 	logrus.AddHook(setting)
 	logrus.AddHook(recentLogsHook)
 	logrus.SetReportCaller(true) // 启用调用者信息
-	err := SetLogLevel(config.Log.Level)
-	if err != nil {
-		logrus.Errorf("设置日志级别失败，已设置为「%s」: %v", logrus.InfoLevel, err)
-		logrus.SetLevel(logrus.InfoLevel)
-	}
+	logrus.SetLevel(config.Log.Level)
+	return nil
 }
 
-func SetLogLevel(level string) error {
-	logLevel, err := logrus.ParseLevel(level)
-	if err != nil {
-		return err
-	}
-	logrus.SetLevel(logLevel)
-	return nil
+func SetLevel(level logrus.Level) {
+	logrus.SetLevel(level)
 }
 
 func GetRecentLogs() []string {

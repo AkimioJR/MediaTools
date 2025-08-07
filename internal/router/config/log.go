@@ -2,10 +2,12 @@ package config
 
 import (
 	"MediaTools/internal/config"
+	"MediaTools/internal/logging"
 	"MediaTools/internal/schemas"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 // @BasePath /config
@@ -49,6 +51,8 @@ func UpdateLog(ctx *gin.Context) {
 		return
 	}
 
+	logrus.Debug("更新日志配置: ", req)
+	logging.SetLevel(req.Level)
 	config.Log = req
 	err = config.WriteConfig()
 	// logging.Init()
