@@ -17,7 +17,7 @@ var (
 	customizationWordRe *regexp.Regexp
 )
 
-func InitFomatTemplates() error {
+func InitFormatTemplates() error {
 	loock.Lock()
 	defer loock.Unlock()
 
@@ -51,7 +51,7 @@ func InitCustomWord() error {
 }
 
 func Init() error {
-	err := InitFomatTemplates()
+	err := InitFormatTemplates()
 	if err != nil {
 		return err
 	}
