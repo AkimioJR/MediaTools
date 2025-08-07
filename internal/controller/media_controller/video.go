@@ -50,11 +50,14 @@ func MatchCustomizationWordWord(title string) []string {
 	loock.RLock()
 	defer loock.RUnlock()
 
-	matchedWords := customizationWordRe.FindAllString(title, -1)
-	if len(matchedWords) == 0 {
-		return []string{}
+	var customWords = []string{}
+	for _, word := range customizationWordRe.FindAllString(title, -1) {
+		word = strings.TrimSpace(word)
+		if word != "" {
+			customWords = append(customWords, word)
+		}
 	}
-	return matchedWords
+	return customWords
 }
 
 func ParseVideoMeta(title string) *meta.VideoMeta {
