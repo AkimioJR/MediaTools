@@ -20,6 +20,9 @@ func Init() error {
 	if config.TMDB.Language != "" {
 		opts = append(opts, themoviedb.CustomLanguage(config.TMDB.Language))
 	}
+	if config.TMDB.IncludeImageLanguage != "" {
+		opts = append(opts, themoviedb.CustomImageLanguage(config.TMDB.IncludeImageLanguage))
+	}
 	if config.TMDB.ApiURL != "" {
 		opts = append(opts, themoviedb.CustomAPIURL(config.TMDB.ApiURL))
 	}
