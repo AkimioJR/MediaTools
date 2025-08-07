@@ -10,7 +10,6 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
-	"path"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -41,7 +40,7 @@ func SaveImage(imgFile *schemas.FileInfo, img image.Image) error {
 // p: TMDB 中图片地址
 // target: 目标路径，不带后缀名
 func DownloadTMDBImageAndSave(p string, target string, storageType schemas.StorageType) error {
-	target += path.Ext(p)
+	target += filepath.Ext(p)
 	dstFile, err := storage_controller.GetFile(target, storageType)
 	if err != nil {
 		return err
@@ -66,7 +65,7 @@ func DownloadTMDBImageAndSave(p string, target string, storageType schemas.Stora
 // url: Fanart 中图片地址
 // target: 目标路径，不带后缀名
 func DownloadFanartImageAndSave(url string, target string, storageType schemas.StorageType) error {
-	target += path.Ext(url)
+	target += filepath.Ext(url)
 	dstFile, err := storage_controller.GetFile(target, storageType)
 	if err != nil {
 		return err
@@ -99,7 +98,7 @@ var supportImgExts = []string{".jpg", ".jpeg", ".png"}
 
 func getSupportImage(arr []string) string {
 	for i := range arr {
-		ext := strings.ToLower(path.Ext(arr[i]))
+		ext := strings.ToLower(filepath.Ext(arr[i]))
 		if slices.Contains(supportImgExts, ext) {
 			return arr[i]
 		}
