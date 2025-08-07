@@ -1,4 +1,4 @@
-package router
+package library
 
 import (
 	"MediaTools/internal/controller/library_controller"
@@ -22,13 +22,13 @@ import (
 // @Accept json
 // @Produce json
 // @Param request body LibraryArchiveMediaRequest true "请求参数"
-// @Success 200 {object} Response[schemas.FileInfo] "成功响应"
-// @Failure 400 {object} Response[schemas.FileInfo] "请求参数错误"
-// @Failure 500 {object} Response[schemas.FileInfo] "服务器错误"
+// @Success 200 {object} schemas.Response[schemas.FileInfo] "成功响应"
+// @Failure 400 {object} schemas.Response[schemas.FileInfo] "请求参数错误"
+// @Failure 500 {object} schemas.Response[schemas.FileInfo] "服务器错误"
 func LibraryArchiveMedia(ctx *gin.Context) {
 	var (
-		req  LibraryArchiveMediaRequest
-		resp Response[*schemas.FileInfo]
+		req  schemas.LibraryArchiveMediaRequest
+		resp schemas.Response[*schemas.FileInfo]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {

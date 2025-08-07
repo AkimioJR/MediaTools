@@ -1,4 +1,4 @@
-package router
+package media
 
 import (
 	"MediaTools/internal/controller/media_controller"
@@ -16,11 +16,11 @@ import (
 // @Description 根据提供的标题识别媒体信息，并返回 MediaItem 对象
 // @Tags media
 // @Param title query string true "媒体标题"
-// @Success 200 {object} Response[*schemas.MediaItem]
-// @Failure 400 {object} Response[*schemas.MediaItem]
-// @Failure 500 {object} Response[*schemas.MediaItem]
-func MediaRecognize(ctx *gin.Context) {
-	var resp Response[*schemas.MediaItem]
+// @Success 200 {object} schemas.Response[*schemas.MediaItem]
+// @Failure 400 {object} schemas.Response[*schemas.MediaItem]
+// @Failure 500 {object} schemas.Response[*schemas.MediaItem]
+func Recognize(ctx *gin.Context) {
+	var resp schemas.Response[*schemas.MediaItem]
 	title := ctx.Query("title")
 	if title == "" {
 		resp.Message = "标题不能为空"

@@ -1,4 +1,4 @@
-package router
+package scrape
 
 import (
 	"MediaTools/internal/controller/scrape_controller"
@@ -16,14 +16,14 @@ import (
 // @Tags scrape
 // @Accept json
 // @Produce json
-// @Param request body ScrapeRequest true "刮削请求参数"
-// @Success 200 {object} Response[*schemas.FileInfo] "刮削成功"
-// @Failure 400 {object} Response[*schemas.FileInfo] "请求参数错误"
-// @Failure 500 {object} Response[*schemas.FileInfo] "刮削失败
-func ScrapeVideo(ctx *gin.Context) {
+// @Param request body schemas.ScrapeRequest true "刮削请求参数"
+// @Success 200 {object} schemas.Response[*schemas.FileInfo] "刮削成功"
+// @Failure 400 {object} schemas.Response[*schemas.FileInfo] "请求参数错误"
+// @Failure 500 {object} schemas.Response[*schemas.FileInfo] "刮削失败
+func Video(ctx *gin.Context) {
 	var (
-		req  ScrapeRequest
-		resp Response[*schemas.FileInfo]
+		req  schemas.ScrapeRequest
+		resp schemas.Response[*schemas.FileInfo]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
