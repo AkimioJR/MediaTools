@@ -21,16 +21,16 @@ type FanartConfig struct {
 }
 
 type Configuration struct {
-	Log        LogConfig        `json:"log"`
-	TMDB       TMDBConfig       `json:"tmdb"`
-	Fanart     FanartConfig     `json:"fanart"`
-	Media      MediaConfig      `json:"media"`
-	CustomWord CustomWordConfig `json:"custom_word"`
+	Log    LogConfig    `json:"log"`
+	TMDB   TMDBConfig   `json:"tmdb"`
+	Fanart FanartConfig `json:"fanart"`
+	Media  MediaConfig  `json:"media"`
 }
 
 type MediaConfig struct {
-	Libraries []LibraryConfig `json:"libraries"` // 媒体库路径列表
-	Format    FormatConfig    `json:"format"`    // 媒体格式配置
+	Libraries  []LibraryConfig  `json:"libraries"`   // 媒体库路径列表
+	Format     FormatConfig     `json:"format"`      // 媒体格式配置
+	CustomWord CustomWordConfig `json:"custom_word"` // 自定义识别词配置
 }
 
 type FormatConfig struct {

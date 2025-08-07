@@ -38,11 +38,11 @@ func InitCustomWord() error {
 	defer loock.Unlock()
 
 	var err error
-	wm, err = wordmatch.NewWordsMatcher(config.CustomWord.IdentifyWord)
+	wm, err = wordmatch.NewWordsMatcher(config.Media.CustomWord.IdentifyWord)
 	if err != nil {
 		return err
 	}
-	re, err := regexp.Compile(strings.Join(config.CustomWord.IdentifyWord, "|"))
+	re, err := regexp.Compile(strings.Join(config.Media.CustomWord.IdentifyWord, "|"))
 	if err != nil {
 		return err
 	}
