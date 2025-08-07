@@ -1,6 +1,10 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"MediaTools/internal/router/config"
+
+	"github.com/gin-gonic/gin"
+)
 
 func InitRouter() *gin.Engine {
 	ginRouter := gin.Default()
@@ -9,6 +13,8 @@ func InitRouter() *gin.Engine {
 	{
 		logRouter.GET("/recent", GetRecentLogs) // 获取最近日志
 	}
+
+	config.RegisterConfigRouter(ginRouter)
 
 	tmdbRouter := ginRouter.Group("/tmdb") // TMDB 相关接口
 	{
