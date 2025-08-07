@@ -8,10 +8,11 @@ type LogConfig struct {
 }
 
 type TMDBConfig struct {
-	ApiURL   string `json:"api_url"`
-	ImageURL string `json:"image_url"`
-	ApiKey   string `json:"api_key"`
-	Language string `json:"language"`
+	ApiURL               string `json:"api_url"`                // TMDB API URL
+	ImageURL             string `json:"image_url"`              // 图片 API URL
+	ApiKey               string `json:"api_key"`                // API Key
+	Language             string `json:"language"`               // 语言
+	IncludeImageLanguage string `json:"include_image_language"` // 包含的图片语言
 }
 
 type FanartConfig struct {
