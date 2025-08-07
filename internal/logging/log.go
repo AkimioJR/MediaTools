@@ -16,12 +16,12 @@ func Init() error {
 	logrus.AddHook(setting)
 	logrus.AddHook(recentLogsHook)
 	logrus.SetReportCaller(true) // 启用调用者信息
-	logrus.SetLevel(config.Log.Level)
+	SetLevel(config.Log.Level)
 	return nil
 }
 
-func SetLevel(level logrus.Level) {
-	logrus.SetLevel(level)
+func SetLevel(level config.LogLevel) {
+	logrus.SetLevel(level.ToLogrusLevel())
 }
 
 func GetRecentLogs() []string {

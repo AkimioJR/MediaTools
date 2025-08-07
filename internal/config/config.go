@@ -3,7 +3,6 @@ package config
 import (
 	"os"
 
-	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
 )
 
@@ -20,11 +19,12 @@ var (
 
 func Init() error {
 	var c Configuration
-	viper.SetConfigFile(ConfigFile)
-	if err := viper.ReadInConfig(); err != nil {
+	file, err := os.OpenFile(ConfigFile, os.O_RDONLY, 0644)
+	if err != nil {
 		return err
 	}
-	if err := viper.Unmarshal(&c); err != nil {
+	defer file.Close()
+	if err := yaml.NewDecoder(file).Decode(&c); err != nil {
 		return err
 	}
 
