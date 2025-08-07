@@ -4,7 +4,7 @@ import (
 	"MediaTools/encode"
 	"MediaTools/utils"
 	"fmt"
-	"path"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strconv"
@@ -142,8 +142,8 @@ func ParseVideoMeta(title string) *VideoMeta {
 		Customization:  make([]string, 0),
 	}
 
-	if utils.IsMediaExtension(path.Ext(title)) {
-		title = strings.TrimSuffix(title, path.Ext(title)) // 去掉文件扩展名
+	if utils.IsMediaExtension(filepath.Ext(title)) {
+		title = strings.TrimSuffix(title, filepath.Ext(title)) // 去掉文件扩展名
 		meta.IsFile = true
 	}
 
