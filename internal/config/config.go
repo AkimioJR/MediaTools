@@ -37,11 +37,11 @@ func Init() error {
 
 func WriteConfig() error {
 	var c Configuration
-	Log = c.Log
-	TMDB = c.TMDB
-	Fanart = c.Fanart
-	Media = c.Media
-	file, err := os.OpenFile(ConfigFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	c.Log = Log
+	c.TMDB = TMDB
+	c.Fanart = Fanart
+	c.Media = Media
+	file, err := os.Create(ConfigFile)
 	if err != nil {
 		return err
 	}
