@@ -2,17 +2,10 @@ package schemas
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"path/filepath"
 	"strings"
 	"time"
-)
-
-var (
-	ErrNoImplement             = errors.New("storage provider not implement")
-	ErrNoSupport               = errors.New("storage provider not support this operation")
-	ErrStorageProviderNotFound = errors.New("storage provider not found")
 )
 
 type StorageType uint8
