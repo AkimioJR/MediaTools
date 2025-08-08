@@ -1,6 +1,7 @@
 package storage_controller
 
 import (
+	"MediaTools/internal/errs"
 	"MediaTools/internal/schemas"
 	"path/filepath"
 )
@@ -11,7 +12,7 @@ func GetFile(path string, storageType schemas.StorageType) (*schemas.FileInfo, e
 
 	_, exists := getStorageProvider(storageType)
 	if !exists {
-		return nil, schemas.ErrStorageProviderNotFound
+		return nil, errs.ErrStorageProviderNotFound
 	}
 	fi := schemas.NewBasicFileInfo(storageType, path)
 	return fi, nil
