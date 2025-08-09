@@ -234,6 +234,52 @@ func StorageDelete(ctx *gin.Context) {
 }
 
 // @BasePath /storage
+// @Route /:storage_type/rename [post]
+// @Summary 重命名文件或目录
+// @Description 根据存储类型和路径重命名指定的文件或目录
+// @Tags storage
+// @Param storage_type path string true "存储类型"
+// @Body {object} schemas.RenameRequest true "重命名请求"
+// @Accept json
+// @Products json
+// @Success 200 {object} schemas.Response[*schemas.FileInfo]
+// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
+// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+func StorageRename(ctx *gin.Context) {
+	var (
+		req  schemas.RenameRequest
+		resp schemas.Response[*schemas.FileInfo]
+	)
+
+	storageTypeStr := ctx.Param("storage_type")
+	storageType := schemas.ParseStorageType(storageTypeStr)
+	if storageType == schemas.StorageUnknown {
+		resp.Message = "无效的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		resp.Message = "请求参数错误: " + err.Error()
+		ctx.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	fileInfo := schemas.NewBasicFileInfo(storageType, req.Path)
+
+	err := storage_controller.Rename(fileInfo, req.NewName)
+	if err != nil {
+		resp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	resp.Data = fileInfo
+	resp.Success = true
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// @BasePath /storage
 // @Route /:storage_type/upload [post]
 // @Summary 上传文件
 // @Description 根据存储类型和路径上传文件

@@ -16,6 +16,7 @@ func RegisterStorageRouter(router *gin.Engine) {
 
 			// 文件和目录操作接口
 			storageTypeRouter.POST("/mkdir", StorageMkdir)
+			storageTypeRouter.POST("/rename", StorageRename)
 			storageTypeRouter.DELETE("/delete", StorageDelete)
 
 			// 文件传输接口

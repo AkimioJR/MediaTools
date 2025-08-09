@@ -30,3 +30,8 @@ type LibraryArchiveMediaRequest struct {
 	TransferType TransferType    `json:"transfer_type"`
 	NeedScrape   bool            `json:"need_scrape"`
 }
+
+type RenameRequest struct {
+	Path    string `json:"path" binding:"required"`
+	NewName string `json:"new_name" binding:"required"`
+}
