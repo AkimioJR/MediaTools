@@ -50,7 +50,16 @@ func UpdateTMDB(ctx *gin.Context) {
 		return
 	}
 
+	oldConfig := config.TMDB
 	config.TMDB = req
+
+	err = tmdb_controller.Init()
+	if err != nil {
+		resp.Message = "初始化 TMDB 控制器失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, resp)
+		goto initErr
+	}
+
 	err = config.WriteConfig()
 	if err != nil {
 		resp.Message = "更新配置失败: " + err.Error()
@@ -58,14 +67,12 @@ func UpdateTMDB(ctx *gin.Context) {
 		return
 	}
 
-	err = tmdb_controller.Init()
-	if err != nil {
-		resp.Message = "初始化 TMDB 控制器失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
-		return
-	}
-
 	resp.Data = config.TMDB
 	resp.Success = true
 	ctx.JSON(http.StatusOK, resp)
+	return
+
+initErr:
+	config.TMDB = oldConfig
+	tmdb_controller.Init()
 }

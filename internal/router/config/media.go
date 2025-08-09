@@ -50,7 +50,15 @@ func UpdateMediaLibrary(ctx *gin.Context) {
 		return
 	}
 
+	oldConfig := config.Media.Libraries
 	config.Media.Libraries = req
+	err = media_controller.Init()
+	if err != nil {
+		resp.Message = "初始化 Media 控制器失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, resp)
+		goto initErr
+	}
+
 	err = config.WriteConfig()
 	if err != nil {
 		resp.Message = "更新配置失败: " + err.Error()
@@ -58,16 +66,13 @@ func UpdateMediaLibrary(ctx *gin.Context) {
 		return
 	}
 
-	err = media_controller.Init()
-	if err != nil {
-		resp.Message = "初始化 Media 控制器失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
-		return
-	}
-
 	resp.Data = config.Media.Libraries
 	resp.Success = true
 	ctx.JSON(http.StatusOK, resp)
+	return
+initErr:
+	config.Media.Libraries = oldConfig
+	media_controller.Init()
 }
 
 // @BasePath /config/media
@@ -111,7 +116,14 @@ func UpdateMediaFormat(ctx *gin.Context) {
 		return
 	}
 
+	oldConfig := config.Media.Format
 	config.Media.Format = req
+	err = media_controller.InitFormatTemplates()
+	if err != nil {
+		resp.Message = "初始化格式模板失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, resp)
+		goto initErr
+	}
 	err = config.WriteConfig()
 	if err != nil {
 		resp.Message = "更新配置失败: " + err.Error()
@@ -119,16 +131,13 @@ func UpdateMediaFormat(ctx *gin.Context) {
 		return
 	}
 
-	err = media_controller.InitFormatTemplates()
-	if err != nil {
-		resp.Message = "初始化格式模板失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
-		return
-	}
-
 	resp.Data = config.Media.Format
 	resp.Success = true
 	ctx.JSON(http.StatusOK, resp)
+	return
+initErr:
+	config.Media.Format = oldConfig
+	media_controller.Init()
 }
 
 // @BasePath /config/media
@@ -172,7 +181,15 @@ func UpdateCustomWord(ctx *gin.Context) {
 		return
 	}
 
+	oldConfig := config.Media.CustomWord
 	config.Media.CustomWord = req
+	err = media_controller.InitCustomWord()
+	if err != nil {
+		resp.Message = "初始化自定义词失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, resp)
+		goto initErr
+	}
+
 	err = config.WriteConfig()
 	if err != nil {
 		resp.Message = "更新配置失败: " + err.Error()
@@ -180,14 +197,11 @@ func UpdateCustomWord(ctx *gin.Context) {
 		return
 	}
 
-	err = media_controller.InitCustomWord()
-	if err != nil {
-		resp.Message = "初始化自定义词失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
-		return
-	}
-
 	resp.Data = config.Media.CustomWord
 	resp.Success = true
 	ctx.JSON(http.StatusOK, resp)
+	return
+initErr:
+	config.Media.CustomWord = oldConfig
+	media_controller.Init()
 }

@@ -50,7 +50,15 @@ func UpdateFanart(ctx *gin.Context) {
 		return
 	}
 
+	oldConfig := config.Fanart
 	config.Fanart = req
+	err = fanart_controller.Init()
+	if err != nil {
+		resp.Message = "初始化 Fanart 控制器失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, resp)
+		goto initErr
+	}
+
 	err = config.WriteConfig()
 	if err != nil {
 		resp.Message = "更新配置失败: " + err.Error()
@@ -58,14 +66,11 @@ func UpdateFanart(ctx *gin.Context) {
 		return
 	}
 
-	err = fanart_controller.Init()
-	if err != nil {
-		resp.Message = "初始化 Fanart 控制器失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
-		return
-	}
-
 	resp.Data = config.Fanart
 	resp.Success = true
 	ctx.JSON(http.StatusOK, resp)
+	return
+initErr:
+	config.Fanart = oldConfig
+	fanart_controller.Init()
 }
