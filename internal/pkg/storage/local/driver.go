@@ -1,6 +1,7 @@
 package local
 
 import (
+	"MediaTools/internal/errs"
 	"MediaTools/internal/schemas"
 	"io"
 	"os"
@@ -39,6 +40,10 @@ func (s *LocalStorage) Mkdir(path string) error {
 
 func (s *LocalStorage) Delete(path string) error {
 	return os.RemoveAll(path)
+}
+
+func (s *LocalStorage) Rename(oldPath string, newName string) error {
+	return errs.ErrStorageProvideNoSupport
 }
 
 func (s *LocalStorage) CreateFile(path string, reader io.Reader) error {
