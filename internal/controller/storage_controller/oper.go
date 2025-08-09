@@ -4,6 +4,7 @@ import (
 	"MediaTools/internal/errs"
 	"MediaTools/internal/schemas"
 	"io"
+	"path/filepath"
 )
 
 func Exists(file *schemas.FileInfo) (bool, error) {
@@ -26,6 +27,25 @@ func Mkdir(file *schemas.FileInfo) error {
 		return errs.ErrStorageProviderNotFound
 	}
 	return provider.Mkdir(file.Path)
+}
+
+func Rename(file *schemas.FileInfo, newName string) error {
+	lock.RLock()
+	defer lock.RUnlock()
+
+	provider, exists := getStorageProvider(file.StorageType)
+	if !exists {
+		return errs.ErrStorageProviderNotFound
+	}
+	err := provider.Rename(file.Path, newName)
+	switch err {
+	case nil:
+		return nil
+	case errs.ErrStorageProvideNoSupport: // 如果不支持重命名，则尝试使用移动的方式
+		return provider.Move(file.Path, filepath.Join(filepath.Dir(file.Path), newName))
+	default:
+		return err
+	}
 }
 
 func Delete(file *schemas.FileInfo) error {
