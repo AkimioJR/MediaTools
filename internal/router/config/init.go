@@ -19,8 +19,8 @@ func RegisterConfigRouter(router *gin.Engine) {
 
 		mediaRouter := configRouter.Group("/media")
 		{
-			mediaRouter.GET("/library", MediaLibrary)
-			mediaRouter.POST("/library", UpdateMediaLibrary)
+			mediaRouter.GET("/libraries", MediaLibrary)
+			mediaRouter.POST("/libraries", UpdateMediaLibrary)
 
 			mediaRouter.GET("/format", MediaFormat)
 			mediaRouter.POST("/format", UpdateMediaFormat)

@@ -10,7 +10,7 @@ import (
 )
 
 // @BasePath /config/media
-// @Router library [get]
+// @Router libraries [get]
 // @Summary 获取媒体库配置
 // @Description 获取媒体库配置
 // @Tags config
@@ -27,7 +27,7 @@ func MediaLibrary(ctx *gin.Context) {
 }
 
 // @BasePath /config/media
-// @Router library [post]
+// @Router libraries [post]
 // @Summary 更新媒体库配置
 // @Description 更新媒体库配置
 // @Tags config
