@@ -1,10 +1,11 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 
-	"gopkg.in/yaml.v3"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -27,36 +28,27 @@ var (
 )
 
 func Init() error {
-	var c Configuration
 	file, err := os.OpenFile(ConfigFile, os.O_RDONLY, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	if err := yaml.NewDecoder(file).Decode(&c); err != nil {
-		return err
-	}
+	switch {
+	case err == nil:
+		defer file.Close()
+		return parseConfig(file)
 
-	Log = c.Log
-	TMDB = c.TMDB
-	Fanart = c.Fanart
-	Media = c.Media
-	return nil
+	case os.IsNotExist(err):
+		logrus.Warning("配置文件不存在，使用默认配置")
+		return initDefaultConfig()
+
+	default:
+		return fmt.Errorf("打开配置文件失败: %w", err)
+	}
 }
 
 func WriteConfig() error {
-	var c Configuration
-	c.Log = Log
-	c.TMDB = TMDB
-	c.Fanart = Fanart
-	c.Media = Media
-	file, err := os.Create(ConfigFile)
-	if err != nil {
-		return err
+	var c = Configuration{
+		Log:    Log,
+		TMDB:   TMDB,
+		Fanart: Fanart,
+		Media:  Media,
 	}
-	defer file.Close()
-	if err := yaml.NewEncoder(file).Encode(&c); err != nil {
-		return err
-	}
-	return nil
+	return writeConfig(c)
 }
