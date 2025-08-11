@@ -2,12 +2,13 @@ package logging
 
 import (
 	"MediaTools/internal/config"
+	"MediaTools/internal/pkg/loghook"
 
 	"github.com/sirupsen/logrus"
 )
 
 var (
-	recentLogsHook = NewRecentLogsHook(100)
+	recentLogsHook = loghook.NewRecentLogsHook(100)
 )
 
 func Init() error {
@@ -20,10 +21,10 @@ func Init() error {
 	return nil
 }
 
-func SetLevel(level config.LogLevel) {
+func SetLevel(level loghook.LogLevel) {
 	logrus.SetLevel(level.ToLogrusLevel())
 }
 
-func GetRecentLogs() []LogDetail {
+func GetRecentLogs() []loghook.LogDetail {
 	return recentLogsHook.GetRecentLogs()
 }

@@ -2,6 +2,7 @@ package log
 
 import (
 	"MediaTools/internal/logging"
+	"MediaTools/internal/pkg/loghook"
 	"MediaTools/internal/schemas"
 	"net/http"
 
@@ -15,11 +16,11 @@ import (
 // @Tags log
 // @Accept json
 // @Produce json
-// @Success 200 {object} schemas.Response[[]logging.LogDetail]
-// @Failure 400 {object} schemas.Response[[]logging.LogDetail]
-// @Failure 500 {object} schemas.Response[[]logging.LogDetail]
+// @Success 200 {object} schemas.Response[[]loghook.LogDetail]
+// @Failure 400 {object} schemas.Response[[]loghook.LogDetail]
+// @Failure 500 {object} schemas.Response[[]loghook.LogDetail]
 func GetRecentLogs(ctx *gin.Context) {
-	var resp schemas.Response[[]logging.LogDetail]
+	var resp schemas.Response[[]loghook.LogDetail]
 	resp.Data = logging.GetRecentLogs()
 	resp.Success = true
 	ctx.JSON(http.StatusOK, resp)

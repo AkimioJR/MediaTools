@@ -1,24 +1,16 @@
-package logging
+package loghook
 
 import (
 	"sync"
-	"time"
 
 	"github.com/sirupsen/logrus"
 )
-
-type LogDetail struct {
-	Level   logrus.Level `json:"level"`   // 日志级别
-	Message string       `json:"message"` // 日志消息
-	Time    time.Time    `json:"time"`    // 日志时间
-	Caller  string       `json:"caller"`  // 日志调用者
-}
 
 type RecentLogsHook struct {
 	logs  []LogDetail
 	size  uint
 	index uint
-	mu    sync.Mutex
+	lock  sync.RWMutex
 }
 
 func NewRecentLogsHook(size uint) *RecentLogsHook {
@@ -29,8 +21,8 @@ func NewRecentLogsHook(size uint) *RecentLogsHook {
 }
 
 func (h *RecentLogsHook) Fire(entry *logrus.Entry) error {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.lock.Lock()
+	defer h.lock.Unlock()
 	h.logs[h.index] = LogDetail{ // 直接存储结构体值
 		Level:   entry.Level,
 		Message: entry.Message,
@@ -47,8 +39,9 @@ func (h *RecentLogsHook) Levels() []logrus.Level {
 
 // 获取最新日志
 func (h *RecentLogsHook) GetRecentLogs() []LogDetail {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.lock.RLock()
+	defer h.lock.RUnlock()
+
 	result := make([]LogDetail, 0, h.size)
 	for i := uint(0); i < h.size; i++ {
 		idx := (h.index - 1 - i + h.size) % h.size

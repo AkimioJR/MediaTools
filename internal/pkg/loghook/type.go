@@ -1,12 +1,20 @@
-package config
+package loghook
 
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
+
+type LogDetail struct {
+	Level   logrus.Level `json:"level"`   // 日志级别
+	Message string       `json:"message"` // 日志消息
+	Time    time.Time    `json:"time"`    // 日志时间
+	Caller  string       `json:"caller"`  // 日志调用者
+}
 
 type LogLevel uint32
 
