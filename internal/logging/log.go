@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	recentLogsHook = NewRecentLogsHook(10)
+	recentLogsHook = NewRecentLogsHook(100)
 )
 
 func Init() error {
