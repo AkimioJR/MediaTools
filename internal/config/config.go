@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"runtime"
 
 	"gopkg.in/yaml.v3"
 )
@@ -11,10 +12,18 @@ const (
 )
 
 var (
-	Log    LogConfig
-	TMDB   TMDBConfig
-	Fanart FanartConfig
-	Media  MediaConfig
+	Log     LogConfig
+	TMDB    TMDBConfig
+	Fanart  FanartConfig
+	Media   MediaConfig
+	Version = VersionInfo{
+		AppVersion: appVersion,
+		CommitHash: commitHash,
+		BuildDate:  parseBuildTime(buildDate),
+		GoVersion:  runtime.Version(),
+		OS:         runtime.GOOS,
+		Arch:       runtime.GOARCH,
+	}
 )
 
 func Init() error {
