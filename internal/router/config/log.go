@@ -51,11 +51,21 @@ func UpdateLog(ctx *gin.Context) {
 		return
 	}
 
-	logrus.Debug("更新日志配置: ", req)
-	logging.SetLevel(req.Level)
+	oldConfig := config.Log
 	config.Log = req
+	logrus.Debug("开始更新日志配置: ", req)
+	err = logging.Init()
+	if err != nil {
+		logrus.Error("更新日志配置失败: ", err)
+		resp.Message = "更新日志配置失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, resp)
+		config.Log = oldConfig
+		logging.Init()
+	}
+	logrus.Debug("日志配置更新成功: ", config.Log)
+
+	logrus.Debug("开始更新配置文件")
 	err = config.WriteConfig()
-	// logging.Init()
 	if err != nil {
 		resp.Message = "更新配置失败: " + err.Error()
 		ctx.JSON(http.StatusInternalServerError, resp)
