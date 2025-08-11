@@ -8,15 +8,21 @@ import (
 )
 
 var (
-	recentLogsHook = loghook.NewRecentLogsHook(100)
+	historyLogsHook = loghook.NewMemoryHistoryHook(100)
+	fileHook        = loghook.NewFileLogsHook("logs")
 )
 
-func Init() error {
-	setting := &serviceLoggerSetting{}
-	logrus.SetFormatter(setting)
-	logrus.AddHook(setting)
-	logrus.AddHook(recentLogsHook)
+func init() {
 	logrus.SetReportCaller(true) // 启用调用者信息
+
+	f := &Formater{}
+	logrus.SetFormatter(f)
+
+	logrus.AddHook(fileHook)
+	logrus.AddHook(historyLogsHook)
+}
+func Init() error {
+	fileHook.LogDir = config.Log.Path
 	SetLevel(config.Log.Level)
 	return nil
 }
@@ -26,5 +32,5 @@ func SetLevel(level loghook.LogLevel) {
 }
 
 func GetRecentLogs() []loghook.LogDetail {
-	return recentLogsHook.GetRecentLogs()
+	return historyLogsHook.GetRecentLogs()
 }
