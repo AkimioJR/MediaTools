@@ -15,11 +15,11 @@ import (
 // @Tags log
 // @Accept json
 // @Produce json
-// @Success 200 {object} schemas.Response[[]string]
-// @Failure 400 {object} schemas.Response[[]string]
-// @Failure 500 {object} schemas.Response[[]string]
+// @Success 200 {object} schemas.Response[[]logging.LogDetail]
+// @Failure 400 {object} schemas.Response[[]logging.LogDetail]
+// @Failure 500 {object} schemas.Response[[]logging.LogDetail]
 func GetRecentLogs(ctx *gin.Context) {
-	var resp schemas.Response[[]string]
+	var resp schemas.Response[[]logging.LogDetail]
 	resp.Data = logging.GetRecentLogs()
 	resp.Success = true
 	ctx.JSON(http.StatusOK, resp)

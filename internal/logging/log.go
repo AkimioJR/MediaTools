@@ -24,6 +24,6 @@ func SetLevel(level config.LogLevel) {
 	logrus.SetLevel(level.ToLogrusLevel())
 }
 
-func GetRecentLogs() []string {
+func GetRecentLogs() []LogDetail {
 	return recentLogsHook.GetRecentLogs()
 }
