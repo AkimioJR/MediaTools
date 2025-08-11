@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,6 +31,7 @@ func center(s string, width int, fill string) string {
 	return strings.Repeat(fill, leftPadding) + s + strings.Repeat(fill, rightPadding)
 }
 func init() {
+	gin.SetMode(gin.ReleaseMode)
 	fmt.Println(LOGO)
 	fmt.Println(center(fmt.Sprintf(" MediaWarp %s ", config.Version.AppVersion), 81, "="))
 }
