@@ -32,11 +32,11 @@ func (h *RecentLogsHook) Levels() []logrus.Level {
 	return logrus.AllLevels
 }
 
-// 获取最新10条日志
+// 获取最新日志
 func (h *RecentLogsHook) GetRecentLogs() []string {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	result := make([]string, 0, 10)
+	result := make([]string, 0, h.size)
 	for i := range h.logs {
 		idx := (h.index - 1 - uint(i) + h.size) % h.size
 		if h.logs[idx] != "" {
