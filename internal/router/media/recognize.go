@@ -29,7 +29,7 @@ func Recognize(ctx *gin.Context) {
 	}
 	logrus.Infof("正在识别媒体：%s", title)
 	videoMeta := media_controller.ParseVideoMeta(title)
-	mediaInfo, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta, nil, nil)
+	mediaInfo, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
 	if err != nil {
 		resp.Message = "识别失败: " + err.Error()
 		ctx.JSON(http.StatusInternalServerError, resp)

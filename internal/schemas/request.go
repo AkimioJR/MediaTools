@@ -20,8 +20,8 @@ type TransferRequest struct {
 
 type ScrapeRequest struct {
 	DstFile   FileInfoRequest `json:"dst_file" binding:"required"`
-	MediaType *meta.MediaType `json:"media_type,omitempty"`
-	TMDBID    *int            `json:"tmdb_id,omitempty"`
+	MediaType meta.MediaType  `json:"media_type,omitempty"`
+	TMDBID    int             `json:"tmdb_id,omitempty"`
 }
 
 type LibraryArchiveMediaRequest struct {

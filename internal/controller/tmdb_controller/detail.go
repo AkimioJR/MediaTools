@@ -8,50 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// 搜索tmdb中所有的标题和译名
-func getNames(tmdbID int, mtype meta.MediaType) ([]string, error) {
-	lock.RLock()
-	defer lock.RUnlock()
-
-	var names []string
-
-	switch mtype {
-	case meta.MediaTypeMovie:
-		titleResp, err := client.GetMovieAlternativeTitle(tmdbID, nil)
-		if err != nil {
-			return nil, fmt.Errorf("获取电影「%d」的其他标题失败: %v", tmdbID, err)
-		}
-		translationResp, err := client.GetMovieTranslation(tmdbID)
-		if err != nil {
-			return nil, fmt.Errorf("获取电影「%d」的翻译失败: %v", tmdbID, err)
-		}
-		for _, title := range titleResp.Titles {
-			names = append(names, title.Title)
-		}
-		for _, translation := range translationResp.Translations {
-			names = append(names, translation.Data.Title)
-		}
-	case meta.MediaTypeTV:
-		titleResp, err := client.GetTVSerieAlternativeTitle(tmdbID, nil)
-		if err != nil {
-			return nil, fmt.Errorf("获取电视剧「%d」的其他标题失败: %v", tmdbID, err)
-		}
-		translationResp, err := client.GetTVSerieTranslation(tmdbID)
-		if err != nil {
-			return nil, fmt.Errorf("获取电视剧「%d」的翻译失败: %v", tmdbID, err)
-		}
-		for _, title := range titleResp.Results {
-			names = append(names, title.Title)
-		}
-		for _, translation := range translationResp.Translations {
-			names = append(names, translation.Data.Name)
-		}
-	default:
-		return nil, fmt.Errorf("不支持的媒体类型: 「%s」", mtype.String())
-	}
-	return names, nil
-}
-
 func GetMovieDetail(movieID int) (*schemas.MediaInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()

@@ -2,6 +2,7 @@ package scrape
 
 import (
 	"MediaTools/internal/controller/scrape_controller"
+	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
 	"net/http"
 
@@ -40,12 +41,12 @@ func Video(ctx *gin.Context) {
 	}
 
 	switch {
-	case req.MediaType != nil && req.TMDBID != nil:
-		logrus.Infof("开始刮削视频：%s，媒体类型：%s，TMDB ID：%d", dstFile.String(), req.MediaType, *req.TMDBID)
-	case req.MediaType != nil:
+	case req.MediaType != meta.MediaTypeUnknown && req.TMDBID != 0:
+		logrus.Infof("开始刮削视频：%s，媒体类型：%s，TMDB ID：%d", dstFile.String(), req.MediaType, req.TMDBID)
+	case req.MediaType != meta.MediaTypeUnknown:
 		logrus.Infof("开始刮削视频：%s，媒体类型：%s", dstFile.String(), req.MediaType)
-	case req.TMDBID != nil:
-		logrus.Infof("开始刮削视频：%s，TMDB ID：%d", dstFile.String(), *req.TMDBID)
+	case req.TMDBID != 0:
+		logrus.Infof("开始刮削视频：%s，TMDB ID：%d", dstFile.String(), req.TMDBID)
 	default:
 		logrus.Infof("开始刮削视频：%s", dstFile.String())
 	}

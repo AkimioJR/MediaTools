@@ -52,7 +52,7 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 
 	logrus.Info("正在解析视频元数据：", srcFile.Name)
 	videoMeta := media_controller.ParseVideoMeta(srcFile.Name)
-	info, err := tmdb_controller.RecognizeMedia(videoMeta, nil, nil)
+	info, err := tmdb_controller.RecognizeMedia(videoMeta)
 	if err != nil {
 		resp.Message = "识别媒体信息失败: " + err.Error()
 		ctx.JSON(http.StatusInternalServerError, resp)
