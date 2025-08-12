@@ -40,11 +40,12 @@ func (f *Formater) Format(entry *logrus.Entry) ([]byte, error) {
 
 	fmt.Fprintf(
 		b,
-		"\033[3%dm【%s】\033[0m %s | %s - %s\n", // 长度需要算是上控制字符的长度
+		"\033[3%dm【%s】\033[0m %s | %s:%d - %s\n", // 长度需要算是上控制字符的长度
 		colorCode,
 		strings.ToUpper(entry.Level.String()),
 		formatTime,
 		entry.Caller.Function,
+		entry.Caller.Line,
 		entry.Message,
 	)
 	return b.Bytes(), nil
