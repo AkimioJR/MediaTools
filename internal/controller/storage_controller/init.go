@@ -73,6 +73,15 @@ func ListStorageProviders() []schemas.StorageProviderItem {
 	return providers
 }
 
+func GetStorageProvider(storageType schemas.StorageType) (*schemas.StorageProviderItem, error) {
+	provider, exists := getStorageProvider(storageType)
+	if !exists {
+		return nil, fmt.Errorf("存储器 %s 不存在", storageType)
+	}
+	item := schemas.NewStorageProviderItem(provider)
+	return &item, nil
+}
+
 func UnRegisterStorageProvider(storageType schemas.StorageType) (*schemas.StorageProviderItem, error) {
 	lock.Lock()
 	defer lock.Unlock()
