@@ -18,8 +18,7 @@ const LOGO = `
 ██╔████╔██║█████╗  ██║  ██║██║███████║   ██║   ██║   ██║██║   ██║██║     ███████╗
 ██║╚██╔╝██║██╔══╝  ██║  ██║██║██╔══██║   ██║   ██║   ██║██║   ██║██║     ╚════██║
 ██║ ╚═╝ ██║███████╗██████╔╝██║██║  ██║   ██║   ╚██████╔╝╚██████╔╝███████╗███████║
-╚═╝     ╚═╝╚══════╝╚═════╝ ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚══════╝
-                                                                                 `
+╚═╝     ╚═╝╚══════╝╚═════╝ ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚══════╝`
 
 func center(s string, width int, fill string) string {
 	if len(s) >= width {
@@ -30,8 +29,10 @@ func center(s string, width int, fill string) string {
 	rightPadding := padding - leftPadding
 	return strings.Repeat(fill, leftPadding) + s + strings.Repeat(fill, rightPadding)
 }
+
 func init() {
 	gin.SetMode(gin.ReleaseMode)
+	fmt.Print("\033[2J") // 清屏
 	fmt.Println(LOGO)
 	fmt.Println(center(fmt.Sprintf(" MediaWarp %s ", config.Version.AppVersion), 81, "="))
 }
