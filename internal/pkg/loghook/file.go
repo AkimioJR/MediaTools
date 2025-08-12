@@ -21,7 +21,7 @@ type FileLogsHook struct {
 	wg        sync.WaitGroup
 }
 
-func NewFileLogsHook(logDir string) *FileLogsHook {
+func NewFileLogsHook(logDir string) (*FileLogsHook, error) {
 	fh := FileLogsHook{
 		logDir: logDir,
 		ch:     make(chan *logrus.Entry, chanSize),
@@ -31,8 +31,12 @@ func NewFileLogsHook(logDir string) *FileLogsHook {
 			DisableHTMLEscape: true,          // 禁用 HTML 转义
 		},
 	}
+	err := os.MkdirAll(logDir, 0755) // 确保日志目录存在
+	if err != nil {
+		return nil, fmt.Errorf("create log directory failed: %v", err)
+	}
 	go fh.writeLog()
-	return &fh
+	return &fh, nil
 }
 
 // Close 方法用于关闭文件和通道，确保资源被正确释放，避免协程泄漏
@@ -45,12 +49,17 @@ func (f *FileLogsHook) Close() {
 	}
 }
 
-func (f *FileLogsHook) ChangeLogDir(logDir string) {
+func (f *FileLogsHook) ChangeLogDir(logDir string) error {
+	err := os.MkdirAll(logDir, 0755) // 确保新日志目录存在
+	if err != nil {
+		return fmt.Errorf("create log directory failed: %v", err)
+	}
 	f.Close()
 	f.logDir = logDir
 	f.day = 0
 	f.ch = make(chan *logrus.Entry, chanSize)
 	go f.writeLog()
+	return nil
 }
 
 // writeLog 是一个协程，用于异步写入日志到文件，避免并发写入问题

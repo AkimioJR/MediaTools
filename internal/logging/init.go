@@ -8,11 +8,17 @@ import (
 )
 
 var (
-	historyLogsHook = loghook.NewMemoryHistoryHook(100)
-	fileHook        = loghook.NewFileLogsHook("logs")
+	historyLogsHook *loghook.MemoryHistoryHook
+	fileHook        *loghook.FileLogsHook
 )
 
 func init() {
+	var err error
+	historyLogsHook = loghook.NewMemoryHistoryHook(100)      // 初始化内存历史日志钩子
+	fileHook, err = loghook.NewFileLogsHook(config.Log.Path) // 初始化文件日志钩子
+	if err != nil {
+		panic("初始化文件日志钩子失败: " + err.Error())
+	}
 	logrus.SetReportCaller(true) // 启用调用者信息
 
 	f := &Formater{}
