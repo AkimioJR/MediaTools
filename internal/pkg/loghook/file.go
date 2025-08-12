@@ -11,18 +11,22 @@ import (
 )
 
 type FileLogsHook struct {
-	LogDir string
-	file   *os.File
-	day    int                // 用于跟踪当前日志文件的日期
-	path   string             // 用于跟踪当前日志文件路径
-	ch     chan *logrus.Entry // 用于异步写入日志
-	wg     sync.WaitGroup     // 用于等待写入协程结束
+	LogDir    string
+	file      *os.File
+	day       int                // 用于跟踪当前日志文件的日期
+	path      string             // 用于跟踪当前日志文件路径
+	ch        chan *logrus.Entry // 用于异步写入日志
+	wg        sync.WaitGroup     // 用于等待写入协程结束
+	formatter logrus.Formatter   // 日志格式化器
 }
 
 func NewFileLogsHook(logDir string) *FileLogsHook {
 	fh := FileLogsHook{
 		LogDir: logDir,
 		ch:     make(chan *logrus.Entry, 500), // 缓冲通道，用于异步写入日志
+		formatter: &logrus.JSONFormatter{
+			TimestampFormat: time.DateTime,
+		},
 	}
 	go fh.writeLog() // 启动日志写入协程
 	return &fh
@@ -54,11 +58,7 @@ func (f *FileLogsHook) writeLog() {
 				f.wg.Done() // 结束当前日志条目的等待
 				continue
 			}
-			formatter := &logrus.JSONFormatter{
-				TimestampFormat: time.DateTime,
-			}
-
-			logData, err := formatter.Format(entry)
+			logData, err := f.formatter.Format(entry)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "format log entry failed: %v", err)
 				f.wg.Done() // 结束当前日志条目的等待
