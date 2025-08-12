@@ -26,8 +26,9 @@ func NewFileLogsHook(logDir string) *FileLogsHook {
 		logDir: logDir,
 		ch:     make(chan *logrus.Entry, chanSize),
 		formatter: &logrus.JSONFormatter{
-			TimestampFormat: time.DateTime,
-			PrettyPrint:     true,
+			TimestampFormat:   time.DateTime, // 使用标准时间格式
+			PrettyPrint:       true,          // 设置为 true 以启用格式化
+			DisableHTMLEscape: true,          // 禁用 HTML 转义
 		},
 	}
 	go fh.writeLog()
@@ -70,13 +71,19 @@ func (f *FileLogsHook) writeLog() {
 				continue
 			}
 		}
-		logData, err := f.formatter.Format(entry)
+
+		entryCopy := *entry    // 创建一个副本以避免修改原始条目
+		entryCopy.Buffer = nil // 清空 Buffer 以确保使用 JSON 格式化器重新格式化
+
+		logData, err := f.formatter.Format(&entryCopy)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "format log entry failed: %v", err)
 			continue
 		}
-		f.file.Write(logData)
 
+		if _, err := f.file.Write(logData); err != nil {
+			fmt.Fprintf(os.Stderr, "write log to file failed: %v", err)
+		}
 	}
 }
 
