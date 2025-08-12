@@ -22,7 +22,7 @@ func init() {
 	logrus.AddHook(historyLogsHook)
 }
 func Init() error {
-	fileHook.LogDir = config.Log.Path
+	fileHook.ChangeLogDir(config.Log.Path) // 设置日志目录
 	return SetLevel(config.Log.Level)
 }
 
