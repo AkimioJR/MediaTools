@@ -5,6 +5,8 @@ import (
 	"MediaTools/internal/outbound"
 	"MediaTools/internal/pkg/themoviedb/v3"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -16,6 +18,7 @@ func Init() error {
 	lock.Lock()
 	defer lock.Unlock()
 
+	logrus.Info("开始初始化 TMDB Controller...")
 	var opts []themoviedb.ClientOptions
 	if config.TMDB.Language != "" {
 		opts = append(opts, themoviedb.CustomLanguage(config.TMDB.Language))
@@ -31,8 +34,12 @@ func Init() error {
 	}
 	opts = append(opts, themoviedb.CustomHTTPClient(outbound.GetHTTPClient()))
 
-	var err error
-	client, err = themoviedb.NewClient(config.TMDB.ApiKey, opts...)
-	return err
+	c, err := themoviedb.NewClient(config.TMDB.ApiKey, opts...)
+	if err != nil {
+		return err
+	}
+	client = c
+	logrus.Info("TMDB Controller 初始化完成")
+	return nil
 
 }

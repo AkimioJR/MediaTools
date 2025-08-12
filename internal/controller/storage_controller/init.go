@@ -4,6 +4,8 @@ import (
 	"MediaTools/internal/pkg/storage/local"
 	"MediaTools/internal/schemas"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -15,6 +17,7 @@ func Init() error {
 	lock.Lock()
 	defer lock.Unlock()
 
+	logrus.Info("开始初始化 Storage Controller...")
 	// 注册本地存储提供者
 	localStorage := &local.LocalStorage{}
 	err := localStorage.Init(nil)
@@ -23,6 +26,7 @@ func Init() error {
 	}
 	storageProviders[schemas.StorageLocal] = localStorage
 
+	logrus.Info("Storage Controller 初始化完成")
 	return nil
 }
 
