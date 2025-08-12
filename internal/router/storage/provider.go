@@ -10,14 +10,14 @@ import (
 )
 
 // @BasePath /storage
-// @Route /list [get]
+// @Route /provider [get]
 // @Summary 获取存储提供者列表
 // @Description 返回所有已注册的存储提供者列表
 // @Tags storage
 // @Products json
 // @Success 200 {object} schemas.Response[[]schemas.StorageProviderItem]
 // @Failure 500 {object} schemas.Response[[]schemas.StorageProviderItem]
-func StorageProviderList(ctx *gin.Context) {
+func ProviderList(ctx *gin.Context) {
 	var resp schemas.Response[[]schemas.StorageProviderItem]
 
 	resp.Data = storage_controller.ListStorageProviders()

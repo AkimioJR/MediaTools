@@ -5,7 +5,10 @@ import "github.com/gin-gonic/gin"
 func RegisterStorageRouter(router *gin.Engine) {
 	storageRouter := router.Group("/storage") // 存储相关接口
 	{
-		storageRouter.GET("/list", StorageProviderList) // 基础信息接口
+		providerRouter := storageRouter.Group("/provider") // 存储提供者相关接口
+		{
+			providerRouter.GET("", ProviderList) // 获取存储提供者列表
+		}
 
 		storageTypeRouter := storageRouter.Group("/:storage_type") // 按存储类型分组的API
 		{
