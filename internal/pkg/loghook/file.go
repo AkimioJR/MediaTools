@@ -14,8 +14,6 @@ const chanSize = 500 // 缓冲通道大小
 
 type FileLogsHook struct {
 	logDir    string
-	file      *os.File // 当前日志文件句柄
-	day       int      // 用于记录当前日志文件的日期
 	ch        chan *logrus.Entry
 	formatter logrus.Formatter
 	wg        sync.WaitGroup
@@ -26,16 +24,9 @@ func NewFileLogsHook(logDir string) (*FileLogsHook, error) {
 		logDir: logDir,
 		ch:     make(chan *logrus.Entry, chanSize),
 		formatter: &logrus.JSONFormatter{
-			TimestampFormat:   time.DateTime, // 使用标准时间格式
-			PrettyPrint:       true,          // 设置为 true 以启用格式化
-			DisableHTMLEscape: true,          // 禁用 HTML 转义
+			TimestampFormat: time.DateTime, // 使用标准时间格式
+			PrettyPrint:     true,          // 设置为 true 以启用格式化
 		},
-	}
-	if logDir != "" {
-		err := os.MkdirAll(logDir, 0755) // 确保日志目录存在
-		if err != nil {
-			return nil, fmt.Errorf("create log directory '%s' failed: %v", logDir, err)
-		}
 	}
 	go fh.writeLog()
 	return &fh, nil
@@ -45,20 +36,11 @@ func NewFileLogsHook(logDir string) (*FileLogsHook, error) {
 func (f *FileLogsHook) Close() {
 	close(f.ch) // 关闭通道
 	f.wg.Wait() // 等待协程退出
-	if f.file != nil {
-		f.file.Close()
-		f.file = nil // 清空文件句柄
-	}
 }
 
 func (f *FileLogsHook) ChangeLogDir(logDir string) error {
-	err := os.MkdirAll(logDir, 0755) // 确保新日志目录存在
-	if err != nil {
-		return fmt.Errorf("create log directory failed: %v", err)
-	}
 	f.Close()
 	f.logDir = logDir
-	f.day = 0
 	f.ch = make(chan *logrus.Entry, chanSize)
 	go f.writeLog()
 	return nil
@@ -66,17 +48,32 @@ func (f *FileLogsHook) ChangeLogDir(logDir string) error {
 
 // writeLog 是一个协程，用于异步写入日志到文件，避免并发写入问题
 func (f *FileLogsHook) writeLog() {
+	var (
+		file *os.File
+		err  error
+		day  = 0
+	)
+
 	f.wg.Add(1)
-	defer f.wg.Done()
+	defer func() {
+		f.wg.Done()
+		if file != nil {
+			file.Close() // 确保文件在退出时被关闭
+		}
+	}()
+
 	for entry := range f.ch {
-		if f.day != entry.Time.Day() || f.file == nil {
-			if f.file != nil {
-				f.file.Close()
+		if day != entry.Time.Day() || file == nil && f.logDir != "" {
+			if file != nil {
+				file.Close()
 			}
-			f.day = entry.Time.Day()
-			var err error
+			day = entry.Time.Day()
+			err = os.MkdirAll(f.logDir, 0755) // 确保新日志目录存在
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "create log directory failed: %v", err)
+			}
 			path := filepath.Join(f.logDir, entry.Time.Local().Format("2006-01-02")+".log")
-			f.file, err = os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+			file, err = os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "open log file '%s' failed: %v", path, err)
 				continue
@@ -93,7 +90,8 @@ func (f *FileLogsHook) writeLog() {
 			continue
 		}
 
-		if _, err := f.file.Write(logData); err != nil {
+		_, err = file.Write(logData)
+		if err != nil {
 			fmt.Fprintf(os.Stderr, "write log to file failed: %v", err)
 		}
 	}
