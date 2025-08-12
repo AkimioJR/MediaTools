@@ -62,7 +62,10 @@ func (f *FileLogsHook) writeLog() {
 	}()
 
 	for entry := range f.ch {
-		if day != entry.Time.Day() || file == nil && f.logDir != "" {
+		if f.logDir == "" { // 如果日志目录未设置，则跳过写入
+			continue
+		}
+		if day != entry.Time.Day() || file == nil {
 			if file != nil {
 				file.Close()
 			}
