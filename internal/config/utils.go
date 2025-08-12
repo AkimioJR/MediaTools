@@ -5,17 +5,18 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
 // 解析配置文件内容
 func parseConfig(file *os.File) error {
-	var config Configuration
-	if err := yaml.NewDecoder(file).Decode(&config); err != nil {
+	var c Configuration
+	if err := yaml.NewDecoder(file).Decode(&c); err != nil {
 		return fmt.Errorf("config parse error: %w", err)
 	}
-
-	config.applyConfig()
+	c.check()
+	c.applyConfig()
 	return nil
 }
 
@@ -51,4 +52,37 @@ func (c *Configuration) writeConfig() error {
 		return err
 	}
 	return nil
+}
+
+// 检查配置的完整性
+func (c *Configuration) check() {
+	if c.Log == (LogConfig{}) {
+		logrus.Warning("日志配置未设置，使用默认配置")
+		c.Log = defaultConfig.Log
+	}
+
+	if c.TMDB.ApiURL == "" {
+		logrus.Warning("TMDB API URL 配置未设置，使用默认配置")
+		c.TMDB.ApiURL = defaultConfig.TMDB.ApiURL
+	}
+
+	if c.TMDB.ImageURL == "" {
+		logrus.Warning("TMDB 图片 API URL 配置未设置，使用默认配置")
+		c.TMDB.ImageURL = defaultConfig.TMDB.ImageURL
+	}
+
+	if c.Fanart.ApiURL == "" {
+		logrus.Warning("Fanart API URL 配置未设置，使用默认配置")
+		c.Fanart.ApiURL = defaultConfig.Fanart.ApiURL
+	}
+
+	if len(c.Storages) == 0 {
+		logrus.Warning("存储配置未设置，使用默认配置")
+		c.Storages = defaultConfig.Storages
+	}
+
+	if c.Media.Format == (FormatConfig{}) {
+		logrus.Warning("媒体格式配置未设置，使用默认配置")
+		c.Media.Format = defaultConfig.Media.Format
+	}
 }
