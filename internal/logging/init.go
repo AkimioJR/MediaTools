@@ -4,6 +4,7 @@ import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/pkg/loghook"
 	"fmt"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -16,7 +17,11 @@ var (
 func init() {
 	var err error
 	historyLogsHook = loghook.NewMemoryHistoryHook(100) // 初始化内存历史日志钩子
-	fileHook, err = loghook.NewFileLogsHook("")         // 初始化文件日志钩子
+	formatter := logrus.JSONFormatter{
+		TimestampFormat: time.DateTime, // 设置时间戳格式
+		PrettyPrint:     true,          // 启用美化输出
+	}
+	fileHook, err = loghook.NewFileLogsHook("", loghook.WithFormatter(&formatter)) // 初始化文件日志钩子
 	if err != nil {
 		panic("初始化文件日志钩子失败: " + err.Error())
 	}
