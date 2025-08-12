@@ -47,14 +47,20 @@ func ProviderRegister(ctx *gin.Context) {
 
 	logrus.Debugf("请求体: %+v", ctx.Request.Body)
 
+	storageTypeStr := ctx.Param("storage_type")
+	storageType := schemas.ParseStorageType(storageTypeStr)
+	if storageType == schemas.StorageUnknown {
+		logrus.Warningf("未知的存储类型: %s", storageTypeStr)
+		resp.Message = "未知的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, resp)
+	}
+
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		logrus.Errorf("解析请求参数失败: %v", err)
 		resp.Message = "解析请求参数失败: " + err.Error()
 		ctx.JSON(http.StatusBadRequest, resp)
 		return
 	}
-
-	storageType := schemas.ParseStorageType(ctx.Param("storage_type"))
 
 	c := config.StorageConfig{
 		Type: storageType,
