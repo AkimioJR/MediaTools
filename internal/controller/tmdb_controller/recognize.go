@@ -15,6 +15,8 @@ func RecognizeMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
+	logrus.Debug("开始识别媒体信息...")
+
 	// 如果视频元数据中包含 TMDB ID，则直接查询
 	if videoMeta.TMDBID > 0 {
 		return GetInfo(videoMeta.TMDBID, videoMeta.MediaType)
@@ -41,7 +43,7 @@ func RecognizeMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, error) {
 	return nil, fmt.Errorf("未能 %v 识别媒体信息，可能是名称不匹配或 TMDB 中没有相关数据", videoMeta.GetTitles())
 }
 
-// RecognizeAndEnrichMedia 识别媒体信息并，如果是电视剧类型，还会补充季和集的详细信息（如果有对应信息）
+// RecognizeAndEnrichMedia 识别媒体信息，如果是电视剧类型，还会补充季和集的详细信息（如果有对应信息）
 // videoMeta 识别的元数据
 // 返回识别后的媒体信息，如果是电视剧类型，还会补充季和集的详细信息
 func RecognizeAndEnrichMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, error) {
@@ -49,12 +51,16 @@ func RecognizeAndEnrichMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, err
 	if err != nil {
 		return nil, fmt.Errorf("识别媒体信息失败: %v", err)
 	}
+	logrus.Debugf("识别到媒体信息: %+v", info)
+
 	if info.MediaType == meta.MediaTypeTV {
+		logrus.Debugf("识别到电视剧类型（S%02dE%02d），开始补充季和集信息...", videoMeta.Season, videoMeta.Episode)
 		if videoMeta.Season != -1 {
 			seasonDetail, err := GetTVSeasonDetail(info.TMDBID, videoMeta.Season)
 			if err != nil {
 				return nil, fmt.Errorf("获取电视剧季信息失败: %v", err)
 			}
+			logrus.Debugf("获取到电视剧季信息: %+v", seasonDetail)
 			info.TMDBInfo.TVInfo.SeasonInfo = seasonDetail.TMDBInfo.TVInfo.SeasonInfo
 		}
 		if videoMeta.Episode != -1 {
@@ -62,8 +68,10 @@ func RecognizeAndEnrichMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, err
 			if err != nil {
 				return nil, fmt.Errorf("获取电视剧集信息失败: %v", err)
 			}
+			logrus.Debugf("获取到电视剧集信息: %+v", episodeDetail)
 			info.TMDBInfo.TVInfo.EpisodeInfo = episodeDetail.TMDBInfo.TVInfo.EpisodeInfo
 		}
 	}
+	logrus.Debugf("识别并补充媒体信息完成: %+v", info)
 	return info, nil
 }

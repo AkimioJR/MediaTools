@@ -68,10 +68,10 @@ func GetTVSeasonDetail(seriesID int, seasonNumber int) (*schemas.MediaInfo, erro
 	lock.RLock()
 	defer lock.RUnlock()
 
-	logrus.Infof("开始获取电视剧（TMDB ID: %d）第 %d 季详情", seriesID, seasonNumber)
+	logrus.Infof("开始获取电视剧（TMDB ID: %d）S%02d详情", seriesID, seasonNumber)
 	seasonDetail, err := client.GetTVSeasonDetail(seriesID, seasonNumber, nil)
 	if err != nil {
-		return nil, fmt.Errorf("获取电视剧（TMDB ID: %d）第 %d 季详情失败: %v", seriesID, seasonNumber, err)
+		return nil, fmt.Errorf("获取电视剧（TMDB ID: %d）S%02d详情失败: %v", seriesID, seasonNumber, err)
 	}
 
 	var mediaInfo schemas.MediaInfo
@@ -86,7 +86,7 @@ func GetTVSeasonDetail(seriesID int, seasonNumber int) (*schemas.MediaInfo, erro
 	}
 	externalID, err := client.GetTVSeasonExternalID(seriesID, seasonNumber)
 	if err != nil {
-		return nil, fmt.Errorf("获取电视剧（TMDB ID: %d）第 %d 季外部ID失败, 错误: %v", seriesID, seasonNumber, err)
+		return nil, fmt.Errorf("获取电视剧（TMDB ID: %d）S%02d外部ID失败, 错误: %v", seriesID, seasonNumber, err)
 	}
 	mediaInfo.TVDBID = externalID.TvdbID
 
@@ -97,10 +97,10 @@ func GetTVEpisodeDetail(seriesID int, seasonNumber int, episodeNumber int) (*sch
 	lock.RLock()
 	defer lock.RUnlock()
 
-	logrus.Infof("开始获取电视剧（TMDB ID: %d）第 %d 季第 %d 集详情", seriesID, seasonNumber, episodeNumber)
+	logrus.Infof("开始获取电视剧（TMDB ID: %d）S%02dE%02d详情", seriesID, seasonNumber, episodeNumber)
 	episodeDetail, err := client.GetTVEpisodeDetail(seriesID, seasonNumber, episodeNumber, nil)
 	if err != nil {
-		return nil, fmt.Errorf("获取电视剧（TMDB ID: %d）第 %d 季第 %d 集详情失败，错误: %v", seriesID, seasonNumber, episodeNumber, err)
+		return nil, fmt.Errorf("获取电视剧（TMDB ID: %d）S%02dE%02d集详情失败，错误: %v", seriesID, seasonNumber, episodeNumber, err)
 	}
 
 	var mediaInfo schemas.MediaInfo
@@ -115,7 +115,7 @@ func GetTVEpisodeDetail(seriesID int, seasonNumber int, episodeNumber int) (*sch
 	}
 	externalID, err := client.GetTVEpisodeExternalID(seriesID, seasonNumber, episodeNumber)
 	if err != nil {
-		return nil, fmt.Errorf("获取电视剧（TMDB ID: %d）第 %d 季第 %d 集外部ID失败，错误: %v", seriesID, seasonNumber, episodeNumber, err)
+		return nil, fmt.Errorf("获取电视剧（TMDB ID: %d）S%02dE%02d外部ID失败，错误: %v", seriesID, seasonNumber, episodeNumber, err)
 	}
 	mediaInfo.IMDBID = externalID.ImdbID
 	mediaInfo.TVDBID = externalID.TvdbID
