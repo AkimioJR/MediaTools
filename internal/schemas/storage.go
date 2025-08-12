@@ -148,9 +148,9 @@ func (fi *FileInfo) String() string {
 }
 
 type StorageProvider interface {
-	Init(config map[string]any) error // 初始化文件系统
-	GetType() StorageType             // 获取文件系统类型
-	GetTransferType() []TransferType  // 获取支持的传输类型
+	Init(config map[string]string) error // 初始化文件系统
+	GetType() StorageType                // 获取文件系统类型
+	GetTransferType() []TransferType     // 获取支持的传输类型
 
 	// 路径级操作
 	Exists(path string) (bool, error)            // 判断文件是否存在

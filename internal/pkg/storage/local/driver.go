@@ -11,7 +11,7 @@ import (
 type LocalStorage struct {
 }
 
-func (s *LocalStorage) Init(config map[string]any) error {
+func (s *LocalStorage) Init(config map[string]string) error {
 	return nil
 }
 
