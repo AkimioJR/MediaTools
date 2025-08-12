@@ -73,6 +73,7 @@ func ProviderRegister(ctx *gin.Context) {
 
 	logrus.Debugf("存储器注册成功: %+v", item)
 
+	resp.Success = true
 	resp.Data = item
 	ctx.JSON(http.StatusOK, resp)
 }
