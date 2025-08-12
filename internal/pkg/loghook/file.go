@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -17,16 +16,27 @@ type FileLogsHook struct {
 	ch        chan logrus.Entry
 	formatter logrus.Formatter
 	wg        sync.WaitGroup
+	level     logrus.Level
 }
 
-func NewFileLogsHook(logDir string) (*FileLogsHook, error) {
+type flhCfg struct {
+	formatter logrus.Formatter
+	level     logrus.Level
+}
+
+type FileLogsHookOption func(*flhCfg)
+
+func NewFileLogsHook(logDir string, opts ...FileLogsHookOption) (*FileLogsHook, error) {
+	c := flhCfg{
+		level:     logrus.TraceLevel,         // 默认全部记录
+		formatter: new(logrus.TextFormatter), // 默认使用 TextFormatter 格式化器
+	}
+	logrus.Info()
 	fh := FileLogsHook{
-		logDir: logDir,
-		ch:     make(chan logrus.Entry, chanSize),
-		formatter: &logrus.JSONFormatter{
-			TimestampFormat: time.DateTime, // 使用标准时间格式
-			PrettyPrint:     true,          // 设置为 true 以启用格式化
-		},
+		logDir:    logDir,
+		ch:        make(chan logrus.Entry, chanSize),
+		formatter: c.formatter,
+		level:     c.level,
 	}
 	go fh.writeLog()
 	return &fh, nil
@@ -41,6 +51,13 @@ func (f *FileLogsHook) Close() {
 func (f *FileLogsHook) SetLogDir(logDir string) {
 	f.Close()
 	f.logDir = logDir
+	f.ch = make(chan logrus.Entry, chanSize)
+	go f.writeLog()
+}
+
+func (f *FileLogsHook) SetLevel(level logrus.Level) {
+	f.Close()
+	f.level = level
 	f.ch = make(chan logrus.Entry, chanSize)
 	go f.writeLog()
 }
@@ -62,7 +79,7 @@ func (f *FileLogsHook) writeLog() {
 	}()
 
 	for entry := range f.ch {
-		if f.logDir == "" { // 如果日志目录未设置，则跳过写入
+		if entry.Level > f.level || f.logDir == "" { // 如果日志级别不够或者目录未设置，则跳过写入
 			continue
 		}
 		if day != entry.Time.Day() || file == nil {
