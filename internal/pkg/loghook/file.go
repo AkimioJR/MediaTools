@@ -16,7 +16,6 @@ type FileLogsHook struct {
 	logDir    string
 	file      *os.File
 	day       int                // 用于跟踪当前日志文件的日期
-	path      string             // 用于跟踪当前日志文件路径
 	ch        chan *logrus.Entry // 用于异步写入日志
 	wg        sync.WaitGroup     // 用于等待写入协程结束
 	formatter logrus.Formatter   // 日志格式化器
@@ -48,7 +47,6 @@ func (f *FileLogsHook) ChangeLogDir(logDir string) {
 	f.Close()
 	f.logDir = logDir
 	f.day = 0                                 // 重置日期
-	f.path = ""                               // 重置路径
 	f.ch = make(chan *logrus.Entry, chanSize) // 重新创建通道
 	go f.writeLog()                           // 重新启动日志写入协程
 }
@@ -62,11 +60,11 @@ func (f *FileLogsHook) writeLog() {
 				f.file.Close()
 			}
 			f.day = entry.Time.Day()
-			f.path = filepath.Join(f.logDir, entry.Time.Local().Format("2006-01-02")+".log")
 			var err error
-			f.file, err = os.OpenFile(f.path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+			path := filepath.Join(f.logDir, entry.Time.Local().Format("2006-01-02")+".log")
+			f.file, err = os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "open log file '%s' failed: %v", f.path, err)
+				fmt.Fprintf(os.Stderr, "open log file '%s' failed: %v", path, err)
 				f.wg.Done() // 结束当前日志条目的等待
 				continue
 			}
