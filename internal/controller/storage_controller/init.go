@@ -70,3 +70,16 @@ func ListStorageProviders() []schemas.StorageProviderItem {
 	}
 	return providers
 }
+
+func DeleteStorageProvider(storageType schemas.StorageType) error {
+	lock.Lock()
+	defer lock.Unlock()
+
+	if _, exists := storageProviders[storageType]; !exists {
+		return fmt.Errorf("存储器 %s 不存在", storageType)
+	}
+
+	delete(storageProviders, storageType)
+	logrus.Infof("已删除存储器: %s", storageType)
+	return nil
+}
