@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 // @BasePath /config
@@ -50,6 +51,8 @@ func UpdateFanart(ctx *gin.Context) {
 		return
 	}
 
+	logrus.Debugf("开始更新 Fanart 配置: %+v", req)
+
 	oldConfig := config.Fanart
 	config.Fanart = req
 	err = fanart_controller.Init()
@@ -58,6 +61,8 @@ func UpdateFanart(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, resp)
 		goto initErr
 	}
+
+	logrus.Debugf("Fanart 控制器初始化成功: %+v", config.Fanart)
 
 	err = config.WriteConfig()
 	if err != nil {

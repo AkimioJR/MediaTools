@@ -53,16 +53,16 @@ func UpdateLog(ctx *gin.Context) {
 
 	oldConfig := config.Log
 	config.Log = req
-	logrus.Debug("开始更新日志配置: ", req)
+	logrus.Debugf("开始更新日志配置: %+v", req)
 	err = logging.Init()
 	if err != nil {
-		logrus.Error("更新日志配置失败: ", err)
+		logrus.Errorf("更新日志配置失败: %v", err)
 		resp.Message = "更新日志配置失败: " + err.Error()
 		ctx.JSON(http.StatusInternalServerError, resp)
 		config.Log = oldConfig
 		logging.Init()
 	}
-	logrus.Debug("日志配置更新成功: ", config.Log)
+	logrus.Debugf("初始化日志配置成功: %+v", config.Log)
 
 	logrus.Debug("开始更新配置文件")
 	err = config.WriteConfig()

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 // @BasePath /config/media
@@ -50,14 +51,19 @@ func UpdateMediaLibrary(ctx *gin.Context) {
 		return
 	}
 
+	logrus.Debugf("开始更新媒体库配置: %+v", req)
+
 	oldConfig := config.Media.Libraries
 	config.Media.Libraries = req
 	err = media_controller.Init()
 	if err != nil {
+		logrus.Errorf("初始化 Media 控制器失败: %v", err)
 		resp.Message = "初始化 Media 控制器失败: " + err.Error()
 		ctx.JSON(http.StatusInternalServerError, resp)
 		goto initErr
 	}
+
+	logrus.Debugf("Media 控制器初始化成功: %+v", config.Media.Libraries)
 
 	err = config.WriteConfig()
 	if err != nil {

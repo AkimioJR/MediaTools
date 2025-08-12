@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 // @BasePath /config
@@ -50,15 +51,19 @@ func UpdateTMDB(ctx *gin.Context) {
 		return
 	}
 
+	logrus.Debugf("开始更新 TMDB 配置: %+v", req)
 	oldConfig := config.TMDB
 	config.TMDB = req
 
 	err = tmdb_controller.Init()
 	if err != nil {
+		logrus.Errorf("初始化 TMDB 控制器失败: %v", err)
 		resp.Message = "初始化 TMDB 控制器失败: " + err.Error()
 		ctx.JSON(http.StatusInternalServerError, resp)
 		goto initErr
 	}
+
+	logrus.Debugf("TMDB 控制器初始化成功: %+v", config.TMDB)
 
 	err = config.WriteConfig()
 	if err != nil {
