@@ -1,5 +1,7 @@
 package config
 
+import "MediaTools/internal/schemas"
+
 var defaultConfig = Configuration{
 	Log: LogConfig{
 		Level: "info",
@@ -13,6 +15,12 @@ var defaultConfig = Configuration{
 	Fanart: FanartConfig{
 		ApiKey: "YOUR_FANART_API_KEY", // 请替换为您的 Fanart API Key
 		ApiURL: "https://webservice.fanart.tv",
+	},
+	Storages: []StorageConfig{
+		{
+			Type: schemas.StorageLocal, // 默认使用本地存储
+			Data: map[string]string{},
+		},
 	},
 	Media: MediaConfig{
 		Format: FormatConfig{

@@ -33,6 +33,7 @@ func applyConfig(c Configuration) {
 	Log = c.Log
 	TMDB = c.TMDB
 	Fanart = c.Fanart
+	Storages = c.Storages
 	Media = c.Media
 }
 

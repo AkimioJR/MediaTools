@@ -13,11 +13,12 @@ const (
 )
 
 var (
-	Log     LogConfig
-	TMDB    TMDBConfig
-	Fanart  FanartConfig
-	Media   MediaConfig
-	Version = VersionInfo{
+	Log      LogConfig
+	TMDB     TMDBConfig
+	Fanart   FanartConfig
+	Storages []StorageConfig
+	Media    MediaConfig
+	Version  = VersionInfo{
 		AppVersion: appVersion,
 		CommitHash: commitHash,
 		BuildDate:  parseBuildTime(buildDate),
@@ -45,10 +46,11 @@ func Init() error {
 
 func WriteConfig() error {
 	var c = Configuration{
-		Log:    Log,
-		TMDB:   TMDB,
-		Fanart: Fanart,
-		Media:  Media,
+		Log:      Log,
+		TMDB:     TMDB,
+		Fanart:   Fanart,
+		Storages: Storages,
+		Media:    Media,
 	}
 	return writeConfig(c)
 }

@@ -24,10 +24,18 @@ type FanartConfig struct {
 }
 
 type Configuration struct {
-	Log    LogConfig    `json:"log" yaml:"log"`
+	// 基础设置
+	Log LogConfig `json:"log" yaml:"log"`
+
+	// 刮削设置
 	TMDB   TMDBConfig   `json:"tmdb" yaml:"tmdb"`
 	Fanart FanartConfig `json:"fanart" yaml:"fanart"`
-	Media  MediaConfig  `json:"media" yaml:"media"`
+
+	// 存储设置
+	Storages []StorageConfig `json:"storages" yaml:"storages"`
+
+	// 媒体库设置
+	Media MediaConfig `json:"media" yaml:"media"`
 }
 
 type MediaConfig struct {
@@ -56,4 +64,9 @@ type CustomWordConfig struct {
 	IdentifyWord  []string `json:"identify_word" yaml:"identify_word"` // 自定义识别词
 	Customization []string `json:"customization" yaml:"customization"` // 自定义占位置词
 	ExcludeWords  []string `json:"exclude_words" yaml:"exclude_words"` // 自定义排除词
+}
+
+type StorageConfig struct {
+	Type schemas.StorageType `json:"type" yaml:"type"`
+	Data map[string]string   `json:"data" yaml:"data"`
 }
