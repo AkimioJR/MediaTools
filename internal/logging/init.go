@@ -14,8 +14,8 @@ var (
 
 func init() {
 	var err error
-	historyLogsHook = loghook.NewMemoryHistoryHook(100)      // 初始化内存历史日志钩子
-	fileHook, err = loghook.NewFileLogsHook(config.Log.Path) // 初始化文件日志钩子
+	historyLogsHook = loghook.NewMemoryHistoryHook(100) // 初始化内存历史日志钩子
+	fileHook, err = loghook.NewFileLogsHook("")         // 初始化文件日志钩子
 	if err != nil {
 		panic("初始化文件日志钩子失败: " + err.Error())
 	}
@@ -27,6 +27,7 @@ func init() {
 	logrus.AddHook(fileHook)
 	logrus.AddHook(historyLogsHook)
 }
+
 func Init() error {
 	fileHook.ChangeLogDir(config.Log.Path) // 设置日志目录
 	return SetLevel(config.Log.Level)

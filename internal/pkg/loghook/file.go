@@ -31,9 +31,11 @@ func NewFileLogsHook(logDir string) (*FileLogsHook, error) {
 			DisableHTMLEscape: true,          // 禁用 HTML 转义
 		},
 	}
-	err := os.MkdirAll(logDir, 0755) // 确保日志目录存在
-	if err != nil {
-		return nil, fmt.Errorf("create log directory failed: %v", err)
+	if logDir != "" {
+		err := os.MkdirAll(logDir, 0755) // 确保日志目录存在
+		if err != nil {
+			return nil, fmt.Errorf("create log directory '%s' failed: %v", logDir, err)
+		}
 	}
 	go fh.writeLog()
 	return &fh, nil
