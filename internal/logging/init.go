@@ -41,6 +41,10 @@ func Init() error {
 	if err != nil {
 		return fmt.Errorf("设置日志级别失败: %w", err)
 	}
+	err = SetFileLevel(config.Log.FileLevel) // 设置文件日志级别
+	if err != nil {
+		return fmt.Errorf("设置文件日志级别失败: %w", err)
+	}
 	logrus.Debug("日志系统初始化完成")
 	return nil
 }
@@ -51,6 +55,15 @@ func SetLevel(level string) error {
 		return err
 	}
 	logrus.SetLevel(logrusLevel)
+	return nil
+}
+
+func SetFileLevel(level string) error {
+	logrusLevel, err := logrus.ParseLevel(level)
+	if err != nil {
+		return err
+	}
+	fileHook.SetLevel(logrusLevel)
 	return nil
 }
 
