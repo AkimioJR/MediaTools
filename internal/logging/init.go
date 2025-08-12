@@ -3,6 +3,7 @@ package logging
 import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/pkg/loghook"
+	"fmt"
 
 	"github.com/sirupsen/logrus"
 )
@@ -29,8 +30,17 @@ func init() {
 }
 
 func Init() error {
-	fileHook.ChangeLogDir(config.Log.Path) // 设置日志目录
-	return SetLevel(config.Log.Level)
+	logrus.Debug("初始化日志系统...")
+	err := fileHook.ChangeLogDir(config.Log.Path) // 设置日志目录
+	if err != nil {
+		return fmt.Errorf("设置日志目录失败: %w", err)
+	}
+	err = SetLevel(config.Log.Level)
+	if err != nil {
+		return fmt.Errorf("设置日志级别失败: %w", err)
+	}
+	logrus.Debug("日志系统初始化完成")
+	return nil
 }
 
 func SetLevel(level string) error {
