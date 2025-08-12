@@ -83,8 +83,9 @@ func (f *FileLogsHook) writeLog() {
 			}
 		}
 
-		entryCopy := *entry    // 创建一个副本以避免修改原始条目
-		entryCopy.Buffer = nil // 清空 Buffer 以确保使用 JSON 格式化器重新格式化
+		entryCopy := *entry                        // 创建一个副本以避免修改原始条目
+		entryCopy.Buffer = nil                     // 清空 Buffer 以确保使用 JSON 格式化器重新格式化
+		entryCopy.Data["line"] = entry.Caller.Line // 添加行号到日志数据中
 
 		logData, err := f.formatter.Format(&entryCopy)
 		if err != nil {
