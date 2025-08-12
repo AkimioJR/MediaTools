@@ -43,7 +43,9 @@ func NewFileLogsHook(logDir string, opts ...FileLogsHookOption) (*FileLogsHook, 
 		level:     logrus.TraceLevel,         // 默认全部记录
 		formatter: new(logrus.TextFormatter), // 默认使用 TextFormatter 格式化器
 	}
-	logrus.Info()
+	for _, opt := range opts {
+		opt(&c)
+	}
 	fh := FileLogsHook{
 		logDir:    logDir,
 		ch:        make(chan logrus.Entry, chanSize),
