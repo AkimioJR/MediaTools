@@ -26,6 +26,18 @@ type flhCfg struct {
 
 type FileLogsHookOption func(*flhCfg)
 
+func WithFormatter(formatter logrus.Formatter) FileLogsHookOption {
+	return func(c *flhCfg) {
+		c.formatter = formatter
+	}
+}
+
+func WithLevel(level logrus.Level) FileLogsHookOption {
+	return func(c *flhCfg) {
+		c.level = level
+	}
+}
+
 func NewFileLogsHook(logDir string, opts ...FileLogsHookOption) (*FileLogsHook, error) {
 	c := flhCfg{
 		level:     logrus.TraceLevel,         // 默认全部记录
