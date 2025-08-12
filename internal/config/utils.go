@@ -20,10 +20,10 @@ func parseConfig(file *os.File) error {
 
 // 初始化默认配置
 func initDefaultConfig() error {
+	applyConfig(defaultConfig)
 	if err := WriteConfig(); err != nil {
 		return fmt.Errorf("failed to create default config: %w", err)
 	}
-	applyConfig(defaultConfig)
 	return nil
 }
 
