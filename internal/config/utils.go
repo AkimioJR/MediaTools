@@ -15,13 +15,13 @@ func parseConfig(file *os.File) error {
 		return fmt.Errorf("config parse error: %w", err)
 	}
 
-	applyConfig(config)
+	config.applyConfig()
 	return nil
 }
 
 // 初始化默认配置
 func initDefaultConfig() error {
-	applyConfig(defaultConfig)
+	defaultConfig.applyConfig()
 	if err := WriteConfig(); err != nil {
 		return fmt.Errorf("failed to create default config: %w", err)
 	}
@@ -29,7 +29,7 @@ func initDefaultConfig() error {
 }
 
 // 应用配置到全局变量
-func applyConfig(c Configuration) {
+func (c *Configuration) applyConfig() {
 	Log = c.Log
 	TMDB = c.TMDB
 	Fanart = c.Fanart
@@ -37,7 +37,7 @@ func applyConfig(c Configuration) {
 	Media = c.Media
 }
 
-func writeConfig(c Configuration) error {
+func (c *Configuration) writeConfig() error {
 	err := os.MkdirAll(filepath.Dir(ConfigFile), 0755)
 	if err != nil {
 		return fmt.Errorf("create config directory error: %w", err)

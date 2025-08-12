@@ -52,5 +52,5 @@ func WriteConfig() error {
 		Storages: Storages,
 		Media:    Media,
 	}
-	return writeConfig(c)
+	return c.writeConfig()
 }
