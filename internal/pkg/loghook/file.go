@@ -26,6 +26,7 @@ func NewFileLogsHook(logDir string) *FileLogsHook {
 		ch:     make(chan *logrus.Entry, 500), // 缓冲通道，用于异步写入日志
 		formatter: &logrus.JSONFormatter{
 			TimestampFormat: time.DateTime,
+			PrettyPrint:     true, // 缩进
 		},
 	}
 	go fh.writeLog() // 启动日志写入协程
