@@ -16,9 +16,6 @@ var (
 )
 
 func Init() error {
-	lock.Lock()
-	defer lock.Unlock()
-
 	logrus.Info("开始初始化 Storage Controller...")
 	for _, storageConfig := range config.Storages {
 		_, err := RegisterStorageProvider(storageConfig)
@@ -36,6 +33,9 @@ func Init() error {
 }
 
 func RegisterStorageProvider(c config.StorageConfig) (*schemas.StorageProviderItem, error) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	logrus.Debugf("开始初始化 %s 存储器...", c.Type)
 	var provider schemas.StorageProvider
 	switch c.Type {
