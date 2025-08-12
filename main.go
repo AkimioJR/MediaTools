@@ -41,18 +41,21 @@ func main() {
 	logrus.Info("开始初始化配置...")
 	err := config.Init()
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("配置初始化失败: %v", err))
 	}
 	logrus.Info("配置初始化完成")
 
 	logrus.Info("开始初始化日志...")
-	logging.Init()
+	err = logging.Init()
+	if err != nil {
+		panic(fmt.Sprintf("日志初始化失败: %v", err))
+	}
 	logrus.Info("日志初始化完成")
 
 	logrus.Info("开始初始化全部工具链...")
 	err = controller.InitAllControllers()
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("工具链初始化失败: %v", err))
 	}
 	logrus.Info("全部工具链初始化完成")
 
