@@ -8,8 +8,9 @@ func RegisterStorageRouter(router *gin.Engine) {
 		providerRouter := storageRouter.Group("/provider") // 存储提供者相关接口
 		{
 			providerRouter.GET("", ProviderList)                    // 获取存储提供者列表
+			providerRouter.GET("/:storage_type", ProviderGet)       // 获取指定存储提供者
 			providerRouter.POST("/:storage_type", ProviderRegister) // 注册新的存储提供者
-			providerRouter.DELETE("/:storage_type", ProviderDelete)    // 删除存储提供者
+			providerRouter.DELETE("/:storage_type", ProviderDelete) // 删除存储提供者
 		}
 
 		storageTypeRouter := storageRouter.Group("/:storage_type") // 按存储类型分组的API

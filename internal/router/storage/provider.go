@@ -28,6 +28,42 @@ func ProviderList(ctx *gin.Context) {
 }
 
 // @BasePath /storage/provider
+// @Route /{storage_type} [get]
+// @Summary 获取指定存储提供者
+// @Description 获取指定类型的存储提供者信息
+// @Tags storage
+// @Param storage_type path string true "存储类型"
+// @Accept json
+// @Products json
+// @Success 200 {object} schemas.Response[*schemas.StorageProviderItem]
+// @Failure 400 {object} schemas.Response[*schemas.StorageProviderItem]
+// @Failure 500 {object} schemas.Response[*schemas.StorageProviderItem]
+func ProviderGet(ctx *gin.Context) {
+	var resp schemas.Response[*schemas.StorageProviderItem]
+
+	storageTypeStr := ctx.Param("storage_type")
+	storageType := schemas.ParseStorageType(storageTypeStr)
+	if storageType == schemas.StorageUnknown {
+		logrus.Warningf("未知的存储类型: %s", storageTypeStr)
+		resp.Message = "未知的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	item, err := storage_controller.GetStorageProvider(storageType)
+	if err != nil {
+		logrus.Warningf("获取存储提供者失败: %v", err)
+		resp.Message = "获取存储提供者失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	resp.Success = true
+	resp.Data = item
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// @BasePath /storage/provider
 // @Route /{storage_type} [post]
 // @Summary 注册新的存储器
 // @Description 注册一个新的存储器
