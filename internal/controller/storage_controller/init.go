@@ -1,8 +1,10 @@
 package storage_controller
 
 import (
+	"MediaTools/internal/config"
 	"MediaTools/internal/pkg/storage/local"
 	"MediaTools/internal/schemas"
+	"fmt"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -18,15 +20,35 @@ func Init() error {
 	defer lock.Unlock()
 
 	logrus.Info("开始初始化 Storage Controller...")
-	// 注册本地存储提供者
-	localStorage := &local.LocalStorage{}
-	err := localStorage.Init(nil)
-	if err != nil {
-		return err
+	for _, storageConfig := range config.Storages {
+		err := RegisterStorageProvider(storageConfig)
+		if err != nil {
+			if storageConfig.Type != schemas.StorageUnknown {
+				return fmt.Errorf("初始化 %s 存储器失败: %v", storageConfig.Type, err)
+			} else {
+				return err
+			}
+		}
 	}
-	storageProviders[schemas.StorageLocal] = localStorage
 
 	logrus.Info("Storage Controller 初始化完成")
+	return nil
+}
+
+func RegisterStorageProvider(c config.StorageConfig) error {
+	logrus.Debugf("开始初始化 %s 存储器...", c.Type)
+	switch c.Type {
+	case schemas.StorageLocal:
+		localStorage := &local.LocalStorage{}
+		err := localStorage.Init(c.Data)
+		if err != nil {
+			return err
+		}
+		storageProviders[schemas.StorageLocal] = localStorage
+	default:
+		return fmt.Errorf("不支持的存储类型: %s", c.Type)
+	}
+	logrus.Infof("%s 存储器已注册", c.Type)
 	return nil
 }
 
