@@ -14,47 +14,49 @@ const chanSize = 500 // 缓冲通道大小
 
 type FileLogsHook struct {
 	logDir    string
-	file      *os.File
-	day       int                // 用于跟踪当前日志文件的日期
-	ch        chan *logrus.Entry // 用于异步写入日志
-	wg        sync.WaitGroup     // 用于等待写入协程结束
-	formatter logrus.Formatter   // 日志格式化器
+	file      *os.File // 当前日志文件句柄
+	day       int      // 用于记录当前日志文件的日期
+	ch        chan *logrus.Entry
+	formatter logrus.Formatter
+	wg        sync.WaitGroup
 }
 
 func NewFileLogsHook(logDir string) *FileLogsHook {
 	fh := FileLogsHook{
 		logDir: logDir,
-		ch:     make(chan *logrus.Entry, chanSize), // 缓冲通道，用于异步写入日志
+		ch:     make(chan *logrus.Entry, chanSize),
 		formatter: &logrus.JSONFormatter{
 			TimestampFormat: time.DateTime,
-			PrettyPrint:     true, // 缩进
+			PrettyPrint:     true,
 		},
 	}
-	go fh.writeLog() // 启动日志写入协程
+	go fh.writeLog()
 	return &fh
 }
 
 // Close 方法用于关闭文件和通道，确保资源被正确释放，避免协程泄漏
 func (f *FileLogsHook) Close() {
-	close(f.ch)
-	f.wg.Wait() // 等待写入协程完成
+	close(f.ch) // 关闭通道
+	f.wg.Wait() // 等待协程退出
 	if f.file != nil {
 		f.file.Close()
+		f.file = nil // 清空文件句柄
 	}
 }
 
 func (f *FileLogsHook) ChangeLogDir(logDir string) {
 	f.Close()
 	f.logDir = logDir
-	f.day = 0                                 // 重置日期
-	f.ch = make(chan *logrus.Entry, chanSize) // 重新创建通道
-	go f.writeLog()                           // 重新启动日志写入协程
+	f.day = 0
+	f.ch = make(chan *logrus.Entry, chanSize)
+	go f.writeLog()
 }
 
 // writeLog 是一个协程，用于异步写入日志到文件，避免并发写入问题
 func (f *FileLogsHook) writeLog() {
+	f.wg.Add(1)
+	defer f.wg.Done()
 	for entry := range f.ch {
-		f.wg.Add(1) // 增加等待组计数器
 		if f.day != entry.Time.Day() || f.file == nil {
 			if f.file != nil {
 				f.file.Close()
@@ -65,18 +67,16 @@ func (f *FileLogsHook) writeLog() {
 			f.file, err = os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "open log file '%s' failed: %v", path, err)
-				f.wg.Done() // 结束当前日志条目的等待
 				continue
 			}
-			logData, err := f.formatter.Format(entry)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "format log entry failed: %v", err)
-				f.wg.Done() // 结束当前日志条目的等待
-				continue
-			}
-			f.file.Write(logData)
-			f.wg.Done() // 结束当前日志条目的等待
 		}
+		logData, err := f.formatter.Format(entry)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "format log entry failed: %v", err)
+			continue
+		}
+		f.file.Write(logData)
+
 	}
 }
 
