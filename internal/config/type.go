@@ -5,8 +5,9 @@ import (
 )
 
 type LogConfig struct {
-	Level string `json:"level" yaml:"level"` // 日志级别
-	Path  string `json:"path" yaml:"path"`   // 日志文件目录
+	Level     string `json:"level" yaml:"level"`           // 终端输出日志级别
+	FileLevel string `json:"file_level" yaml:"file_level"` // 文件日志级别
+	Path      string `json:"path" yaml:"path"`             // 日志文件目录
 }
 
 type TMDBConfig struct {

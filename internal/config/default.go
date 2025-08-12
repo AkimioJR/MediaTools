@@ -4,8 +4,9 @@ import "MediaTools/internal/schemas"
 
 var defaultConfig = Configuration{
 	Log: LogConfig{
-		Level: "info",
-		Path:  "logs",
+		Level:     "info",
+		FileLevel: "debug",
+		Path:      "logs",
 	},
 	TMDB: TMDBConfig{
 		ApiKey:   "YOUR_TMDB_API_KEY", // 请替换为您的 TMDB API Key
