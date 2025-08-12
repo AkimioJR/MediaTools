@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 )
@@ -36,6 +37,10 @@ func applyConfig(c Configuration) {
 }
 
 func writeConfig(c Configuration) error {
+	err := os.MkdirAll(filepath.Dir(ConfigFile), 0755)
+	if err != nil {
+		return fmt.Errorf("create config directory error: %w", err)
+	}
 	file, err := os.Create(ConfigFile)
 	if err != nil {
 		return err
