@@ -38,12 +38,11 @@ func (f *FileLogsHook) Close() {
 	f.wg.Wait() // 等待协程退出
 }
 
-func (f *FileLogsHook) ChangeLogDir(logDir string) error {
+func (f *FileLogsHook) SetLogDir(logDir string) {
 	f.Close()
 	f.logDir = logDir
 	f.ch = make(chan *logrus.Entry, chanSize)
 	go f.writeLog()
-	return nil
 }
 
 // writeLog 是一个协程，用于异步写入日志到文件，避免并发写入问题

@@ -31,11 +31,8 @@ func init() {
 
 func Init() error {
 	logrus.Debug("初始化日志系统...")
-	err := fileHook.ChangeLogDir(config.Log.Path) // 设置日志目录
-	if err != nil {
-		return fmt.Errorf("设置日志目录失败: %w", err)
-	}
-	err = SetLevel(config.Log.Level)
+	fileHook.SetLogDir(config.Log.Path) // 设置日志目录
+	err := SetLevel(config.Log.Level)   // 设置日志级别
 	if err != nil {
 		return fmt.Errorf("设置日志级别失败: %w", err)
 	}
