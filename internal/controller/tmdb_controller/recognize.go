@@ -50,14 +50,14 @@ func RecognizeAndEnrichMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, err
 		return nil, fmt.Errorf("识别媒体信息失败: %v", err)
 	}
 	if info.MediaType == meta.MediaTypeTV {
-		if videoMeta.Season != 1 {
+		if videoMeta.Season != -1 {
 			seasonDetail, err := GetTVSeasonDetail(info.TMDBID, videoMeta.Season)
 			if err != nil {
 				return nil, fmt.Errorf("获取电视剧季信息失败: %v", err)
 			}
 			info.TMDBInfo.TVInfo.SeasonInfo = seasonDetail.TMDBInfo.TVInfo.SeasonInfo
 		}
-		if videoMeta.Episode != 1 {
+		if videoMeta.Episode != -1 {
 			episodeDetail, err := GetTVEpisodeDetail(info.TMDBID, videoMeta.Season, videoMeta.Episode)
 			if err != nil {
 				return nil, fmt.Errorf("获取电视剧集信息失败: %v", err)
