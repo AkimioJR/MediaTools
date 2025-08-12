@@ -36,8 +36,7 @@ func init() {
 
 func Init() error {
 	logrus.Debug("初始化日志系统...")
-	fileHook.SetLogDir(config.Log.Path) // 设置日志目录
-	err := SetLevel(config.Log.Level)   // 设置日志级别
+	err := SetLevel(config.Log.Level) // 设置日志级别
 	if err != nil {
 		return fmt.Errorf("设置日志级别失败: %w", err)
 	}
@@ -45,6 +44,7 @@ func Init() error {
 	if err != nil {
 		return fmt.Errorf("设置文件日志级别失败: %w", err)
 	}
+	SetLogDir(config.Log.Path) // 设置日志目录
 	logrus.Debug("日志系统初始化完成")
 	return nil
 }
@@ -65,6 +65,10 @@ func SetFileLevel(level string) error {
 	}
 	fileHook.SetLevel(logrusLevel)
 	return nil
+}
+
+func SetLogDir(dir string) {
+	fileHook.SetLogDir(dir)
 }
 
 func GetRecentLogs() []loghook.LogDetail {
