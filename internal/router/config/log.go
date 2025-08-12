@@ -56,11 +56,11 @@ func UpdateLog(ctx *gin.Context) {
 
 	logrus.Debugf("开始更新日志配置: %+v", req)
 
-	if config.Log.Level != req.Level {
-		config.Log.Level = req.Level
-		err = logging.SetLevel(req.Level)
+	if config.Log.ConsoleLevel != req.ConsoleLevel {
+		config.Log.ConsoleLevel = req.ConsoleLevel
+		err = logging.SetLevel(req.ConsoleLevel)
 		if err != nil {
-			err = fmt.Errorf("设置日志级别失败: %w", err)
+			err = fmt.Errorf("设置终端日志级别失败: %w", err)
 			goto responseErr
 		}
 	}
@@ -72,9 +72,9 @@ func UpdateLog(ctx *gin.Context) {
 			goto responseErr
 		}
 	}
-	if config.Log.Path != req.Path {
-		config.Log.Path = req.Path
-		logging.SetLogDir(req.Path) // 更新日志目录
+	if config.Log.FileDir != req.FileDir {
+		config.Log.FileDir = req.FileDir
+		logging.SetLogDir(req.FileDir) // 更新日志目录
 	}
 
 	logrus.Debugf("初始化日志配置成功: %+v", config.Log)

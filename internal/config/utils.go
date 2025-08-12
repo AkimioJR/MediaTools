@@ -56,9 +56,9 @@ func (c *Configuration) writeConfig() error {
 
 // 检查配置的完整性
 func (c *Configuration) check() {
-	if c.Log.Level == "" {
+	if c.Log.ConsoleLevel == "" {
 		logrus.Warning("日志终端输出级别未设置，使用默认配置")
-		c.Log.Level = defaultConfig.Log.Level
+		c.Log.ConsoleLevel = defaultConfig.Log.ConsoleLevel
 	}
 
 	if c.Log.FileLevel == "" {
@@ -66,9 +66,9 @@ func (c *Configuration) check() {
 		c.Log.FileLevel = defaultConfig.Log.FileLevel
 	}
 
-	if c.Log.Path == "" {
+	if c.Log.FileDir == "" {
 		logrus.Warning("日志文件目录未设置，使用默认配置")
-		c.Log.Path = defaultConfig.Log.Path
+		c.Log.FileDir = defaultConfig.Log.FileDir
 	}
 
 	if c.TMDB.ApiURL == "" {

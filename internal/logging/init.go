@@ -36,15 +36,15 @@ func init() {
 
 func Init() error {
 	logrus.Debug("初始化日志系统...")
-	err := SetLevel(config.Log.Level) // 设置日志级别
+	err := SetLevel(config.Log.ConsoleLevel) // 设置日志级别
 	if err != nil {
-		return fmt.Errorf("设置日志级别失败: %w", err)
+		return fmt.Errorf("设置终端日志级别失败: %w", err)
 	}
 	err = SetFileLevel(config.Log.FileLevel) // 设置文件日志级别
 	if err != nil {
 		return fmt.Errorf("设置文件日志级别失败: %w", err)
 	}
-	SetLogDir(config.Log.Path) // 设置日志目录
+	SetLogDir(config.Log.FileDir) // 设置日志目录
 	logrus.Debug("日志系统初始化完成")
 	return nil
 }
