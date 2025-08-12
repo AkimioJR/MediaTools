@@ -46,6 +46,19 @@ func (t *StorageType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (t StorageType) MarshalYAML() (any, error) {
+	return t.String(), nil
+}
+
+func (t *StorageType) UnmarshalYAML(unmarshal func(any) error) error {
+	var s string
+	if err := unmarshal(&s); err != nil {
+		return err
+	}
+	*t = ParseStorageType(s)
+	return nil
+}
+
 type TransferType uint8
 
 const (
