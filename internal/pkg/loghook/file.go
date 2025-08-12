@@ -14,7 +14,7 @@ const chanSize = 500 // 缓冲通道大小
 
 type FileLogsHook struct {
 	logDir    string
-	ch        chan *logrus.Entry
+	ch        chan logrus.Entry
 	formatter logrus.Formatter
 	wg        sync.WaitGroup
 }
@@ -22,7 +22,7 @@ type FileLogsHook struct {
 func NewFileLogsHook(logDir string) (*FileLogsHook, error) {
 	fh := FileLogsHook{
 		logDir: logDir,
-		ch:     make(chan *logrus.Entry, chanSize),
+		ch:     make(chan logrus.Entry, chanSize),
 		formatter: &logrus.JSONFormatter{
 			TimestampFormat: time.DateTime, // 使用标准时间格式
 			PrettyPrint:     true,          // 设置为 true 以启用格式化
@@ -41,7 +41,7 @@ func (f *FileLogsHook) Close() {
 func (f *FileLogsHook) SetLogDir(logDir string) {
 	f.Close()
 	f.logDir = logDir
-	f.ch = make(chan *logrus.Entry, chanSize)
+	f.ch = make(chan logrus.Entry, chanSize)
 	go f.writeLog()
 }
 
@@ -82,11 +82,10 @@ func (f *FileLogsHook) writeLog() {
 			}
 		}
 
-		entryCopy := *entry                        // 创建一个副本以避免修改原始条目
-		entryCopy.Buffer = nil                     // 清空 Buffer 以确保使用 JSON 格式化器重新格式化
-		entryCopy.Data["line"] = entry.Caller.Line // 添加行号到日志数据中
+		entry.Buffer = nil                     // 清空 Buffer 以确保使用 JSON 格式化器重新格式化
+		entry.Data["line"] = entry.Caller.Line // 添加行号到日志数据中
 
-		logData, err := f.formatter.Format(&entryCopy)
+		logData, err := f.formatter.Format(&entry)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "format log entry failed: %v", err)
 			continue
@@ -104,7 +103,7 @@ func (f *FileLogsHook) Levels() []logrus.Level {
 }
 
 func (f *FileLogsHook) Fire(entry *logrus.Entry) error {
-	f.ch <- entry // 将日志条目发送到通道
+	f.ch <- *entry // 将日志条目发送到通道
 	return nil
 }
 
