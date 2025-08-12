@@ -1,10 +1,8 @@
 package config
 
-import "MediaTools/internal/pkg/loghook"
-
 var defaultConfig = Configuration{
 	Log: LogConfig{
-		Level: loghook.LevelInfo,
+		Level: "info",
 		Path:  "logs",
 	},
 	TMDB: TMDBConfig{

@@ -23,12 +23,16 @@ func init() {
 }
 func Init() error {
 	fileHook.LogDir = config.Log.Path
-	SetLevel(config.Log.Level)
-	return nil
+	return SetLevel(config.Log.Level)
 }
 
-func SetLevel(level loghook.LogLevel) {
-	logrus.SetLevel(level.ToLogrusLevel())
+func SetLevel(level string) error {
+	logrusLevel, err := logrus.ParseLevel(level)
+	if err != nil {
+		return err
+	}
+	logrus.SetLevel(logrusLevel)
+	return nil
 }
 
 func GetRecentLogs() []loghook.LogDetail {

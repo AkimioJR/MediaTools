@@ -2,10 +2,17 @@ package loghook
 
 import (
 	"sync"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
+type LogDetail struct {
+	Level   logrus.Level `json:"level"`   // 日志级别
+	Message string       `json:"message"` // 日志消息
+	Time    time.Time    `json:"time"`    // 日志时间
+	Caller  string       `json:"caller"`  // 日志调用者
+}
 type MemoryHistoryHook struct {
 	logs  []LogDetail
 	size  uint

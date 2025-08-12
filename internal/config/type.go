@@ -1,13 +1,12 @@
 package config
 
 import (
-	"MediaTools/internal/pkg/loghook"
 	"MediaTools/internal/schemas"
 )
 
 type LogConfig struct {
-	Level loghook.LogLevel `json:"level" yaml:"level"` // 日志级别
-	Path  string           `json:"path" yaml:"path"`   // 日志文件目录
+	Level string `json:"level" yaml:"level"` // 日志级别
+	Path  string `json:"path" yaml:"path"`   // 日志文件目录
 }
 
 type TMDBConfig struct {
