@@ -1,4 +1,4 @@
-package media
+package recognize
 
 import (
 	"MediaTools/internal/controller/recognize_controller"
@@ -10,16 +10,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @Route /media/recognize [get]
+// @Route /recognize/media [get]
 // @Summary 识别媒体信息
 // @Description 根据提供的标题识别媒体信息，并返回 MediaItem 对象
-// @Tags 媒体信息
+// @Tags 识别
 // @Param title query string true "媒体标题"
 // @Produce json
 // @Success 200 {object} schemas.MediaItem
 // @Failure 400 {object} schemas.ErrResponse
 // @Failure 500 {object} schemas.ErrResponse
-func Recognize(ctx *gin.Context) {
+func RecognizeMedia(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 	title := ctx.Query("title")
 	if title == "" {
