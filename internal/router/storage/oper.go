@@ -18,37 +18,35 @@ import (
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "文件或目录路径"
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+// @Success 200 {object} schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageGetFileInfo(ctx *gin.Context) {
-	var resp schemas.Response[*schemas.FileInfo]
+	var errResp schemas.ErrResponse
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		resp.Message = "无效的存储类型: " + storageTypeStr
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "无效的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	path := ctx.Query("path")
 	if path == "" {
-		resp.Message = "路径不能为空"
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "路径不能为空"
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	fileInfo, err := storage_controller.GetFile(path, storageType)
 	if err != nil {
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Data = fileInfo
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, fileInfo)
 }
 
 // @BasePath /storage
@@ -59,24 +57,24 @@ func StorageGetFileInfo(ctx *gin.Context) {
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "文件或目录路径"
 // @Products json
-// @Success 200 {object} schemas.Response[bool]
-// @Failure 400 {object} schemas.Response[bool]
-// @Failure 500 {object} schemas.Response[bool]
+// @Success 200 {object} bool
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageCheckExists(ctx *gin.Context) {
-	var resp schemas.Response[bool]
+	var errResp schemas.ErrResponse
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		resp.Message = "无效的存储类型: " + storageTypeStr
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "无效的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	path := ctx.Query("path")
 	if path == "" {
-		resp.Message = "路径不能为空"
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "路径不能为空"
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -84,14 +82,12 @@ func StorageCheckExists(ctx *gin.Context) {
 
 	exists, err := storage_controller.Exists(fileInfo)
 	if err != nil {
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Data = exists
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, exists)
 }
 
 // @BasePath /storage
@@ -102,24 +98,24 @@ func StorageCheckExists(ctx *gin.Context) {
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "目录路径"
 // @Products json
-// @Success 200 {object} schemas.Response[[]schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[[]schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[[]schemas.FileInfo]
+// @Success 200 {object} []schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageList(ctx *gin.Context) {
-	var resp schemas.Response[[]schemas.FileInfo]
+	var errResp schemas.ErrResponse
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		resp.Message = "无效的存储类型: " + storageTypeStr
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "无效的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	path := ctx.Query("path")
 	if path == "" {
-		resp.Message = "路径不能为空"
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "路径不能为空"
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -129,14 +125,12 @@ func StorageList(ctx *gin.Context) {
 	files, err := storage_controller.List(dirInfo)
 	if err != nil {
 
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Data = files
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, files)
 }
 
 // @BasePath /storage
@@ -148,26 +142,26 @@ func StorageList(ctx *gin.Context) {
 // @Body {object} schemas.PathRequest true "目录路径"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+// @Success 200 {object} schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageMkdir(ctx *gin.Context) {
 	var (
-		req  schemas.PathRequest
-		resp schemas.Response[*schemas.FileInfo]
+		req     schemas.PathRequest
+		errResp schemas.ErrResponse
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		resp.Message = "无效的存储类型: " + storageTypeStr
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "无效的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		resp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "请求参数错误: " + err.Error()
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -176,14 +170,12 @@ func StorageMkdir(ctx *gin.Context) {
 
 	err := storage_controller.Mkdir(dirInfo)
 	if err != nil {
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Data = dirInfo
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, dirInfo)
 }
 
 // @BasePath /storage
@@ -195,26 +187,26 @@ func StorageMkdir(ctx *gin.Context) {
 // @Body {object} schemas.PathRequest true "文件或目录路径"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+// @Success 200 {object} schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageDelete(ctx *gin.Context) {
 	var (
-		req  schemas.PathRequest
-		resp schemas.Response[*schemas.FileInfo]
+		req     schemas.PathRequest
+		errResp schemas.ErrResponse
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		resp.Message = "无效的存储类型: " + storageTypeStr
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "无效的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		resp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "请求参数错误: " + err.Error()
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -223,14 +215,12 @@ func StorageDelete(ctx *gin.Context) {
 	err := storage_controller.Delete(fileInfo)
 	if err != nil {
 
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Data = fileInfo
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, fileInfo)
 }
 
 // @BasePath /storage
@@ -242,26 +232,26 @@ func StorageDelete(ctx *gin.Context) {
 // @Body {object} schemas.RenameRequest true "重命名请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+// @Success 200 {object} schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageRename(ctx *gin.Context) {
 	var (
-		req  schemas.RenameRequest
-		resp schemas.Response[*schemas.FileInfo]
+		req     schemas.RenameRequest
+		errResp schemas.ErrResponse
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		resp.Message = "无效的存储类型: " + storageTypeStr
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "无效的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		resp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "请求参数错误: " + err.Error()
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -269,14 +259,12 @@ func StorageRename(ctx *gin.Context) {
 
 	err := storage_controller.Rename(fileInfo, req.NewName)
 	if err != nil {
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Data = fileInfo
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, fileInfo)
 }
 
 // @BasePath /storage
@@ -289,38 +277,38 @@ func StorageRename(ctx *gin.Context) {
 // @Param file formData file true "上传文件"
 // @Accept multipart/form-data
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+// @Success 200 {object} schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageUploadFile(ctx *gin.Context) {
-	var resp schemas.Response[*schemas.FileInfo]
+	var errResp schemas.ErrResponse
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		resp.Message = "无效的存储类型: " + storageTypeStr
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "无效的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	path := ctx.PostForm("path")
 	if path == "" {
-		resp.Message = "路径不能为空"
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "路径不能为空"
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	file, err := ctx.FormFile("file")
 	if err != nil {
-		resp.Message = "获取上传文件失败: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "获取上传文件失败: " + err.Error()
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	src, err := file.Open()
 	if err != nil {
-		resp.Message = "打开上传文件失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "打开上传文件失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 	defer src.Close()
@@ -330,14 +318,12 @@ func StorageUploadFile(ctx *gin.Context) {
 
 	err = storage_controller.CreateFile(fileInfo, src)
 	if err != nil {
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Data = fileInfo
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, fileInfo)
 }
 
 // @BasePath /storage
@@ -347,24 +333,28 @@ func StorageUploadFile(ctx *gin.Context) {
 // @Tags storage
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "文件路径"
-// @Failure 400 {object} schemas.schemas.FileInfo]
-// @Failure 500 {object} schemas.schemas.FileInfo]
+// @Produce application/octet-stream
+// @Success 200 {file} file "文件下载成功"
+// @Header 200 {string} Content-Disposition "文件下载头，格式：attachment; filename=文件名"
+// @Header 200 {string} Content-Type "application/octet-stream"
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageDownloadFile(ctx *gin.Context) {
-	var resp schemas.Response[*schemas.FileInfo]
+	var errResp schemas.ErrResponse
 
 	path := ctx.Query("path")
 	storageTypeStr := ctx.Param("storage_type")
 
 	if path == "" {
-		resp.Message = "路径不能为空"
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "路径不能为空"
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		resp.Message = "无效的存储类型: " + storageTypeStr
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "无效的存储类型: " + storageTypeStr
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -372,8 +362,8 @@ func StorageDownloadFile(ctx *gin.Context) {
 
 	reader, err := storage_controller.ReadFile(fileInfo)
 	if err != nil {
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 	defer reader.Close()

@@ -7,7 +7,6 @@ import (
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -21,32 +20,32 @@ import (
 // @Tags Library
 // @Accept json
 // @Produce json
-// @Param request body LibraryArchiveMediaRequest true "请求参数"
-// @Success 200 {object} schemas.Response[schemas.FileInfo] "成功响应"
-// @Failure 400 {object} schemas.Response[schemas.FileInfo] "请求参数错误"
-// @Failure 500 {object} schemas.Response[schemas.FileInfo] "服务器错误"
+// @Param request body schemas.LibraryArchiveMediaRequest true "请求参数"
+// @Success 200 {object} schemas.FileInfo "成功响应"
+// @Failure 400 {object} schemas.ErrResponse "请求参数错误"
+// @Failure 500 {object} schemas.ErrResponse "服务器错误"
 func LibraryArchiveMedia(ctx *gin.Context) {
 	var (
-		req  schemas.LibraryArchiveMediaRequest
-		resp schemas.Response[*schemas.FileInfo]
+		req     schemas.LibraryArchiveMediaRequest
+		errResp schemas.ErrResponse
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		resp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "请求参数错误: " + err.Error()
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	srcFile, err := storage_controller.GetFile(req.SrcFile.Path, req.SrcFile.StorageType)
 	if err != nil {
-		resp.Message = fmt.Sprintf("获取源文件失败: %v", err)
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "获取源文件失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 	dstDir, err := storage_controller.GetFile(req.DstDir.Path, req.DstDir.StorageType)
 	if err != nil {
-		resp.Message = fmt.Sprintf("获取目标目录失败: %v", err)
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "获取目标目录失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
@@ -54,30 +53,30 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 	videoMeta := media_controller.ParseVideoMeta(srcFile.Name)
 	info, err := tmdb_controller.RecognizeMedia(videoMeta)
 	if err != nil {
-		resp.Message = "识别媒体信息失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "识别媒体信息失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 	if info.MediaType == meta.MediaTypeTV {
 		seasonDetail, err := tmdb_controller.GetTVSeasonDetail(info.TMDBID, videoMeta.Season)
 		if err != nil {
-			resp.Message = "获取电视剧季节信息失败: " + err.Error()
-			ctx.JSON(http.StatusInternalServerError, resp)
+			errResp.Message = "获取电视剧季节信息失败: " + err.Error()
+			ctx.JSON(http.StatusInternalServerError, errResp)
 			return
 		}
 		info.TMDBInfo.TVInfo.SeasonInfo = seasonDetail.TMDBInfo.TVInfo.SeasonInfo
 		episodeDetail, err := tmdb_controller.GetTVEpisodeDetail(info.TMDBID, videoMeta.Season, videoMeta.Episode)
 		if err != nil {
-			resp.Message = "获取电视剧集信息失败: " + err.Error()
-			ctx.JSON(http.StatusInternalServerError, resp)
+			errResp.Message = "获取电视剧集信息失败: " + err.Error()
+			ctx.JSON(http.StatusInternalServerError, errResp)
 			return
 		}
 		info.TMDBInfo.TVInfo.EpisodeInfo = episodeDetail.TMDBInfo.TVInfo.EpisodeInfo
 	}
 	item, err := schemas.NewMediaItem(videoMeta, info)
 	if err != nil {
-		resp.Message = "创建媒体项失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "创建媒体项失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 	var dst *schemas.FileInfo
@@ -87,13 +86,10 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 		dst, err = library_controller.ArchiveMedia(srcFile, dstDir, schemas.TransferLink, item, nil)
 	}
 	if err != nil {
-		resp.Message = "转移媒体文件失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "转移媒体文件失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 	logrus.Infof("%s 媒体文件转移完成", srcFile)
-
-	resp.Data = dst
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, dst)
 }

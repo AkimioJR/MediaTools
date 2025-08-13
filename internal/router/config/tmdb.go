@@ -15,16 +15,10 @@ import (
 // @Summary 获取 TMDB 配置
 // @Description 获取 TMDB 配置
 // @Tags config
-// @Accept json
 // @Produce json
-// @Success 200 {object} schemas.Response[config.TMDBConfig]
-// @Failure 400 {object} schemas.Response[config.TMDBConfig]
-// @Failure 500 {object} schemas.Response[config.TMDBConfig]
+// @Success 200 {object} config.TMDBConfig
 func TMDB(ctx *gin.Context) {
-	var resp schemas.Response[config.TMDBConfig]
-	resp.Data = config.TMDB
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, config.TMDB)
 }
 
 // @BasePath /config
@@ -33,21 +27,20 @@ func TMDB(ctx *gin.Context) {
 // @Description 更新 TMDB 配置
 // @Tags config
 // @Accept json
-// @Produce json
 // @Param config body config.TMDBConfig true "TMDB 配置"
-// @Success 200 {object} schemas.Response[config.TMDBConfig]
-// @Failure 400 {object} schemas.Response[config.TMDBConfig]
-// @Failure 500 {object} schemas.Response[config.TMDBConfig]
+// @Success 200 {object} config.TMDBConfig
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func UpdateTMDB(ctx *gin.Context) {
 	var (
-		req  config.TMDBConfig
-		resp schemas.Response[config.TMDBConfig]
+		req     config.TMDBConfig
+		errResp schemas.ErrResponse
 	)
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		resp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "请求参数错误: " + err.Error()
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -58,8 +51,8 @@ func UpdateTMDB(ctx *gin.Context) {
 	err = tmdb_controller.Init()
 	if err != nil {
 		logrus.Errorf("初始化 TMDB 控制器失败: %v", err)
-		resp.Message = "初始化 TMDB 控制器失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "初始化 TMDB 控制器失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		goto initErr
 	}
 
@@ -67,14 +60,12 @@ func UpdateTMDB(ctx *gin.Context) {
 
 	err = config.WriteConfig()
 	if err != nil {
-		resp.Message = "更新配置失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "更新配置失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Data = config.TMDB
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, config.TMDB)
 	return
 
 initErr:

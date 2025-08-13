@@ -1,7 +1,6 @@
 package schemas
 
-type Response[T any] struct {
+type ErrResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
-	Data    T      `json:"data,omitempty"`
 }

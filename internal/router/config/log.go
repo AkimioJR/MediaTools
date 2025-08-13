@@ -4,7 +4,6 @@ import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/logging"
 	"MediaTools/internal/schemas"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,16 +15,10 @@ import (
 // @Summary 获取日志配置
 // @Description 获取日志配置
 // @Tags config
-// @Accept json
 // @Produce json
-// @Success 200 {object} schemas.Response[config.LogConfig]
-// @Failure 400 {object} schemas.Response[config.LogConfig]
-// @Failure 500 {object} schemas.Response[config.LogConfig]
+// @Success 200 {object} config.LogConfig
 func Log(ctx *gin.Context) {
-	var resp schemas.Response[config.LogConfig]
-	resp.Data = config.Log
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, config.Log)
 }
 
 // @BasePath /config
@@ -36,21 +29,19 @@ func Log(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param config body config.LogConfig true "日志配置"
-// @Success 200 {object} schemas.Response[config.LogConfig]
-// @Failure 400 {object} schemas.Response[config.LogConfig]
-// @Failure 500 {object} schemas.Response[config.LogConfig]
+// @Success 200 {object} config.LogConfig
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func UpdateLog(ctx *gin.Context) {
 	var (
 		req       config.LogConfig
-		resp      schemas.Response[config.LogConfig]
 		oldConfig = config.Log
-		err       error
+		errResp   schemas.ErrResponse
 	)
 
-	err = ctx.ShouldBindJSON(&req)
+	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		resp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		ctx.JSON(http.StatusBadRequest, schemas.ErrResponse{Message: "请求参数错误: " + err.Error()})
 		return
 	}
 
@@ -60,16 +51,16 @@ func UpdateLog(ctx *gin.Context) {
 		config.Log.ConsoleLevel = req.ConsoleLevel
 		err = logging.SetLevel(req.ConsoleLevel)
 		if err != nil {
-			err = fmt.Errorf("设置终端日志级别失败: %w", err)
-			goto responseErr
+			errResp.Message = "设置终端日志级别失败: " + err.Error()
+			goto initErr
 		}
 	}
 	if config.Log.FileLevel != req.FileLevel {
 		config.Log.FileLevel = req.FileLevel
 		err = logging.SetFileLevel(req.FileLevel)
 		if err != nil {
-			err = fmt.Errorf("设置文件日志级别失败: %w", err)
-			goto responseErr
+			errResp.Message = "设置文件日志级别失败: " + err.Error()
+			goto initErr
 		}
 	}
 	if config.Log.FileDir != req.FileDir {
@@ -82,21 +73,18 @@ func UpdateLog(ctx *gin.Context) {
 	logrus.Debug("开始更新配置文件")
 	err = config.WriteConfig()
 	if err != nil {
-		resp.Message = "更新配置失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "更新配置失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Data = config.Log
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, config.Log)
 	return
 
-responseErr:
-	resp.Message = err.Error()
-	logrus.Errorf("更新日志配置失败: %v", err)
+initErr:
+	logrus.Errorf("更新日志配置失败: %s", errResp.Message)
 	config.Log = oldConfig // 恢复旧配置
 	logging.Init()         // 重新初始化日志系统
 	logrus.Debugf("日志配置恢复成功: %+v", config.Log)
-	ctx.JSON(http.StatusInternalServerError, resp)
+	ctx.JSON(http.StatusInternalServerError, errResp)
 }

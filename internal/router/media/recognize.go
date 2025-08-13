@@ -16,32 +16,31 @@ import (
 // @Description 根据提供的标题识别媒体信息，并返回 MediaItem 对象
 // @Tags media
 // @Param title query string true "媒体标题"
-// @Success 200 {object} schemas.Response[*schemas.MediaItem]
-// @Failure 400 {object} schemas.Response[*schemas.MediaItem]
-// @Failure 500 {object} schemas.Response[*schemas.MediaItem]
+// @Produce json
+// @Success 200 {object} schemas.MediaItem
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func Recognize(ctx *gin.Context) {
-	var resp schemas.Response[*schemas.MediaItem]
+	var errResp schemas.ErrResponse
 	title := ctx.Query("title")
 	if title == "" {
-		resp.Message = "标题不能为空"
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "标题不能为空"
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 	logrus.Infof("正在识别媒体：%s", title)
 	videoMeta := media_controller.ParseVideoMeta(title)
 	mediaInfo, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
 	if err != nil {
-		resp.Message = "识别失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "识别失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 	item, err := schemas.NewMediaItem(videoMeta, mediaInfo)
 	if err != nil {
-		resp.Message = "创建媒体项失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "创建媒体项失败: " + err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
-	resp.Data = item
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, item)
 }

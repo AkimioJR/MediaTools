@@ -15,16 +15,10 @@ import (
 // @Summary 获取 Fanart 配置
 // @Description 获取 Fanart 配置
 // @Tags config
-// @Accept json
 // @Produce json
-// @Success 200 {object} schemas.Response[config.FanartConfig]
-// @Failure 400 {object} schemas.Response[config.FanartConfig]
-// @Failure 500 {object} schemas.Response[config.FanartConfig]
+// @Success 200 {object} config.FanartConfig
 func Fanart(ctx *gin.Context) {
-	var resp schemas.Response[config.FanartConfig]
-	resp.Data = config.Fanart
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, config.Fanart)
 }
 
 // @BasePath /config
@@ -35,19 +29,15 @@ func Fanart(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param config body config.FanartConfig true "Fanart 配置"
-// @Success 200 {object} schemas.Response[config.FanartConfig]
-// @Failure 400 {object} schemas.Response[config.FanartConfig]
-// @Failure 500 {object} schemas.Response[config.FanartConfig]
+// @Success 200 {object} config.FanartConfig
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func UpdateFanart(ctx *gin.Context) {
-	var (
-		req  config.FanartConfig
-		resp schemas.Response[config.FanartConfig]
-	)
+	var req config.FanartConfig
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		resp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		ctx.JSON(http.StatusBadRequest, schemas.ErrResponse{Message: "请求参数错误: " + err.Error()})
 		return
 	}
 
@@ -57,8 +47,7 @@ func UpdateFanart(ctx *gin.Context) {
 	config.Fanart = req
 	err = fanart_controller.Init()
 	if err != nil {
-		resp.Message = "初始化 Fanart 控制器失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		ctx.JSON(http.StatusBadRequest, schemas.ErrResponse{Message: "初始化 Fanart 控制器失败: " + err.Error()})
 		goto initErr
 	}
 
@@ -66,15 +55,13 @@ func UpdateFanart(ctx *gin.Context) {
 
 	err = config.WriteConfig()
 	if err != nil {
-		resp.Message = "更新配置失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		ctx.JSON(http.StatusInternalServerError, schemas.ErrResponse{Message: "写入配置文件失败: " + err.Error()})
 		return
 	}
 
-	resp.Data = config.Fanart
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, config.Fanart)
 	return
+
 initErr:
 	config.Fanart = oldConfig
 	fanart_controller.Init()

@@ -16,15 +16,9 @@ import (
 // @Description 返回所有已注册的存储提供者列表
 // @Tags storage
 // @Products json
-// @Success 200 {object} schemas.Response[[]schemas.StorageProviderItem]
-// @Failure 500 {object} schemas.Response[[]schemas.StorageProviderItem]
+// @Success 200 {object} []schemas.StorageProviderItem
 func ProviderList(ctx *gin.Context) {
-	var resp schemas.Response[[]schemas.StorageProviderItem]
-
-	resp.Data = storage_controller.ListStorageProviders()
-	resp.Success = true
-	logrus.Info(resp)
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, storage_controller.ListStorageProviders())
 }
 
 // @BasePath /storage/provider
@@ -35,32 +29,30 @@ func ProviderList(ctx *gin.Context) {
 // @Param storage_type path string true "存储类型"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.StorageProviderItem]
-// @Failure 400 {object} schemas.Response[*schemas.StorageProviderItem]
-// @Failure 500 {object} schemas.Response[*schemas.StorageProviderItem]
+// @Success 200 {object} schemas.StorageProviderItem
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func ProviderGet(ctx *gin.Context) {
-	var resp schemas.Response[*schemas.StorageProviderItem]
+	var errResp schemas.ErrResponse
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		logrus.Warningf("未知的存储类型: %s", storageTypeStr)
-		resp.Message = "未知的存储类型: " + storageTypeStr
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "未知的存储类型: " + storageTypeStr
+		logrus.Warning(errResp.Message)
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	item, err := storage_controller.GetStorageProvider(storageType)
 	if err != nil {
-		logrus.Warningf("获取存储提供者失败: %v", err)
-		resp.Message = "获取存储提供者失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "获取存储提供者失败: " + err.Error()
+		logrus.Warning(errResp.Message)
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Success = true
-	resp.Data = item
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, item)
 }
 
 // @BasePath /storage/provider
@@ -72,13 +64,13 @@ func ProviderGet(ctx *gin.Context) {
 // @Param body body map[string]string true "存储器配置"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.StorageProviderItem]
-// @Failure 400 {object} schemas.Response[*schemas.StorageProviderItem]
-// @Failure 500 {object} schemas.Response[*schemas.StorageProviderItem]
+// @Success 200 {object} schemas.StorageProviderItem
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func ProviderRegister(ctx *gin.Context) {
 	var (
-		req  map[string]string
-		resp schemas.Response[*schemas.StorageProviderItem]
+		req     map[string]string
+		errResp schemas.ErrResponse
 	)
 
 	logrus.Debugf("请求体: %+v", ctx.Request.Body)
@@ -86,15 +78,15 @@ func ProviderRegister(ctx *gin.Context) {
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		logrus.Warningf("未知的存储类型: %s", storageTypeStr)
-		resp.Message = "未知的存储类型: " + storageTypeStr
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "未知的存储类型: " + storageTypeStr
+		logrus.Warning(errResp.Message)
+		ctx.JSON(http.StatusBadRequest, errResp)
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		logrus.Errorf("解析请求参数失败: %v", err)
-		resp.Message = "解析请求参数失败: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "解析请求参数失败: " + err.Error()
+		logrus.Warning(errResp.Message)
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -107,17 +99,14 @@ func ProviderRegister(ctx *gin.Context) {
 
 	item, err := storage_controller.RegisterStorageProvider(c)
 	if err != nil {
-		logrus.Errorf("注册存储器失败: %v", err)
-		resp.Message = "注册存储器失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "注册存储器失败: " + err.Error()
+		logrus.Warning(errResp.Message)
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
 	logrus.Debugf("存储器注册成功: %+v", item)
-
-	resp.Success = true
-	resp.Data = item
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, item)
 }
 
 // @BasePath /storage/provider
@@ -128,37 +117,34 @@ func ProviderRegister(ctx *gin.Context) {
 // @Param storage_type path string true "存储类型"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.StorageProviderItem]
-// @Failure 400 {object} schemas.Response[*schemas.StorageProviderItem]
-// @Failure 500 {object} schemas.Response[*schemas.StorageProviderItem]
-// @Router /storage/provider/{storage_type} [delete]
+// @Success 200 {object} schemas.StorageProviderItem
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func ProviderDelete(ctx *gin.Context) {
-	var resp schemas.Response[*schemas.StorageProviderItem]
+	var errResp schemas.ErrResponse
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	switch storageType {
 	case schemas.StorageUnknown:
-		logrus.Warningf("未知的存储类型: %s", storageTypeStr)
-		resp.Message = "未知的存储类型"
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "未知的存储类型"
+		logrus.Warning(errResp.Message)
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	case schemas.StorageLocal:
-		logrus.Warning("无法删除本地存储器")
-		resp.Message = "无法删除本地存储器"
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "无法删除本地存储器"
+		logrus.Warning(errResp.Message)
+		ctx.JSON(http.StatusBadRequest, errResp)
 	}
 
 	item, err := storage_controller.UnRegisterStorageProvider(storageType)
 	if err != nil {
-		logrus.Errorf("删除存储器失败: %v", err)
-		resp.Message = "删除存储器失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = "删除存储器失败: " + err.Error()
+		logrus.Warning(errResp.Message)
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
 	logrus.Debugf("已删除存储器: %s", storageType)
-	resp.Success = true
-	resp.Data = item
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, item)
 }

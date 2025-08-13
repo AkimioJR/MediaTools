@@ -14,21 +14,21 @@ import (
 // 如果传输类型未知，则返回错误
 func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferType, transferFunc func(*schemas.FileInfo, *schemas.FileInfo) error) {
 	var (
-		req  schemas.TransferRequest
-		resp schemas.Response[*schemas.FileInfo]
+		req     schemas.TransferRequest
+		errResp schemas.ErrResponse
 	)
 
 	// 绑定并验证请求参数
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		resp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "请求参数错误: " + err.Error()
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	// 验证传输类型
 	if req.TransferType != expectedTransferType && req.TransferType != schemas.TransferUnknown {
-		resp.Message = "传输类型错误: " + req.TransferType.String()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "传输类型错误: " + req.TransferType.String()
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -39,15 +39,13 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferT
 	// 执行传输操作
 	err := transferFunc(srcFile, dstFile)
 	if err != nil {
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
 	// 返回成功响应
-	resp.Data = dstFile
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, dstFile)
 }
 
 // @BasePath /storage
@@ -58,9 +56,9 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferT
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+// @Success 200 {object} schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageCopyFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferCopy, storage_controller.Copy)
 }
@@ -73,9 +71,9 @@ func StorageCopyFile(ctx *gin.Context) {
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+// @Success 200 {object} schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageMoveFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferMove, storage_controller.Move)
 }
@@ -88,9 +86,9 @@ func StorageMoveFile(ctx *gin.Context) {
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+// @Success 200 {object} schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageLinkFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferLink, storage_controller.Link)
 }
@@ -103,9 +101,9 @@ func StorageLinkFile(ctx *gin.Context) {
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+// @Success 200 {object} schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageSoftLinkFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferSoftLink, storage_controller.SoftLink)
 }
@@ -118,24 +116,24 @@ func StorageSoftLinkFile(ctx *gin.Context) {
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 400 {object} schemas.Response[*schemas.FileInfo]
-// @Failure 500 {object} schemas.Response[*schemas.FileInfo]
+// @Success 200 {object} schemas.FileInfo
+// @Failure 400 {object} schemas.ErrResponse
+// @Failure 500 {object} schemas.ErrResponse
 func StorageTransferFile(ctx *gin.Context) {
 	var (
-		req  schemas.TransferRequest
-		resp schemas.Response[*schemas.FileInfo]
+		req     schemas.TransferRequest
+		errResp schemas.ErrResponse
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		resp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "请求参数错误: " + err.Error()
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
 	if req.TransferType == schemas.TransferUnknown {
-		resp.Message = "传输类型错误: " + req.TransferType.String()
-		ctx.JSON(http.StatusBadRequest, resp)
+		errResp.Message = "传输类型错误: " + req.TransferType.String()
+		ctx.JSON(http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -145,12 +143,10 @@ func StorageTransferFile(ctx *gin.Context) {
 
 	err := storage_controller.TransferFile(srcFile, dstFile, req.TransferType)
 	if err != nil {
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
+		errResp.Message = err.Error()
+		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
 
-	resp.Data = dstFile
-	resp.Success = true
-	ctx.JSON(http.StatusOK, resp)
+	ctx.JSON(http.StatusOK, dstFile)
 }
