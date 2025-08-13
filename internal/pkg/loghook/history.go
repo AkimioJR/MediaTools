@@ -8,10 +8,10 @@ import (
 )
 
 type LogDetail struct {
-	Level   logrus.Level `json:"level"`   // 日志级别
-	Message string       `json:"message"` // 日志消息
-	Time    time.Time    `json:"time"`    // 日志时间
-	Caller  string       `json:"caller"`  // 日志调用者
+	Level   string    `json:"level"`   // 日志级别
+	Message string    `json:"message"` // 日志消息
+	Time    time.Time `json:"time"`    // 日志时间
+	Caller  string    `json:"caller"`  // 日志调用者
 }
 type MemoryHistoryHook struct {
 	logs  []LogDetail
@@ -31,7 +31,7 @@ func (h *MemoryHistoryHook) Fire(entry *logrus.Entry) error {
 	h.lock.Lock()
 	defer h.lock.Unlock()
 	h.logs[h.index] = LogDetail{ // 直接存储结构体值
-		Level:   entry.Level,
+		Level:   entry.Level.String(),
 		Message: entry.Message,
 		Time:    entry.Time,
 		Caller:  entry.Caller.Function,
