@@ -1416,7 +1416,7 @@ const docTemplate = `{
                 }
             }
         },
-        "schemas.RecognizationResponse": {
+        "schemas.RecognizeMediaResponse": {
             "type": "object",
             "properties": {
                 "custom_rule": {

@@ -16,7 +16,7 @@ import (
 // @Tags 识别
 // @Param title query string true "媒体标题"
 // @Produce json
-// @Success 200 {object} schemas.RecognizationResponse
+// @Success 200 {object} schemas.RecognizeMediaResponse
 // @Failure 400 {object} schemas.ErrResponse
 // @Failure 500 {object} schemas.ErrResponse
 func RecognizeMedia(ctx *gin.Context) {
@@ -41,7 +41,7 @@ func RecognizeMedia(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
-	ctx.JSON(http.StatusOK, schemas.RecognizationResponse{
+	ctx.JSON(http.StatusOK, schemas.RecognizeMediaResponse{
 		Item:       item,
 		CustomRule: customRule,
 		MetaRule:   metaRule,

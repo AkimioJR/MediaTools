@@ -604,7 +604,7 @@ definitions:
         description: 年份
         type: integer
     type: object
-  schemas.RecognizationResponse:
+  schemas.RecognizeMediaResponse:
     properties:
       custom_rule:
         description: 应用自定义规则
