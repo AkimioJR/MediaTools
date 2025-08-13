@@ -99,7 +99,7 @@ func ApplyMediaMetaRule(vm *meta.VideoMeta) string {
 				logrus.Warningf("标题「%s」匹配到的设置规则格式错误：%s", vm.OrginalTitle, part)
 				continue
 			}
-
+			kv[1] = strings.TrimSpace(kv[1])
 			switch strings.TrimSpace(strings.ToLower(kv[0])) {
 			case "tmdbid": // TMDB ID
 				id, err := strconv.Atoi(kv[1])
@@ -117,7 +117,7 @@ func ApplyMediaMetaRule(vm *meta.VideoMeta) string {
 					continue
 				}
 				vm.MediaType = mediaType
-				rules = append(rules, "type="+mediaType.String())
+				rules = append(rules, "type="+kv[1])
 
 			case "s": // 季数
 				season, err := strconv.Atoi(kv[1])
