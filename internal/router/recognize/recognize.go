@@ -16,7 +16,7 @@ import (
 // @Tags 识别
 // @Param title query string true "媒体标题"
 // @Produce json
-// @Success 200 {object} schemas.MediaItem
+// @Success 200 {object} schemas.RecognizationResponse
 // @Failure 400 {object} schemas.ErrResponse
 // @Failure 500 {object} schemas.ErrResponse
 func RecognizeMedia(ctx *gin.Context) {
@@ -28,7 +28,7 @@ func RecognizeMedia(ctx *gin.Context) {
 		return
 	}
 	logrus.Infof("正在识别媒体：%s", title)
-	videoMeta, _, _ := recognize_controller.ParseVideoMeta(title)
+	videoMeta, customRule, metaRule := recognize_controller.ParseVideoMeta(title)
 	mediaInfo, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
 	if err != nil {
 		errResp.Message = "识别失败: " + err.Error()
@@ -41,5 +41,9 @@ func RecognizeMedia(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errResp)
 		return
 	}
-	ctx.JSON(http.StatusOK, item)
+	ctx.JSON(http.StatusOK, schemas.RecognizationResponse{
+		Item:       item,
+		CustomRule: customRule,
+		MetaRule:   metaRule,
+	})
 }
