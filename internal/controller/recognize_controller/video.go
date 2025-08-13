@@ -62,13 +62,16 @@ func MatchCustomizationWordWord(title string) []string {
 	return customWords
 }
 
-func ParseVideoMeta(title string) (*meta.VideoMeta, string) {
+// 根据文件名/标题解析媒体数据
+// 返回解析元数据、匹配的自定义规则、应用的自定义媒体规则
+func ParseVideoMeta(title string) (*meta.VideoMeta, string, string) {
 	loock.RLock()
 	defer loock.RUnlock()
-	title, rule := MatchAndProcessVideoTitle(title)
+	title, customRule := MatchAndProcessVideoTitle(title)
 	vm := meta.ParseVideoMeta(title)
 	vm.Customization = MatchCustomizationWordWord(title)
-	return vm, rule
+	metaRule := ApplyMediaMetaRule(vm)
+	return vm, customRule, metaRule
 }
 
 var ruleRe = regexp.MustCompile(`\{\[.+\]\}`)
