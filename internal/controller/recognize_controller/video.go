@@ -73,10 +73,10 @@ func ParseVideoMeta(title string) (*meta.VideoMeta, string) {
 
 var ruleRe = regexp.MustCompile(`\{\[.+\]\}`)
 
-// UpdateMetaByRule 根据匹配规则更新视频元数据
+// ApplyMediaMetaRule 应用的自定义媒体规则
 // {[tmdbid=xxx;type=movie/tv;s=xxx;e=xxx]} 直接指定TMDBID，其中s、e为季数和集数（可选）
 // 返回应用的规则
-func UpdateMetaByRule(vm *meta.VideoMeta) string {
+func ApplyMediaMetaRule(vm *meta.VideoMeta) string {
 	loock.RLock()
 	defer loock.RUnlock()
 	matches := ruleRe.FindStringSubmatch(vm.OrginalTitle)

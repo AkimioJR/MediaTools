@@ -400,7 +400,7 @@ func TestUpdateMetaByRule(t *testing.T) {
 			vm := &meta.VideoMeta{
 				OrginalTitle: tt.title,
 			}
-			recognize_controller.UpdateMetaByRule(vm)
+			recognize_controller.ApplyMediaMetaRule(vm)
 
 			require.Equal(t, tt.expectedTMDB, vm.TMDBID, "Expected TMDBID to match for title: %s", tt.title)
 			require.Equal(t, tt.expectedType, vm.MediaType, "Expected MediaType to match for title: %s", tt.title)
