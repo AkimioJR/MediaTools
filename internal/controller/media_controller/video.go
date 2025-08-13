@@ -4,6 +4,8 @@ import (
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -67,4 +69,66 @@ func ParseVideoMeta(title string) (*meta.VideoMeta, string) {
 	vm := meta.ParseVideoMeta(title)
 	vm.Customization = MatchCustomizationWordWord(title)
 	return vm, rule
+}
+
+var ruleRe = regexp.MustCompile(`\{\[.+\]\}`)
+
+// UpdateMetaByRule 根据匹配规则更新视频元数据
+// {[tmdbid=xxx;type=movie/tv;s=xxx;e=xxx]} 直接指定TMDBID，其中s、e为季数和集数（可选）
+func UpdateMetaByRule(vm *meta.VideoMeta) {
+	loock.RLock()
+	defer loock.RUnlock()
+	matches := ruleRe.FindStringSubmatch(vm.OrginalTitle)
+	switch len(matches) {
+	case 0:
+		logrus.Debugf("标题「%s」未匹配到设置规则", vm.OrginalTitle)
+	case 1:
+		logrus.Debugf("标题「%s」匹配到设置规则：%s", vm.OrginalTitle, matches[0])
+		// 解析规则
+		rule := matches[0][2 : len(matches[0])-2] // 去掉两边的 {[ 和 ]}
+		parts := strings.Split(rule, ";")
+		for _, part := range parts {
+			kv := strings.Split(part, "=")
+			if len(kv) != 2 {
+				logrus.Warningf("标题「%s」匹配到的设置规则格式错误：%s", vm.OrginalTitle, part)
+				continue
+			}
+
+			switch strings.TrimSpace(strings.ToLower(kv[0])) {
+			case "tmdbid": // TMDB ID
+				id, err := strconv.Atoi(kv[1])
+				if err != nil {
+					logrus.Warningf("标题「%s」匹配到的设置规则TMDBID格式错误：%s", vm.OrginalTitle, kv[1])
+					continue
+				}
+				vm.TMDBID = id
+
+			case "type": // 媒体类型
+				mediaType := meta.ParseMediaType(kv[1])
+				if mediaType == meta.MediaTypeUnknown {
+					logrus.Warningf("标题「%s」匹配到的设置规则类型错误：%s", vm.OrginalTitle, kv[1])
+					continue
+				}
+				vm.MediaType = mediaType
+
+			case "s": // 季数
+				season, err := strconv.Atoi(kv[1])
+				if err != nil {
+					logrus.Warningf("标题「%s」匹配到的设置规则季数格式错误：%s", vm.OrginalTitle, kv[1])
+					continue
+				}
+				vm.Season = season
+
+			case "e": // 集数
+				episode, err := strconv.Atoi(kv[1])
+				if err != nil {
+					logrus.Warningf("标题「%s」匹配到的设置规则集数格式错误：%s", vm.OrginalTitle, kv[1])
+					continue
+				}
+				vm.Episode = episode
+			}
+		}
+	default:
+		logrus.Warningf("标题「%s」匹配到多个设置规则：%+v，跳过解析", vm.OrginalTitle, matches)
+	}
 }
