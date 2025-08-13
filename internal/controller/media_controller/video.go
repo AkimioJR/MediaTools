@@ -60,11 +60,11 @@ func MatchCustomizationWordWord(title string) []string {
 	return customWords
 }
 
-func ParseVideoMeta(title string) *meta.VideoMeta {
+func ParseVideoMeta(title string) (*meta.VideoMeta, string) {
 	loock.RLock()
 	defer loock.RUnlock()
-	title, _ = MatchAndProcessVideoTitle(title)
+	title, rule := MatchAndProcessVideoTitle(title)
 	vm := meta.ParseVideoMeta(title)
 	vm.Customization = MatchCustomizationWordWord(title)
-	return vm
+	return vm, rule
 }

@@ -28,7 +28,7 @@ func Recognize(ctx *gin.Context) {
 		return
 	}
 	logrus.Infof("正在识别媒体：%s", title)
-	videoMeta := media_controller.ParseVideoMeta(title)
+	videoMeta, _ := media_controller.ParseVideoMeta(title)
 	mediaInfo, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
 	if err != nil {
 		errResp.Message = "识别失败: " + err.Error()
