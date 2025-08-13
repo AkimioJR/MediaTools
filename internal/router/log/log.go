@@ -7,8 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @BasePath /log
-// @Router /recent [get]
+// @Router /log/recent [get]
 // @Summary 获取最近日志
 // @Description 获取最近日志
 // @Tags log

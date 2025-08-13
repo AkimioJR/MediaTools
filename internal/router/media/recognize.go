@@ -10,8 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @BasePath /media
-// @Route /recognize [get]
+// @Route /media/recognize [get]
 // @Summary 识别媒体信息
 // @Description 根据提供的标题识别媒体信息，并返回 MediaItem 对象
 // @Tags media

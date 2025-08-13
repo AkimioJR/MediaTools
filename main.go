@@ -35,6 +35,10 @@ func init() {
 	gin.SetMode(gin.ReleaseMode)
 }
 
+// @title MediaTools API 文档
+// @version 1.0
+// @description 下一代媒体刮削&整理工具
+// @Schemes HTTP
 func main() {
 	logrus.Info("开始初始化配置...")
 	err := config.Init()

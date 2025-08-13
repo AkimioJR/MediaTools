@@ -10,8 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @BasePath /storage
-// @Route /provider [get]
+// @Route /storage/provider [get]
 // @Summary 获取存储提供者列表
 // @Description 返回所有已注册的存储提供者列表
 // @Tags storage
@@ -21,8 +20,7 @@ func ProviderList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, storage_controller.ListStorageProviders())
 }
 
-// @BasePath /storage/provider
-// @Route /{storage_type} [get]
+// @Route /storage/provider/{storage_type} [get]
 // @Summary 获取指定存储提供者
 // @Description 获取指定类型的存储提供者信息
 // @Tags storage
@@ -55,8 +53,7 @@ func ProviderGet(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, item)
 }
 
-// @BasePath /storage/provider
-// @Route /{storage_type} [post]
+// @Route /storage/provider/{storage_type} [post]
 // @Summary 注册新的存储器
 // @Description 注册一个新的存储器
 // @Tags storage
@@ -109,8 +106,7 @@ func ProviderRegister(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, item)
 }
 
-// @BasePath /storage/provider
-// @Route /{storage_type} [delete]
+// @Route /storage/provider/{storage_type} [delete]
 // @Summary 删除存储器
 // @Description 删除指定类型的存储器
 // @Tags storage

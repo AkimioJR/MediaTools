@@ -10,8 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @BasePath /scrape
-// @Router /video [post]
+// @Router /scrape/video [post]
 // @Summary 刮削视频
 // @Description 刮削视频文件的元数据和相关信息
 // @Tags scrape

@@ -10,8 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @BasePath /storage
-// @Route /:storage_type/info [get]
+// @Route /storage/:storage_type/info [get]
 // @Summary 获取文件/目录信息
 // @Description 根据路径和存储类型获取文件或目录的详细信息
 // @Tags storage
@@ -49,8 +48,7 @@ func StorageGetFileInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, fileInfo)
 }
 
-// @BasePath /storage
-// @Route /:storage_type/exists [get]
+// @Route /storage/:storage_type/exists [get]
 // @Summary 检查文件/目录是否存在
 // @Description 根据路径和存储类型检查文件或目录是否存在
 // @Tags storage
@@ -90,8 +88,7 @@ func StorageCheckExists(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, exists)
 }
 
-// @BasePath /storage
-// @Route /:storage_type/list [get]
+// @Route /storage/:storage_type/list [get]
 // @Summary 列出目录内容
 // @Description 根据存储类型和路径列出目录下的所有文件和子目录
 // @Tags storage
@@ -133,8 +130,7 @@ func StorageList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, files)
 }
 
-// @BasePath /storage
-// @Route /:storage_type/mkdir [post]
+// @Route /storage/:storage_type/mkdir [post]
 // @Summary 创建目录
 // @Description 根据存储类型和路径创建一个新目录
 // @Tags storage
@@ -178,8 +174,7 @@ func StorageMkdir(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dirInfo)
 }
 
-// @BasePath /storage
-// @Route /:storage_type/delete [delete]
+// @Route /storage/:storage_type/delete [delete]
 // @Summary 删除文件或目录
 // @Description 根据存储类型和路径删除指定的文件或目录
 // @Tags storage
@@ -223,8 +218,7 @@ func StorageDelete(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, fileInfo)
 }
 
-// @BasePath /storage
-// @Route /:storage_type/rename [post]
+// @Route /storage/:storage_type/rename [post]
 // @Summary 重命名文件或目录
 // @Description 根据存储类型和路径重命名指定的文件或目录
 // @Tags storage
@@ -267,8 +261,7 @@ func StorageRename(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, fileInfo)
 }
 
-// @BasePath /storage
-// @Route /:storage_type/upload [post]
+// @Route /storage/:storage_type/upload [post]
 // @Summary 上传文件
 // @Description 根据存储类型和路径上传文件
 // @Tags storage
@@ -326,8 +319,7 @@ func StorageUploadFile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, fileInfo)
 }
 
-// @BasePath /storage
-// @Route /:storage_type/download [get]
+// @Route /storage/:storage_type/download [get]
 // @Summary 下载文件
 // @Description 根据存储类型和路径下载文件
 // @Tags storage

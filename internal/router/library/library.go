@@ -13,8 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @BasePath /library
-// @Router /archive [post]
+// @Router  /library/archive [post]
 // @Summary 归档媒体文件
 // @Description 整理一个视频文件及其相关的字幕和音轨文件到指定目录
 // @Tags Library

@@ -10,8 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @BasePath /config
-// @Router /tmdb [get]
+// @Router /config/tmdb [get]
 // @Summary 获取 TMDB 配置
 // @Description 获取 TMDB 配置
 // @Tags config
@@ -21,8 +20,7 @@ func TMDB(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.TMDB)
 }
 
-// @BasePath /config
-// @Router /tmdb [post]
+// @Router /config/tmdb [post]
 // @Summary 更新 TMDB 配置
 // @Description 更新 TMDB 配置
 // @Tags config

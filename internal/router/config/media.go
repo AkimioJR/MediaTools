@@ -10,8 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @BasePath /config/media
-// @Router /libraries [get]
+// @Router /config/libraries [get]
 // @Summary 获取媒体库配置
 // @Description 获取媒体库配置
 // @Tags config
@@ -21,8 +20,7 @@ func MediaLibrary(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.Media.Libraries)
 }
 
-// @BasePath /config/media
-// @Router /libraries [post]
+// @Router /config/libraries [post]
 // @Summary 更新媒体库配置
 // @Description 更新媒体库配置
 // @Tags config
@@ -73,8 +71,7 @@ initErr:
 	media_controller.Init()
 }
 
-// @BasePath /config/media
-// @Router /format [get]
+// @Router /config/media/format [get]
 // @Summary 获取媒体格式配置
 // @Description 获取媒体格式配置
 // @Tags config
@@ -84,8 +81,7 @@ func MediaFormat(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.Media.Format)
 }
 
-// @BasePath /config/media
-// @Router /format [post]
+// @Router /config/media/format [post]
 // @Summary 更新媒体格式配置
 // @Description 更新媒体格式配置
 // @Tags config
@@ -130,8 +126,7 @@ initErr:
 	media_controller.Init()
 }
 
-// @BasePath /config/media
-// @Router /custom_word [get]
+// @Router /config/media/custom_word [get]
 // @Summary 获取自定义词配置
 // @Description 获取自定义词配置
 // @Tags config
@@ -142,8 +137,7 @@ func CustomWord(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.Media.CustomWord)
 }
 
-// @BasePath /config/media
-// @Router /custom_word [post]
+// @Router /config/media/custom_word [post]
 // @Summary 更新自定义词配置
 // @Description 更新自定义词配置
 // @Tags config

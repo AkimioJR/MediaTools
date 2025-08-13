@@ -15,120 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/archive": {
-            "post": {
-                "description": "整理一个视频文件及其相关的字幕和音轨文件到指定目录",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Library"
-                ],
-                "summary": "归档媒体文件",
-                "parameters": [
-                    {
-                        "description": "请求参数",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/schemas.LibraryArchiveMediaRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "成功响应",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.FileInfo"
-                        }
-                    },
-                    "400": {
-                        "description": "请求参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "服务器错误",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/custom_word": {
-            "get": {
-                "description": "获取自定义词配置",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "config"
-                ],
-                "summary": "获取自定义词配置",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.CustomWordConfig"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "更新自定义词配置",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "config"
-                ],
-                "summary": "更新自定义词配置",
-                "parameters": [
-                    {
-                        "description": "自定义词配置",
-                        "name": "config",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/config.CustomWordConfig"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.CustomWordConfig"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/fanart": {
+        "/config/fanart": {
             "get": {
                 "description": "获取 Fanart 配置",
                 "produces": [
@@ -192,71 +79,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/format": {
-            "get": {
-                "description": "获取媒体格式配置",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "config"
-                ],
-                "summary": "获取媒体格式配置",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.FormatConfig"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "更新媒体格式配置",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "config"
-                ],
-                "summary": "更新媒体格式配置",
-                "parameters": [
-                    {
-                        "description": "媒体格式配置",
-                        "name": "config",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/config.FormatConfig"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.FormatConfig"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/libraries": {
+        "/config/libraries": {
             "get": {
                 "description": "获取媒体库配置",
                 "produces": [
@@ -329,7 +152,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/log": {
+        "/config/log": {
             "get": {
                 "description": "获取日志配置",
                 "produces": [
@@ -388,6 +211,267 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/config/media/custom_word": {
+            "get": {
+                "description": "获取自定义词配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "config"
+                ],
+                "summary": "获取自定义词配置",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/config.CustomWordConfig"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "更新自定义词配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "config"
+                ],
+                "summary": "更新自定义词配置",
+                "parameters": [
+                    {
+                        "description": "自定义词配置",
+                        "name": "config",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/config.CustomWordConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/config.CustomWordConfig"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/config/media/format": {
+            "get": {
+                "description": "获取媒体格式配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "config"
+                ],
+                "summary": "获取媒体格式配置",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/config.FormatConfig"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "更新媒体格式配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "config"
+                ],
+                "summary": "更新媒体格式配置",
+                "parameters": [
+                    {
+                        "description": "媒体格式配置",
+                        "name": "config",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/config.FormatConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/config.FormatConfig"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/config/tmdb": {
+            "get": {
+                "description": "获取 TMDB 配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "config"
+                ],
+                "summary": "获取 TMDB 配置",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/config.TMDBConfig"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "更新 TMDB 配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "config"
+                ],
+                "summary": "更新 TMDB 配置",
+                "parameters": [
+                    {
+                        "description": "TMDB 配置",
+                        "name": "config",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/config.TMDBConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/config.TMDBConfig"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/library/archive": {
+            "post": {
+                "description": "整理一个视频文件及其相关的字幕和音轨文件到指定目录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Library"
+                ],
+                "summary": "归档媒体文件",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.LibraryArchiveMediaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.FileInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/log/recent": {
+            "get": {
+                "description": "获取最近日志",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "log"
+                ],
+                "summary": "获取最近日志",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/loghook.LogDetail"
+                            }
                         }
                     }
                 }
@@ -509,91 +593,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/recent": {
-            "get": {
-                "description": "获取最近日志",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "log"
-                ],
-                "summary": "获取最近日志",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/loghook.LogDetail"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/tmdb": {
-            "get": {
-                "description": "获取 TMDB 配置",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "config"
-                ],
-                "summary": "获取 TMDB 配置",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.TMDBConfig"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "更新 TMDB 配置",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "config"
-                ],
-                "summary": "更新 TMDB 配置",
-                "parameters": [
-                    {
-                        "description": "TMDB 配置",
-                        "name": "config",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/config.TMDBConfig"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.TMDBConfig"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/video": {
+        "/scrape/video": {
             "post": {
                 "description": "刮削视频文件的元数据和相关信息",
                 "consumes": [
@@ -1498,12 +1498,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
 	BasePath:         "",
-	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Schemes:          []string{"HTTP"},
+	Title:            "MediaTools API 文档",
+	Description:      "下一代媒体刮削&整理工具",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

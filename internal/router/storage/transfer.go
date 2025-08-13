@@ -48,8 +48,7 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferT
 	ctx.JSON(http.StatusOK, dstFile)
 }
 
-// @BasePath /storage
-// @Route /copy [post]
+// @Route /storage/copy [post]
 // @Summary 复制文件
 // @Description 将文件从源位置复制到目标位置
 // @Tags storage
@@ -63,8 +62,7 @@ func StorageCopyFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferCopy, storage_controller.Copy)
 }
 
-// @BasePath /storage
-// @Route /move [post]
+// @Route /storage/move [post]
 // @Summary 移动文件
 // @Description 将文件从源位置移动到目标位置
 // @Tags storage
@@ -78,8 +76,7 @@ func StorageMoveFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferMove, storage_controller.Move)
 }
 
-// @BasePath /storage
-// @Route /link [post]
+// @Route /storage/link [post]
 // @Summary 创建硬链接
 // @Description 为文件创建硬链接
 // @Tags storage
@@ -93,8 +90,7 @@ func StorageLinkFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferLink, storage_controller.Link)
 }
 
-// @BasePath /storage
-// @Route /softlink [post]
+// @Route /storage/softlink [post]
 // @Summary 创建软链接
 // @Description 为文件创建软链接（符号链接）
 // @Tags storage
@@ -108,8 +104,7 @@ func StorageSoftLinkFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferSoftLink, storage_controller.SoftLink)
 }
 
-// @BasePath /storage
-// @Route /transfer [post]
+// @Route /storage/transfer [post]
 // @Summary 通用文件传输接口
 // @Description 根据传输类型执行文件传输操作（复制、移动、硬链接、软链接）
 // @Tags storage

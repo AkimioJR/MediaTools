@@ -668,82 +668,11 @@ definitions:
     - TransferSoftLink
 info:
   contact: {}
+  description: 下一代媒体刮削&整理工具
+  title: MediaTools API 文档
+  version: "1.0"
 paths:
-  /archive:
-    post:
-      consumes:
-      - application/json
-      description: 整理一个视频文件及其相关的字幕和音轨文件到指定目录
-      parameters:
-      - description: 请求参数
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/schemas.LibraryArchiveMediaRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 成功响应
-          schema:
-            $ref: '#/definitions/schemas.FileInfo'
-        "400":
-          description: 请求参数错误
-          schema:
-            $ref: '#/definitions/schemas.ErrResponse'
-        "500":
-          description: 服务器错误
-          schema:
-            $ref: '#/definitions/schemas.ErrResponse'
-      summary: 归档媒体文件
-      tags:
-      - Library
-  /custom_word:
-    get:
-      consumes:
-      - application/json
-      description: 获取自定义词配置
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/config.CustomWordConfig'
-      summary: 获取自定义词配置
-      tags:
-      - config
-    post:
-      consumes:
-      - application/json
-      description: 更新自定义词配置
-      parameters:
-      - description: 自定义词配置
-        in: body
-        name: config
-        required: true
-        schema:
-          $ref: '#/definitions/config.CustomWordConfig'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/config.CustomWordConfig'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/schemas.ErrResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/schemas.ErrResponse'
-      summary: 更新自定义词配置
-      tags:
-      - config
-  /fanart:
+  /config/fanart:
     get:
       description: 获取 Fanart 配置
       produces:
@@ -785,49 +714,7 @@ paths:
       summary: 更新 Fanart 配置
       tags:
       - config
-  /format:
-    get:
-      description: 获取媒体格式配置
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/config.FormatConfig'
-      summary: 获取媒体格式配置
-      tags:
-      - config
-    post:
-      consumes:
-      - application/json
-      description: 更新媒体格式配置
-      parameters:
-      - description: 媒体格式配置
-        in: body
-        name: config
-        required: true
-        schema:
-          $ref: '#/definitions/config.FormatConfig'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/config.FormatConfig'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/schemas.ErrResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/schemas.ErrResponse'
-      summary: 更新媒体格式配置
-      tags:
-      - config
-  /libraries:
+  /config/libraries:
     get:
       description: 获取媒体库配置
       produces:
@@ -875,7 +762,7 @@ paths:
       summary: 更新媒体库配置
       tags:
       - config
-  /log:
+  /config/log:
     get:
       description: 获取日志配置
       produces:
@@ -917,6 +804,177 @@ paths:
       summary: 更新日志配置
       tags:
       - config
+  /config/media/custom_word:
+    get:
+      consumes:
+      - application/json
+      description: 获取自定义词配置
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/config.CustomWordConfig'
+      summary: 获取自定义词配置
+      tags:
+      - config
+    post:
+      consumes:
+      - application/json
+      description: 更新自定义词配置
+      parameters:
+      - description: 自定义词配置
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/config.CustomWordConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/config.CustomWordConfig'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrResponse'
+      summary: 更新自定义词配置
+      tags:
+      - config
+  /config/media/format:
+    get:
+      description: 获取媒体格式配置
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/config.FormatConfig'
+      summary: 获取媒体格式配置
+      tags:
+      - config
+    post:
+      consumes:
+      - application/json
+      description: 更新媒体格式配置
+      parameters:
+      - description: 媒体格式配置
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/config.FormatConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/config.FormatConfig'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrResponse'
+      summary: 更新媒体格式配置
+      tags:
+      - config
+  /config/tmdb:
+    get:
+      description: 获取 TMDB 配置
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/config.TMDBConfig'
+      summary: 获取 TMDB 配置
+      tags:
+      - config
+    post:
+      consumes:
+      - application/json
+      description: 更新 TMDB 配置
+      parameters:
+      - description: TMDB 配置
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/config.TMDBConfig'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/config.TMDBConfig'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrResponse'
+      summary: 更新 TMDB 配置
+      tags:
+      - config
+  /library/archive:
+    post:
+      consumes:
+      - application/json
+      description: 整理一个视频文件及其相关的字幕和音轨文件到指定目录
+      parameters:
+      - description: 请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.LibraryArchiveMediaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应
+          schema:
+            $ref: '#/definitions/schemas.FileInfo'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/schemas.ErrResponse'
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/schemas.ErrResponse'
+      summary: 归档媒体文件
+      tags:
+      - Library
+  /log/recent:
+    get:
+      description: 获取最近日志
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/loghook.LogDetail'
+            type: array
+      summary: 获取最近日志
+      tags:
+      - log
   /overview/{media_type}/{tmdb_id}:
     get:
       description: 根据媒体类型和 TMDB ID 获取对应的概述信息
@@ -995,62 +1053,7 @@ paths:
       summary: 获取媒体海报图片
       tags:
       - TMDB
-  /recent:
-    get:
-      description: 获取最近日志
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/loghook.LogDetail'
-            type: array
-      summary: 获取最近日志
-      tags:
-      - log
-  /tmdb:
-    get:
-      description: 获取 TMDB 配置
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/config.TMDBConfig'
-      summary: 获取 TMDB 配置
-      tags:
-      - config
-    post:
-      consumes:
-      - application/json
-      description: 更新 TMDB 配置
-      parameters:
-      - description: TMDB 配置
-        in: body
-        name: config
-        required: true
-        schema:
-          $ref: '#/definitions/config.TMDBConfig'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/config.TMDBConfig'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/schemas.ErrResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/schemas.ErrResponse'
-      summary: 更新 TMDB 配置
-      tags:
-      - config
-  /video:
+  /scrape/video:
     post:
       consumes:
       - application/json
@@ -1080,4 +1083,6 @@ paths:
       summary: 刮削视频
       tags:
       - scrape
+schemes:
+- HTTP
 swagger: "2.0"

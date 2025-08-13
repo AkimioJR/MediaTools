@@ -10,8 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @BasePath /config
-// @Router /fanart [get]
+// @Router /config/fanart [get]
 // @Summary 获取 Fanart 配置
 // @Description 获取 Fanart 配置
 // @Tags config
@@ -21,8 +20,7 @@ func Fanart(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.Fanart)
 }
 
-// @BasePath /config
-// @Router /fanart [post]
+// @Router /config/fanart [post]
 // @Summary 更新 Fanart 配置
 // @Description 更新 Fanart 配置
 // @Tags config
