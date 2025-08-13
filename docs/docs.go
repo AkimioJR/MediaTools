@@ -1416,6 +1416,27 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.RecognizationResponse": {
+            "type": "object",
+            "properties": {
+                "custom_rule": {
+                    "description": "应用自定义规则",
+                    "type": "string"
+                },
+                "item": {
+                    "description": "识别到的媒体项",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.MediaItem"
+                        }
+                    ]
+                },
+                "meta_rule": {
+                    "description": "应用的媒体规则",
+                    "type": "string"
+                }
+            }
+        },
         "schemas.ScrapeRequest": {
             "type": "object",
             "required": [

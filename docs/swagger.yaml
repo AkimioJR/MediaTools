@@ -604,6 +604,19 @@ definitions:
         description: 年份
         type: integer
     type: object
+  schemas.RecognizationResponse:
+    properties:
+      custom_rule:
+        description: 应用自定义规则
+        type: string
+      item:
+        allOf:
+        - $ref: '#/definitions/schemas.MediaItem'
+        description: 识别到的媒体项
+      meta_rule:
+        description: 应用的媒体规则
+        type: string
+    type: object
   schemas.ScrapeRequest:
     properties:
       dst_file:
