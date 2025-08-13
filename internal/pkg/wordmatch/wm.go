@@ -30,7 +30,11 @@ func (wm *WordsMatcher) MatchAndProcess(title string) (string, string) {
 	var rule string // 匹配到的规则
 	for _, word := range wm.words {
 		if word.replaceFromRe != nil { // 替换被替换词
-			title = word.replaceFromRe.ReplaceAllString(title, word.ReplaceTo)
+			if word.replaceFromRe.MatchString(title) {
+				rule = word.originalStr
+				title = word.replaceFromRe.ReplaceAllString(title, word.ReplaceTo)
+				break // 替换后直接跳出循环
+			}
 		}
 		if word.PrefixWord != "" && word.SuffixWord != "" && word.OffsetExpr != "" { // 前后定位词和偏移量表达式
 			prefixIndex := strings.Index(title, word.PrefixWord)
@@ -70,6 +74,7 @@ func (wm *WordsMatcher) MatchAndProcess(title string) (string, string) {
 				title = strings.Replace(title, episodeStr, strconv.Itoa(newEpisode), 1)
 			}
 			rule = word.originalStr
+			break
 		}
 	}
 	return title, rule
