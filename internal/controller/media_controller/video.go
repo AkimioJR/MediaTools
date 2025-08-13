@@ -75,18 +75,21 @@ var ruleRe = regexp.MustCompile(`\{\[.+\]\}`)
 
 // UpdateMetaByRule 根据匹配规则更新视频元数据
 // {[tmdbid=xxx;type=movie/tv;s=xxx;e=xxx]} 直接指定TMDBID，其中s、e为季数和集数（可选）
-func UpdateMetaByRule(vm *meta.VideoMeta) {
+// 返回应用的规则
+func UpdateMetaByRule(vm *meta.VideoMeta) string {
 	loock.RLock()
 	defer loock.RUnlock()
 	matches := ruleRe.FindStringSubmatch(vm.OrginalTitle)
 	switch len(matches) {
 	case 0:
 		logrus.Debugf("标题「%s」未匹配到设置规则", vm.OrginalTitle)
+		return ""
 	case 1:
 		logrus.Debugf("标题「%s」匹配到设置规则：%s", vm.OrginalTitle, matches[0])
 		// 解析规则
 		rule := matches[0][2 : len(matches[0])-2] // 去掉两边的 {[ 和 ]}
 		parts := strings.Split(rule, ";")
+		var rules []string
 		for _, part := range parts {
 			kv := strings.Split(part, "=")
 			if len(kv) != 2 {
@@ -102,6 +105,7 @@ func UpdateMetaByRule(vm *meta.VideoMeta) {
 					continue
 				}
 				vm.TMDBID = id
+				rules = append(rules, "tmdbid="+strconv.Itoa(id))
 
 			case "type": // 媒体类型
 				mediaType := meta.ParseMediaType(kv[1])
@@ -110,6 +114,7 @@ func UpdateMetaByRule(vm *meta.VideoMeta) {
 					continue
 				}
 				vm.MediaType = mediaType
+				rules = append(rules, "type="+mediaType.String())
 
 			case "s": // 季数
 				season, err := strconv.Atoi(kv[1])
@@ -118,6 +123,7 @@ func UpdateMetaByRule(vm *meta.VideoMeta) {
 					continue
 				}
 				vm.Season = season
+				rules = append(rules, "s="+strconv.Itoa(season))
 
 			case "e": // 集数
 				episode, err := strconv.Atoi(kv[1])
@@ -126,9 +132,12 @@ func UpdateMetaByRule(vm *meta.VideoMeta) {
 					continue
 				}
 				vm.Episode = episode
+				rules = append(rules, "e="+strconv.Itoa(episode))
 			}
 		}
+		return "{[" + strings.Join(rules, ";") + "]}"
 	default:
 		logrus.Warningf("标题「%s」匹配到多个设置规则：%+v，跳过解析", vm.OrginalTitle, matches)
+		return ""
 	}
 }
