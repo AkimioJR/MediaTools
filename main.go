@@ -5,6 +5,7 @@ import (
 	"MediaTools/internal/controller"
 	"MediaTools/internal/logging"
 	"MediaTools/internal/router"
+	"flag"
 	"fmt"
 	"strings"
 
@@ -20,21 +21,18 @@ const LOGO = `
 ██║ ╚═╝ ██║███████╗██████╔╝██║██║  ██║   ██║   ╚██████╔╝╚██████╔╝███████╗███████║
 ╚═╝     ╚═╝╚══════╝╚═════╝ ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚══════╝`
 
-func center(s string, width int, fill string) string {
-	if len(s) >= width {
-		return s
-	}
-	padding := width - len(s)
-	leftPadding := padding / 2
-	rightPadding := padding - leftPadding
-	return strings.Repeat(fill, leftPadding) + s + strings.Repeat(fill, rightPadding)
-}
+var (
+	isDev bool
+)
 
 func init() {
-	gin.SetMode(gin.ReleaseMode)
+	flag.BoolVar(&isDev, "dev", false, "是否启用开发者模式\nEnable developer mode")
+	flag.Parse()
+
 	fmt.Print("\033[2J") // 清屏
 	fmt.Println(LOGO)
-	fmt.Println(center(fmt.Sprintf(" MediaWarp %s ", config.Version.AppVersion), 81, "="))
+	fmt.Println(strings.Repeat("=", 31) + fmt.Sprintf(" MediaWarp %s ", config.Version.AppVersion) + strings.Repeat("=", 32))
+	gin.SetMode(gin.ReleaseMode)
 }
 
 func main() {
