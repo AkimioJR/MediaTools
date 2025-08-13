@@ -2,7 +2,7 @@ package library_controller
 
 import (
 	"MediaTools/extensions"
-	"MediaTools/internal/controller/media_controller"
+	"MediaTools/internal/controller/recognize_controller"
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
@@ -31,7 +31,7 @@ func ArchiveMedia(
 	lock.RLock()
 	defer lock.RUnlock()
 
-	targetName, err := media_controller.FormatVideo(item)
+	targetName, err := recognize_controller.FormatVideo(item)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func ArchiveMediaSmart(src *schemas.FileInfo) error {
 		}
 
 		logrus.Info("正在解析视频元数据：", src.Name)
-		videoMeta, _ := media_controller.ParseVideoMeta(src.Name)
+		videoMeta, _ := recognize_controller.ParseVideoMeta(src.Name)
 		info, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
 		if err != nil {
 			return fmt.Errorf("识别媒体信息失败：%w", err)

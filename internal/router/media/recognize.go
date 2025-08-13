@@ -1,7 +1,7 @@
 package media
 
 import (
-	"MediaTools/internal/controller/media_controller"
+	"MediaTools/internal/controller/recognize_controller"
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/schemas"
 	"net/http"
@@ -28,7 +28,7 @@ func Recognize(ctx *gin.Context) {
 		return
 	}
 	logrus.Infof("正在识别媒体：%s", title)
-	videoMeta, _ := media_controller.ParseVideoMeta(title)
+	videoMeta, _ := recognize_controller.ParseVideoMeta(title)
 	mediaInfo, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
 	if err != nil {
 		errResp.Message = "识别失败: " + err.Error()

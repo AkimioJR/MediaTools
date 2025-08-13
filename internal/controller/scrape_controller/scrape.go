@@ -2,7 +2,8 @@ package scrape_controller
 
 import (
 	"MediaTools/internal/controller/fanart_controller"
-	"MediaTools/internal/controller/media_controller"
+	"MediaTools/internal/controller/recognize_controller"
+
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/pkg/meta"
@@ -35,7 +36,7 @@ func Scrape(dstFile *schemas.FileInfo, info *schemas.MediaInfo) error {
 // RecognizeAndScrape 识别并刮削媒体信息
 // 识别目标文件的元数据，查询 TMDB 获取媒体信息，并在该文件夹进行刮削
 func RecognizeAndScrape(dstFile *schemas.FileInfo, mediaType meta.MediaType, tmdbID int) error {
-	videoMeta, _ := media_controller.ParseVideoMeta(dstFile.Name)
+	videoMeta, _ := recognize_controller.ParseVideoMeta(dstFile.Name)
 	if mediaType != meta.MediaTypeUnknown && videoMeta.MediaType == meta.MediaTypeUnknown {
 		videoMeta.MediaType = mediaType
 	}

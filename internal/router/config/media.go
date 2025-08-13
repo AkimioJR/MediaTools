@@ -2,7 +2,7 @@ package config
 
 import (
 	"MediaTools/internal/config"
-	"MediaTools/internal/controller/media_controller"
+	"MediaTools/internal/controller/recognize_controller"
 	"MediaTools/internal/schemas"
 	"net/http"
 
@@ -47,7 +47,7 @@ func UpdateMediaLibrary(ctx *gin.Context) {
 
 	oldConfig := config.Media.Libraries
 	config.Media.Libraries = req
-	err = media_controller.Init()
+	err = recognize_controller.Init()
 	if err != nil {
 		logrus.Errorf("初始化 Media 控制器失败: %v", err)
 		errResp.Message = "初始化 Media 控制器失败: " + err.Error()
@@ -68,7 +68,7 @@ func UpdateMediaLibrary(ctx *gin.Context) {
 	return
 initErr:
 	config.Media.Libraries = oldConfig
-	media_controller.Init()
+	recognize_controller.Init()
 }
 
 // @Router /config/media/format [get]
@@ -106,7 +106,7 @@ func UpdateMediaFormat(ctx *gin.Context) {
 
 	oldConfig := config.Media.Format
 	config.Media.Format = req
-	err = media_controller.InitFormatTemplates()
+	err = recognize_controller.InitFormatTemplates()
 	if err != nil {
 		ErrResp.Message = "初始化格式模板失败: " + err.Error()
 		ctx.JSON(http.StatusInternalServerError, ErrResp)
@@ -123,7 +123,7 @@ func UpdateMediaFormat(ctx *gin.Context) {
 	return
 initErr:
 	config.Media.Format = oldConfig
-	media_controller.Init()
+	recognize_controller.Init()
 }
 
 // @Router /config/media/custom_word [get]
@@ -162,7 +162,7 @@ func UpdateCustomWord(ctx *gin.Context) {
 
 	oldConfig := config.Media.CustomWord
 	config.Media.CustomWord = req
-	err = media_controller.InitCustomWord()
+	err = recognize_controller.InitCustomWord()
 	if err != nil {
 		errResp.Message = "初始化自定义词失败: " + err.Error()
 		ctx.JSON(http.StatusInternalServerError, errResp)
@@ -180,5 +180,5 @@ func UpdateCustomWord(ctx *gin.Context) {
 	return
 initErr:
 	config.Media.CustomWord = oldConfig
-	media_controller.Init()
+	recognize_controller.Init()
 }

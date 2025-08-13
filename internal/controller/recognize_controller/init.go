@@ -1,4 +1,4 @@
-package media_controller
+package recognize_controller
 
 import (
 	"MediaTools/internal/config"

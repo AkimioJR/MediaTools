@@ -1,7 +1,7 @@
-package media_controller_test
+package recognize_controller_test
 
 import (
-	"MediaTools/internal/controller/media_controller"
+	"MediaTools/internal/controller/recognize_controller"
 	"MediaTools/internal/pkg/meta"
 	"testing"
 
@@ -400,7 +400,7 @@ func TestUpdateMetaByRule(t *testing.T) {
 			vm := &meta.VideoMeta{
 				OrginalTitle: tt.title,
 			}
-			media_controller.UpdateMetaByRule(vm)
+			recognize_controller.UpdateMetaByRule(vm)
 
 			require.Equal(t, tt.expectedTMDB, vm.TMDBID, "Expected TMDBID to match for title: %s", tt.title)
 			require.Equal(t, tt.expectedType, vm.MediaType, "Expected MediaType to match for title: %s", tt.title)
