@@ -1,0 +1,411 @@
+package media_controller_test
+
+import (
+	"MediaTools/internal/controller/media_controller"
+	"MediaTools/internal/pkg/meta"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
+
+func TestUpdateMetaByRule(t *testing.T) {
+	tests := []struct {
+		name            string
+		title           string
+		expectedTMDB    int
+		expectedType    meta.MediaType
+		expectedSeason  int
+		expectedEpisode int
+	}{
+		{
+			name:            "DOUBLE DECKER 动画",
+			title:           "DOUBLE DECKER！道格＆基里爾 {[tmdbid=82046;type=tv;s=1]}",
+			expectedTMDB:    82046,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "最强肉盾迷宫攻略 第二季",
+			title:           "最強肉盾的迷宮攻略～擁有稀少技能體力 9999 的肉盾，被勇者隊伍辭退了～ {[tmdbid=210511;type=tv;s=2]}",
+			expectedTMDB:    210511,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  2,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "为美好的世界献上祝福 第三季",
+			title:           "為美好的世界獻上祝福！3 {[tmdbid=65844;type=tv;s=3]}",
+			expectedTMDB:    65844,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  3,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "防风少年 第一季",
+			title:           "WIND BREAKER—防風少年— {[tmdbid=223500;type=tv;s=1]}防风少年",
+			expectedTMDB:    223500,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "摇曳露营 第三季",
+			title:           "搖曳露營△ 第三季 {[tmdbid=76075;type=tv;s=3]}",
+			expectedTMDB:    76075,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  3,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "王牌酒保",
+			title:           "王牌酒保 Glass of God {[tmdbid=225168;type=tv;s=1]}",
+			expectedTMDB:    225168,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "黑执事寄宿学校篇",
+			title:           "黑執事 寄宿學校篇 {[tmdbid=50712;type=tv;s=4]}黑执事 S04",
+			expectedTMDB:    50712,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  4,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "尼尔自动人形",
+			title:           "尼爾：自動人形 Ver1.1a {[tmdbid=158373;type=tv;s=1]}尼尔：自动人形",
+			expectedTMDB:    158373,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "物语系列第外季第怪季",
+			title:           "物語系列 第外季＆第怪季 {[tmdbid=46195;type=tv;s=5]}物语系列 S05",
+			expectedTMDB:    46195,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  5,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "战国妖狐千魔混沌篇",
+			title:           "戰國妖狐 千魔混沌篇 {[tmdbid=234995;type=tv;s=2]}战国妖狐 S02",
+			expectedTMDB:    234995,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  2,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "卡片战斗先导者第二季",
+			title:           "卡片戰鬥!! 先導者 Divinez 第二季 {[tmdbid=106301;type=tv;s=6]}卡片战斗先导者overDress S06",
+			expectedTMDB:    106301,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  6,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "身为VTuber的我",
+			title:           "身為 VTuber 的我因為忘記關台而成了傳說 {[tmdbid=229743;type=tv;s=1]}身为VTuber的我因为忘记关台而成了传说",
+			expectedTMDB:    229743,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "学姊是男孩",
+			title:           "学姊是男孩 {[tmdbid=239761;type=tv;s=1]}前辈是男孩子",
+			expectedTMDB:    239761,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "新人大叔冒险者",
+			title:           "新人大叔冒險者，被最強隊伍操到死成無敵 {[tmdbid=250598;type=tv;s=1]}",
+			expectedTMDB:    250598,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "2.5次元的诱惑",
+			title:           "2.5 次元的誘惑 {[tmdbid=216074;type=tv;s=1]}2.5次元的诱惑",
+			expectedTMDB:    216074,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "我推的孩子",
+			title:           "【我推的孩子】  {[tmdbid=203737;type=tv;s=1]}我推的孩子",
+			expectedTMDB:    203737,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "深夜Punch",
+			title:           "深夜 Punch {[tmdbid=244617;type=tv;s=1]}深夜Punch",
+			expectedTMDB:    244617,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "妖精的尾巴百年任务",
+			title:           "FAIRY TAIL 魔導少年 百年任務 {[tmdbid=248947;type=tv;s=1]}妖精的尾巴 百年任务",
+			expectedTMDB:    248947,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "听说你们要结婚",
+			title:           "聽說你們要結婚！？ {[tmdbid=230189;type=tv;s=1]}",
+			expectedTMDB:    230189,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "当不成魔法师的女孩",
+			title:           "當不成魔法師的女孩 {[tmdbid=99088;type=tv;s=1]}",
+			expectedTMDB:    99088,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "新网球王子U-17世界杯",
+			title:           "新網球王子 U-17 世界盃 SEMIFINAL {[tmdbid=205493;type=tv;s=2]}",
+			expectedTMDB:    205493,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  2,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "刀剑神域外传Gun Gale Online II",
+			title:           "刀劍神域外傳 Gun Gale Online II {[tmdbid=78204;type=tv;s=2]}",
+			expectedTMDB:    78204,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  2,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "青之驱魔师雪之尽头篇",
+			title:           "青之驅魔師 雪之盡頭篇 {[tmdbid=38464;type=tv;s=4]}",
+			expectedTMDB:    38464,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  4,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "香蕉喵游世界",
+			title:           "香蕉喵遊世界 {[tmdbid=67656;type=tv;s=3]}",
+			expectedTMDB:    67656,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  3,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "离开A级队伍的我",
+			title:           "離開 A 級隊伍的我，和從前的弟子往迷宮深處邁進 {[tmdbid=270487;type=tv;s=1]}",
+			expectedTMDB:    270487,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "S级怪兽贝希摩斯",
+			title:           "S 級怪獸《貝希摩斯》被誤認成小貓，成為精靈女孩的騎士（寵物）一起生活 {[tmdbid=249545;type=tv;s=1]}",
+			expectedTMDB:    249545,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "我独自升级第二季",
+			title:           "我獨自升級 第二季 －起於闇影－ {[tmdbid=127532;type=tv;s=1]}",
+			expectedTMDB:    127532,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "金肉人完美超人始祖篇",
+			title:           "金肉人 完美超人始祖篇 Season 2 {[tmdbid=236000;type=tv;s=1]}",
+			expectedTMDB:    236000,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "UniteUp众星齐聚",
+			title:           "UniteUp! 眾星齊聚 -Uni：Birth- {[tmdbid=210899;type=tv;s=2]}偶像集结！ S02",
+			expectedTMDB:    210899,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  2,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "鬼人幻灯抄",
+			title:           "鬼人幻燈抄 {[tmdbid=133154;type=tv;s=1]}鬼人幻灯抄",
+			expectedTMDB:    133154,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "男女之间存在纯友情吗",
+			title:           "男女之間存在純友情嗎？（不，不存在！）  {[tmdbid=217407;type=tv;s=1]}",
+			expectedTMDB:    217407,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "炎炎消防队参之章",
+			title:           "炎炎消防隊 參之章 {[tmdbid=88046;type=tv;s=3]}炎炎消防队 S03",
+			expectedTMDB:    88046,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  3,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "黑执事绿之魔女篇",
+			title:           "黑執事 綠之魔女篇 {[tmdbid=50712;type=tv;s=5]}黑执事 S05",
+			expectedTMDB:    50712,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  5,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "小市民系列第二季",
+			title:           "小市民系列 第二季 {[tmdbid=243501;type=tv;s=1]}小市民系列",
+			expectedTMDB:    243501,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "随兴旅",
+			title:           "隨興旅－That′s Journey－ {[tmdbid=254853;type=tv;s=1]}随兴旅－That′s Journey－",
+			expectedTMDB:    254853,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "中禅寺老师妖怪讲义录",
+			title:           "中禪寺老師妖怪講義錄 解謎就交給老師 {[tmdbid=275623;type=tv;s=1]}中禅寺老师的灵怪讲义实录",
+			expectedTMDB:    275623,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "紫云寺家的兄弟姊妹",
+			title:           "紫雲寺家的兄弟姊妹 {[tmdbid=261091;type=tv;s=1]}紫云寺家的孩子们",
+			expectedTMDB:    261091,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "莉可丽丝友谊是时间的窃贼",
+			title:           "Lycoris Recoil 莉可麗絲：友誼是時間的竊賊 - {[tmdbid=154494;type=tv;s=0]}莉可丽丝 S00",
+			expectedTMDB:    154494,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  0,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "被驱逐出勇者队伍的白魔导师",
+			title:           "被驅逐出勇者隊伍的白魔導師，被.S.級冒險者撿到  {[tmdbid=284771;type=tv;s=1]}被驅逐出勇者隊伍的白魔導師，被S級冒險者撿到",
+			expectedTMDB:    284771,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "我们不可能成为恋人",
+			title:           "我們不可能成為戀人！絕對不行。（※似乎可行？） {[tmdbid=277513;type=tv;s=1]}我们不可能成为恋人！绝对不行。 (※似乎可行？)",
+			expectedTMDB:    277513,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "地缚少年花子君2",
+			title:           "地縛少年花子君.2 {[tmdbid=95269;type=tv;s=2]}地缚少年花子君 S02",
+			expectedTMDB:    95269,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  2,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "青春猪头少年圣诞服女郎",
+			title:           "青春豬頭少年不會夢到聖誕服女郎 {[tmdbid=82739;type=tv;s=2]}青春猪头少年不会梦到兔女郎学姐S02",
+			expectedTMDB:    82739,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  2,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "人妻的嘴唇尝起来有罐装沙瓦的味道",
+			title:           "人妻的嘴唇嚐起來有罐裝沙瓦的味道 {[tmdbid=283884;type=tv;s=1]}人妻之唇烧酒之味",
+			expectedTMDB:    283884,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "去唱卡拉OK吧",
+			title:           "去唱卡拉 OK 吧！ {[tmdbid=274546;type=tv;s=1]}去唱卡拉OK吧！",
+			expectedTMDB:    274546,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "卡片战斗先导者第四季DELUXE决胜篇",
+			title:           "卡片戰鬥!! 先導者 Divinez 第四季「DELUXE 決勝篇」 {[tmdbid=106301;type=tv;s=8]}卡片战斗先导者 overDress",
+			expectedTMDB:    106301,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  8,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "恋上换装娃娃Season2",
+			title:           "戀上換裝娃娃 Season 2 {[tmdbid=123249;type=tv;s=1]} 更衣人偶坠入爱河",
+			expectedTMDB:    123249,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+		{
+			name:            "涅库罗诺美子的宇宙恐怖秀",
+			title:           "涅庫羅諾美子的宇宙恐怖秀 {[tmdbid=279993;type=tv;s=1]} 黑野美子的宇宙恐怖秀",
+			expectedTMDB:    279993,
+			expectedType:    meta.MediaTypeTV,
+			expectedSeason:  1,
+			expectedEpisode: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			vm := &meta.VideoMeta{
+				OrginalTitle: tt.title,
+			}
+			media_controller.UpdateMetaByRule(vm)
+
+			require.Equal(t, tt.expectedTMDB, vm.TMDBID, "Expected TMDBID to match for title: %s", tt.title)
+			require.Equal(t, tt.expectedType, vm.MediaType, "Expected MediaType to match for title: %s", tt.title)
+			require.Equal(t, tt.expectedSeason, vm.Season, "Expected Season to match for title: %s", tt.title)
+			require.Equal(t, tt.expectedEpisode, vm.Episode, "Expected Episode to match for title: %s", tt.title)
+		})
+	}
+}
