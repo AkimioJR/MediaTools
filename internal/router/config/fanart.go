@@ -13,7 +13,7 @@ import (
 // @Router /config/fanart [get]
 // @Summary 获取 Fanart 配置
 // @Description 获取 Fanart 配置
-// @Tags config
+// @Tags 应用配置,Fanart
 // @Produce json
 // @Success 200 {object} config.FanartConfig
 func Fanart(ctx *gin.Context) {
@@ -23,7 +23,7 @@ func Fanart(ctx *gin.Context) {
 // @Router /config/fanart [post]
 // @Summary 更新 Fanart 配置
 // @Description 更新 Fanart 配置
-// @Tags config
+// @Tags 应用配置,Fanart
 // @Accept json
 // @Produce json
 // @Param config body config.FanartConfig true "Fanart 配置"

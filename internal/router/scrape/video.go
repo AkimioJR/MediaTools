@@ -13,7 +13,7 @@ import (
 // @Router /scrape/video [post]
 // @Summary 刮削视频
 // @Description 刮削视频文件的元数据和相关信息
-// @Tags scrape
+// @Tags 刮削
 // @Accept json
 // @Produce json
 // @Param request body schemas.ScrapeRequest true "刮削请求参数"

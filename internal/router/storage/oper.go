@@ -13,7 +13,7 @@ import (
 // @Route /storage/:storage_type/info [get]
 // @Summary 获取文件/目录信息
 // @Description 根据路径和存储类型获取文件或目录的详细信息
-// @Tags storage
+// @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "文件或目录路径"
 // @Products json
@@ -51,7 +51,7 @@ func StorageGetFileInfo(ctx *gin.Context) {
 // @Route /storage/:storage_type/exists [get]
 // @Summary 检查文件/目录是否存在
 // @Description 根据路径和存储类型检查文件或目录是否存在
-// @Tags storage
+// @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "文件或目录路径"
 // @Products json
@@ -91,7 +91,7 @@ func StorageCheckExists(ctx *gin.Context) {
 // @Route /storage/:storage_type/list [get]
 // @Summary 列出目录内容
 // @Description 根据存储类型和路径列出目录下的所有文件和子目录
-// @Tags storage
+// @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "目录路径"
 // @Products json
@@ -133,7 +133,7 @@ func StorageList(ctx *gin.Context) {
 // @Route /storage/:storage_type/mkdir [post]
 // @Summary 创建目录
 // @Description 根据存储类型和路径创建一个新目录
-// @Tags storage
+// @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
 // @Body {object} schemas.PathRequest true "目录路径"
 // @Accept json
@@ -177,7 +177,7 @@ func StorageMkdir(ctx *gin.Context) {
 // @Route /storage/:storage_type/delete [delete]
 // @Summary 删除文件或目录
 // @Description 根据存储类型和路径删除指定的文件或目录
-// @Tags storage
+// @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
 // @Body {object} schemas.PathRequest true "文件或目录路径"
 // @Accept json
@@ -221,7 +221,7 @@ func StorageDelete(ctx *gin.Context) {
 // @Route /storage/:storage_type/rename [post]
 // @Summary 重命名文件或目录
 // @Description 根据存储类型和路径重命名指定的文件或目录
-// @Tags storage
+// @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
 // @Body {object} schemas.RenameRequest true "重命名请求"
 // @Accept json
@@ -264,7 +264,7 @@ func StorageRename(ctx *gin.Context) {
 // @Route /storage/:storage_type/upload [post]
 // @Summary 上传文件
 // @Description 根据存储类型和路径上传文件
-// @Tags storage
+// @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
 // @Param path formData string true "上传路径"
 // @Param file formData file true "上传文件"
@@ -322,7 +322,7 @@ func StorageUploadFile(ctx *gin.Context) {
 // @Route /storage/:storage_type/download [get]
 // @Summary 下载文件
 // @Description 根据存储类型和路径下载文件
-// @Tags storage
+// @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "文件路径"
 // @Produce application/octet-stream

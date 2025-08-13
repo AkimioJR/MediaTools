@@ -16,7 +16,7 @@ import (
 // @Router  /library/archive [post]
 // @Summary 归档媒体文件
 // @Description 整理一个视频文件及其相关的字幕和音轨文件到指定目录
-// @Tags Library
+// @Tags 媒体库
 // @Accept json
 // @Produce json
 // @Param request body schemas.LibraryArchiveMediaRequest true "请求参数"

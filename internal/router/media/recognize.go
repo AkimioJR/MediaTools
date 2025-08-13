@@ -13,7 +13,7 @@ import (
 // @Route /media/recognize [get]
 // @Summary 识别媒体信息
 // @Description 根据提供的标题识别媒体信息，并返回 MediaItem 对象
-// @Tags media
+// @Tags 媒体信息
 // @Param title query string true "媒体标题"
 // @Produce json
 // @Success 200 {object} schemas.MediaItem

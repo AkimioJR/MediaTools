@@ -684,7 +684,8 @@ paths:
             $ref: '#/definitions/config.FanartConfig'
       summary: 获取 Fanart 配置
       tags:
-      - config
+      - 应用配置
+      - Fanart
     post:
       consumes:
       - application/json
@@ -713,7 +714,8 @@ paths:
             $ref: '#/definitions/schemas.ErrResponse'
       summary: 更新 Fanart 配置
       tags:
-      - config
+      - 应用配置
+      - Fanart
   /config/libraries:
     get:
       description: 获取媒体库配置
@@ -728,7 +730,7 @@ paths:
             type: array
       summary: 获取媒体库配置
       tags:
-      - config
+      - 应用配置
     post:
       consumes:
       - application/json
@@ -761,7 +763,7 @@ paths:
             $ref: '#/definitions/schemas.ErrResponse'
       summary: 更新媒体库配置
       tags:
-      - config
+      - 应用配置
   /config/log:
     get:
       description: 获取日志配置
@@ -774,7 +776,8 @@ paths:
             $ref: '#/definitions/config.LogConfig'
       summary: 获取日志配置
       tags:
-      - config
+      - 应用配置
+      - 日志
     post:
       consumes:
       - application/json
@@ -803,7 +806,8 @@ paths:
             $ref: '#/definitions/schemas.ErrResponse'
       summary: 更新日志配置
       tags:
-      - config
+      - 应用配置
+      - 日志
   /config/media/custom_word:
     get:
       consumes:
@@ -818,7 +822,7 @@ paths:
             $ref: '#/definitions/config.CustomWordConfig'
       summary: 获取自定义词配置
       tags:
-      - config
+      - 应用配置
     post:
       consumes:
       - application/json
@@ -847,7 +851,7 @@ paths:
             $ref: '#/definitions/schemas.ErrResponse'
       summary: 更新自定义词配置
       tags:
-      - config
+      - 应用配置
   /config/media/format:
     get:
       description: 获取媒体格式配置
@@ -860,7 +864,7 @@ paths:
             $ref: '#/definitions/config.FormatConfig'
       summary: 获取媒体格式配置
       tags:
-      - config
+      - 应用配置
     post:
       consumes:
       - application/json
@@ -889,7 +893,7 @@ paths:
             $ref: '#/definitions/schemas.ErrResponse'
       summary: 更新媒体格式配置
       tags:
-      - config
+      - 应用配置
   /config/tmdb:
     get:
       description: 获取 TMDB 配置
@@ -902,7 +906,8 @@ paths:
             $ref: '#/definitions/config.TMDBConfig'
       summary: 获取 TMDB 配置
       tags:
-      - config
+      - 应用配置
+      - TMDB
     post:
       consumes:
       - application/json
@@ -929,7 +934,8 @@ paths:
             $ref: '#/definitions/schemas.ErrResponse'
       summary: 更新 TMDB 配置
       tags:
-      - config
+      - 应用配置
+      - TMDB
   /library/archive:
     post:
       consumes:
@@ -959,7 +965,7 @@ paths:
             $ref: '#/definitions/schemas.ErrResponse'
       summary: 归档媒体文件
       tags:
-      - Library
+      - 媒体库
   /log/recent:
     get:
       description: 获取最近日志
@@ -974,7 +980,7 @@ paths:
             type: array
       summary: 获取最近日志
       tags:
-      - log
+      - 日志
   /overview/{media_type}/{tmdb_id}:
     get:
       description: 根据媒体类型和 TMDB ID 获取对应的概述信息
@@ -1082,7 +1088,7 @@ paths:
             $ref: '#/definitions/schemas.ErrResponse'
       summary: 刮削视频
       tags:
-      - scrape
+      - 刮削
 schemes:
 - HTTP
 swagger: "2.0"

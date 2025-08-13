@@ -51,7 +51,7 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferT
 // @Route /storage/copy [post]
 // @Summary 复制文件
 // @Description 将文件从源位置复制到目标位置
-// @Tags storage
+// @Tags 存储,存储文件,文件转移
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
@@ -65,7 +65,7 @@ func StorageCopyFile(ctx *gin.Context) {
 // @Route /storage/move [post]
 // @Summary 移动文件
 // @Description 将文件从源位置移动到目标位置
-// @Tags storage
+// @Tags 存储,存储文件,文件转移
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
@@ -79,7 +79,7 @@ func StorageMoveFile(ctx *gin.Context) {
 // @Route /storage/link [post]
 // @Summary 创建硬链接
 // @Description 为文件创建硬链接
-// @Tags storage
+// @Tags 存储,存储文件,文件转移
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
@@ -93,7 +93,7 @@ func StorageLinkFile(ctx *gin.Context) {
 // @Route /storage/softlink [post]
 // @Summary 创建软链接
 // @Description 为文件创建软链接（符号链接）
-// @Tags storage
+// @Tags 存储,存储文件,文件转移
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
@@ -107,7 +107,7 @@ func StorageSoftLinkFile(ctx *gin.Context) {
 // @Route /storage/transfer [post]
 // @Summary 通用文件传输接口
 // @Description 根据传输类型执行文件传输操作（复制、移动、硬链接、软链接）
-// @Tags storage
+// @Tags 存储,存储文件,文件转移
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json

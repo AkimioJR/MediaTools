@@ -10,7 +10,7 @@ import (
 // @Router /log/recent [get]
 // @Summary 获取最近日志
 // @Description 获取最近日志
-// @Tags log
+// @Tags 日志
 // @Produce json
 // @Success 200 {object} []loghook.LogDetail
 func GetRecentLogs(ctx *gin.Context) {

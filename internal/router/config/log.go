@@ -10,22 +10,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-
 // @Router /config/log [get]
 // @Summary 获取日志配置
 // @Description 获取日志配置
-// @Tags config
+// @Tags 应用配置,日志
 // @Produce json
 // @Success 200 {object} config.LogConfig
 func Log(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.Log)
 }
 
-
 // @Router /config/log [post]
 // @Summary 更新日志配置
 // @Description 更新日志配置
-// @Tags config
+// @Tags 应用配置,日志
 // @Accept json
 // @Produce json
 // @Param config body config.LogConfig true "日志配置"

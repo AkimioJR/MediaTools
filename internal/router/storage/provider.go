@@ -13,7 +13,7 @@ import (
 // @Route /storage/provider [get]
 // @Summary 获取存储提供者列表
 // @Description 返回所有已注册的存储提供者列表
-// @Tags storage
+// @Tags 存储,存储器
 // @Products json
 // @Success 200 {object} []schemas.StorageProviderItem
 func ProviderList(ctx *gin.Context) {
@@ -23,7 +23,7 @@ func ProviderList(ctx *gin.Context) {
 // @Route /storage/provider/{storage_type} [get]
 // @Summary 获取指定存储提供者
 // @Description 获取指定类型的存储提供者信息
-// @Tags storage
+// @Tags 存储,存储器
 // @Param storage_type path string true "存储类型"
 // @Accept json
 // @Products json
@@ -56,7 +56,7 @@ func ProviderGet(ctx *gin.Context) {
 // @Route /storage/provider/{storage_type} [post]
 // @Summary 注册新的存储器
 // @Description 注册一个新的存储器
-// @Tags storage
+// @Tags 存储,存储器
 // @Param storage_type path string true "存储类型"
 // @Param body body map[string]string true "存储器配置"
 // @Accept json
@@ -109,7 +109,7 @@ func ProviderRegister(ctx *gin.Context) {
 // @Route /storage/provider/{storage_type} [delete]
 // @Summary 删除存储器
 // @Description 删除指定类型的存储器
-// @Tags storage
+// @Tags 存储,存储器
 // @Param storage_type path string true "存储类型"
 // @Accept json
 // @Products json

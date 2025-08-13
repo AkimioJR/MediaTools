@@ -13,7 +13,7 @@ import (
 // @Router /config/tmdb [get]
 // @Summary 获取 TMDB 配置
 // @Description 获取 TMDB 配置
-// @Tags config
+// @Tags 应用配置,TMDB
 // @Produce json
 // @Success 200 {object} config.TMDBConfig
 func TMDB(ctx *gin.Context) {
@@ -23,7 +23,7 @@ func TMDB(ctx *gin.Context) {
 // @Router /config/tmdb [post]
 // @Summary 更新 TMDB 配置
 // @Description 更新 TMDB 配置
-// @Tags config
+// @Tags 应用配置,TMDB
 // @Accept json
 // @Param config body config.TMDBConfig true "TMDB 配置"
 // @Success 200 {object} config.TMDBConfig

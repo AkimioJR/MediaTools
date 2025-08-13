@@ -13,7 +13,7 @@ import (
 // @Router /config/libraries [get]
 // @Summary 获取媒体库配置
 // @Description 获取媒体库配置
-// @Tags config
+// @Tags 应用配置
 // @Produce json
 // @Success 200 {object} []config.LibraryConfig
 func MediaLibrary(ctx *gin.Context) {
@@ -23,7 +23,7 @@ func MediaLibrary(ctx *gin.Context) {
 // @Router /config/libraries [post]
 // @Summary 更新媒体库配置
 // @Description 更新媒体库配置
-// @Tags config
+// @Tags 应用配置
 // @Accept json
 // @Produce json
 // @Param config body []config.LibraryConfig true "媒体库配置"
@@ -74,7 +74,7 @@ initErr:
 // @Router /config/media/format [get]
 // @Summary 获取媒体格式配置
 // @Description 获取媒体格式配置
-// @Tags config
+// @Tags 应用配置
 // @Produce json
 // @Success 200 {object} config.FormatConfig
 func MediaFormat(ctx *gin.Context) {
@@ -84,7 +84,7 @@ func MediaFormat(ctx *gin.Context) {
 // @Router /config/media/format [post]
 // @Summary 更新媒体格式配置
 // @Description 更新媒体格式配置
-// @Tags config
+// @Tags 应用配置
 // @Accept json
 // @Produce json
 // @Param config body config.FormatConfig true "媒体格式配置"
@@ -129,7 +129,7 @@ initErr:
 // @Router /config/media/custom_word [get]
 // @Summary 获取自定义词配置
 // @Description 获取自定义词配置
-// @Tags config
+// @Tags 应用配置
 // @Accept json
 // @Produce json
 // @Success 200 {object} config.CustomWordConfig
@@ -140,7 +140,7 @@ func CustomWord(ctx *gin.Context) {
 // @Router /config/media/custom_word [post]
 // @Summary 更新自定义词配置
 // @Description 更新自定义词配置
-// @Tags config
+// @Tags 应用配置
 // @Accept json
 // @Produce json
 // @Param config body config.CustomWordConfig true "自定义词配置"

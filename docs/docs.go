@@ -22,7 +22,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置",
+                    "Fanart"
                 ],
                 "summary": "获取 Fanart 配置",
                 "responses": {
@@ -43,7 +44,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置",
+                    "Fanart"
                 ],
                 "summary": "更新 Fanart 配置",
                 "parameters": [
@@ -86,7 +88,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置"
                 ],
                 "summary": "获取媒体库配置",
                 "responses": {
@@ -110,7 +112,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置"
                 ],
                 "summary": "更新媒体库配置",
                 "parameters": [
@@ -159,7 +161,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置",
+                    "日志"
                 ],
                 "summary": "获取日志配置",
                 "responses": {
@@ -180,7 +183,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置",
+                    "日志"
                 ],
                 "summary": "更新日志配置",
                 "parameters": [
@@ -226,7 +230,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置"
                 ],
                 "summary": "获取自定义词配置",
                 "responses": {
@@ -247,7 +251,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置"
                 ],
                 "summary": "更新自定义词配置",
                 "parameters": [
@@ -290,7 +294,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置"
                 ],
                 "summary": "获取媒体格式配置",
                 "responses": {
@@ -311,7 +315,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置"
                 ],
                 "summary": "更新媒体格式配置",
                 "parameters": [
@@ -354,7 +358,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置",
+                    "TMDB"
                 ],
                 "summary": "获取 TMDB 配置",
                 "responses": {
@@ -372,7 +377,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "config"
+                    "应用配置",
+                    "TMDB"
                 ],
                 "summary": "更新 TMDB 配置",
                 "parameters": [
@@ -418,7 +424,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Library"
+                    "媒体库"
                 ],
                 "summary": "归档媒体文件",
                 "parameters": [
@@ -461,7 +467,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "log"
+                    "日志"
                 ],
                 "summary": "获取最近日志",
                 "responses": {
@@ -603,7 +609,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "scrape"
+                    "刮削"
                 ],
                 "summary": "刮削视频",
                 "parameters": [
