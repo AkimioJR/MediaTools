@@ -57,7 +57,7 @@ func main() {
 	}
 	logrus.Info("全部工具链初始化完成")
 
-	ginR := router.InitRouter()
+	ginR := router.InitRouter(isDev)
 	err = ginR.Run(":8080")
 	if err != nil {
 		panic(fmt.Sprintf("启动服务器失败: %v", err))
