@@ -15,7 +15,6 @@ import (
 // @Description 返回所有已注册的存储提供者列表
 // @Tags 存储,存储器
 // @Products json
-// @Success 200 {object} []schemas.StorageProviderItem
 func ProviderList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, storage_controller.ListStorageProviders())
 }
@@ -27,9 +26,6 @@ func ProviderList(ctx *gin.Context) {
 // @Param storage_type path string true "存储类型"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.StorageProviderItem
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func ProviderGet(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 
@@ -61,9 +57,6 @@ func ProviderGet(ctx *gin.Context) {
 // @Param body body map[string]string true "存储器配置"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.StorageProviderItem
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func ProviderRegister(ctx *gin.Context) {
 	var (
 		req     map[string]string
@@ -113,9 +106,6 @@ func ProviderRegister(ctx *gin.Context) {
 // @Param storage_type path string true "存储类型"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.StorageProviderItem
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func ProviderDelete(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 

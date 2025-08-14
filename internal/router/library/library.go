@@ -20,9 +20,6 @@ import (
 // @Accept json
 // @Produce json
 // @Param request body schemas.LibraryArchiveMediaRequest true "请求参数"
-// @Success 200 {object} schemas.FileInfo "成功响应"
-// @Failure 400 {object} schemas.ErrResponse "请求参数错误"
-// @Failure 500 {object} schemas.ErrResponse "服务器错误"
 func LibraryArchiveMedia(ctx *gin.Context) {
 	var (
 		req     schemas.LibraryArchiveMediaRequest

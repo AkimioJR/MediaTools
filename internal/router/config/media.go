@@ -15,7 +15,6 @@ import (
 // @Description 获取媒体库配置
 // @Tags 应用配置
 // @Produce json
-// @Success 200 {object} []config.LibraryConfig
 func MediaLibrary(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.Media.Libraries)
 }
@@ -27,9 +26,6 @@ func MediaLibrary(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param config body []config.LibraryConfig true "媒体库配置"
-// @Success 200 {object} []config.LibraryConfig
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func UpdateMediaLibrary(ctx *gin.Context) {
 	var (
 		req     []config.LibraryConfig
@@ -76,7 +72,6 @@ initErr:
 // @Description 获取媒体格式配置
 // @Tags 应用配置
 // @Produce json
-// @Success 200 {object} config.FormatConfig
 func MediaFormat(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.Media.Format)
 }
@@ -88,9 +83,6 @@ func MediaFormat(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param config body config.FormatConfig true "媒体格式配置"
-// @Success 200 {object} config.FormatConfig
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func UpdateMediaFormat(ctx *gin.Context) {
 	var (
 		req     config.FormatConfig
@@ -132,7 +124,6 @@ initErr:
 // @Tags 应用配置
 // @Accept json
 // @Produce json
-// @Success 200 {object} config.CustomWordConfig
 func CustomWord(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.Media.CustomWord)
 }
@@ -144,9 +135,6 @@ func CustomWord(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param config body config.CustomWordConfig true "自定义词配置"
-// @Success 200 {object} config.CustomWordConfig
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func UpdateCustomWord(ctx *gin.Context) {
 	var (
 		req     config.CustomWordConfig

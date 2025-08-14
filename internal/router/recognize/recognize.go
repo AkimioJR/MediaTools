@@ -16,9 +16,6 @@ import (
 // @Tags 识别
 // @Param title query string true "媒体标题"
 // @Produce json
-// @Success 200 {object} schemas.RecognizeMediaDetail
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func RecognizeMedia(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 	title := ctx.Query("title")

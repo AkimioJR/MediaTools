@@ -55,9 +55,7 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferT
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
+
 func StorageCopyFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferCopy, storage_controller.Copy)
 }
@@ -69,9 +67,7 @@ func StorageCopyFile(ctx *gin.Context) {
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
+
 func StorageMoveFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferMove, storage_controller.Move)
 }
@@ -83,9 +79,7 @@ func StorageMoveFile(ctx *gin.Context) {
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
+
 func StorageLinkFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferLink, storage_controller.Link)
 }
@@ -97,9 +91,7 @@ func StorageLinkFile(ctx *gin.Context) {
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
+
 func StorageSoftLinkFile(ctx *gin.Context) {
 	handleFileTransfer(ctx, schemas.TransferSoftLink, storage_controller.SoftLink)
 }
@@ -111,9 +103,7 @@ func StorageSoftLinkFile(ctx *gin.Context) {
 // @Body {object} schemas.TransferRequest true "传输请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
+
 func StorageTransferFile(ctx *gin.Context) {
 	var (
 		req     schemas.TransferRequest

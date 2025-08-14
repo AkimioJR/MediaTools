@@ -12,7 +12,6 @@ import (
 // @Description 获取最近日志
 // @Tags 日志
 // @Produce json
-// @Success 200 {object} []loghook.LogDetail
 func GetRecentLogs(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, logging.GetRecentLogs())
 }

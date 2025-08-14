@@ -17,9 +17,6 @@ import (
 // @Accept json
 // @Produce json
 // @Param request body schemas.ScrapeRequest true "刮削请求参数"
-// @Success 200 {object} schemas.FileInfo "刮削成功"
-// @Failure 400 {object} schemas.ErrResponse "请求参数错误"
-// @Failure 500 {object} schemas.ErrResponse "刮削失败
 func Video(ctx *gin.Context) {
 	var (
 		req     schemas.ScrapeRequest

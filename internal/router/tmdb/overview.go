@@ -19,11 +19,6 @@ import (
 // @Param tmdb_id path uint true "TMDB ID"
 // @Param season query uint false "季数"
 // @Param episode query uint false "集数"
-// @Success 200 {object} string "成功响应，返回概述信息"
-// @Failure 400 {object} schemas.ErrResponse "请求参数错误"
-// @Failure 500 {object} schemas.ErrResponse "服务器错误"
-// @Failure 404 {object} schemas.ErrResponse "未找到概述信息"
-// @Failure 500 {object} schemas.ErrResponse "服务器错误"
 func Overview(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 

@@ -17,9 +17,6 @@ import (
 // @Tags TMDB
 // @Param media_type path string true "媒体类型" Enums(Movie, TV)
 // @Param tmdb_id path uint true "TMDB ID"
-// @Success 200 {object} string "成功响应，返回图片 URL"
-// @Failure 400 {object} schemas.ErrResponse "请求参数错误"
-// @Failure 500 {object} schemas.ErrResponse "服务器错误"
 func PosterImage(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 

@@ -15,7 +15,6 @@ import (
 // @Description 获取 Fanart 配置
 // @Tags 应用配置,Fanart
 // @Produce json
-// @Success 200 {object} config.FanartConfig
 func Fanart(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.Fanart)
 }
@@ -27,9 +26,6 @@ func Fanart(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param config body config.FanartConfig true "Fanart 配置"
-// @Success 200 {object} config.FanartConfig
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func UpdateFanart(ctx *gin.Context) {
 	var req config.FanartConfig
 

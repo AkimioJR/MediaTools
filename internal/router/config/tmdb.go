@@ -15,7 +15,6 @@ import (
 // @Description 获取 TMDB 配置
 // @Tags 应用配置,TMDB
 // @Produce json
-// @Success 200 {object} config.TMDBConfig
 func TMDB(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.TMDB)
 }
@@ -26,9 +25,6 @@ func TMDB(ctx *gin.Context) {
 // @Tags 应用配置,TMDB
 // @Accept json
 // @Param config body config.TMDBConfig true "TMDB 配置"
-// @Success 200 {object} config.TMDBConfig
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func UpdateTMDB(ctx *gin.Context) {
 	var (
 		req     config.TMDBConfig

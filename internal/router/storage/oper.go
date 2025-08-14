@@ -17,9 +17,6 @@ import (
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "文件或目录路径"
 // @Products json
-// @Success 200 {object} schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func StorageGetFileInfo(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 
@@ -55,9 +52,6 @@ func StorageGetFileInfo(ctx *gin.Context) {
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "文件或目录路径"
 // @Products json
-// @Success 200 {object} bool
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func StorageCheckExists(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 
@@ -95,9 +89,6 @@ func StorageCheckExists(ctx *gin.Context) {
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "目录路径"
 // @Products json
-// @Success 200 {object} []schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func StorageList(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 
@@ -138,9 +129,6 @@ func StorageList(ctx *gin.Context) {
 // @Body {object} schemas.PathRequest true "目录路径"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func StorageMkdir(ctx *gin.Context) {
 	var (
 		req     schemas.PathRequest
@@ -182,9 +170,6 @@ func StorageMkdir(ctx *gin.Context) {
 // @Body {object} schemas.PathRequest true "文件或目录路径"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func StorageDelete(ctx *gin.Context) {
 	var (
 		req     schemas.PathRequest
@@ -226,9 +211,6 @@ func StorageDelete(ctx *gin.Context) {
 // @Body {object} schemas.RenameRequest true "重命名请求"
 // @Accept json
 // @Products json
-// @Success 200 {object} schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func StorageRename(ctx *gin.Context) {
 	var (
 		req     schemas.RenameRequest
@@ -270,9 +252,6 @@ func StorageRename(ctx *gin.Context) {
 // @Param file formData file true "上传文件"
 // @Accept multipart/form-data
 // @Products json
-// @Success 200 {object} schemas.FileInfo
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func StorageUploadFile(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 
@@ -329,8 +308,6 @@ func StorageUploadFile(ctx *gin.Context) {
 // @Success 200 {file} file "文件下载成功"
 // @Header 200 {string} Content-Disposition "文件下载头，格式：attachment; filename=文件名"
 // @Header 200 {string} Content-Type "application/octet-stream"
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func StorageDownloadFile(ctx *gin.Context) {
 	var errResp schemas.ErrResponse
 

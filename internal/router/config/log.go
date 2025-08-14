@@ -15,7 +15,6 @@ import (
 // @Description 获取日志配置
 // @Tags 应用配置,日志
 // @Produce json
-// @Success 200 {object} config.LogConfig
 func Log(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, config.Log)
 }
@@ -27,9 +26,6 @@ func Log(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param config body config.LogConfig true "日志配置"
-// @Success 200 {object} config.LogConfig
-// @Failure 400 {object} schemas.ErrResponse
-// @Failure 500 {object} schemas.ErrResponse
 func UpdateLog(ctx *gin.Context) {
 	var (
 		req       config.LogConfig
