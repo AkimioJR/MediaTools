@@ -1,6 +1,7 @@
 package loghook
 
 import (
+	"strconv"
 	"sync"
 	"time"
 
@@ -34,7 +35,7 @@ func (h *MemoryHistoryHook) Fire(entry *logrus.Entry) error {
 		Level:   entry.Level.String(),
 		Message: entry.Message,
 		Time:    entry.Time,
-		Caller:  entry.Caller.Function,
+		Caller:  entry.Caller.Function + ":" + strconv.Itoa(entry.Caller.Line),
 	}
 	h.index = (h.index + 1) % h.size
 	return nil
