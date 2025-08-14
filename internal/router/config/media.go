@@ -16,7 +16,10 @@ import (
 // @Tags 应用配置
 // @Produce json
 func MediaLibrary(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, config.Media.Libraries)
+	var resp schemas.Response[[]config.LibraryConfig]
+	resp.Success = true
+	resp.Data = config.Media.Libraries
+	resp.RespondJSON(ctx, http.StatusOK)
 }
 
 // @Router /config/libraries [post]
@@ -28,14 +31,14 @@ func MediaLibrary(ctx *gin.Context) {
 // @Param config body []config.LibraryConfig true "媒体库配置"
 func UpdateMediaLibrary(ctx *gin.Context) {
 	var (
-		req     []config.LibraryConfig
-		errResp schemas.ErrResponse
+		req  []config.LibraryConfig
+		resp schemas.Response[[]config.LibraryConfig]
 	)
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		errResp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "请求参数错误: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 
@@ -45,26 +48,27 @@ func UpdateMediaLibrary(ctx *gin.Context) {
 	config.Media.Libraries = req
 	err = recognize_controller.Init()
 	if err != nil {
-		logrus.Errorf("初始化 Media 控制器失败: %v", err)
-		errResp.Message = "初始化 Media 控制器失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
-		goto initErr
+		logrus.Warningf("初始化 Media 控制器失败: %v", err)
+		resp.Message = "初始化 Media 控制器失败: " + err.Error()
+		config.Media.Libraries = oldConfig
+		recognize_controller.Init()
+		logrus.Debugf("恢复旧的媒体库配置: %+v", config.Media.Libraries)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		return
 	}
 
 	logrus.Debugf("Media 控制器初始化成功: %+v", config.Media.Libraries)
 
 	err = config.WriteConfig()
 	if err != nil {
-		errResp.Message = "更新配置失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "写入配置文件失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, config.Media.Libraries)
-	return
-initErr:
-	config.Media.Libraries = oldConfig
-	recognize_controller.Init()
+	resp.Success = true
+	resp.Data = config.Media.Libraries
+	resp.RespondJSON(ctx, http.StatusOK)
 }
 
 // @Router /config/media/format [get]
@@ -73,7 +77,11 @@ initErr:
 // @Tags 应用配置
 // @Produce json
 func MediaFormat(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, config.Media.Format)
+	var resp schemas.Response[*config.FormatConfig]
+	resp.Success = true
+	resp.Data = &config.Media.Format
+	logrus.Debugf("获取媒体格式配置: %+v", resp.Data)
+	resp.RespondJSON(ctx, http.StatusOK)
 }
 
 // @Router /config/media/format [post]
@@ -85,14 +93,15 @@ func MediaFormat(ctx *gin.Context) {
 // @Param config body config.FormatConfig true "媒体格式配置"
 func UpdateMediaFormat(ctx *gin.Context) {
 	var (
-		req     config.FormatConfig
-		ErrResp schemas.ErrResponse
+		req  config.FormatConfig
+		resp schemas.Response[*config.FormatConfig]
 	)
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ErrResp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, ErrResp)
+		resp.Message = "请求参数错误: " + err.Error()
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 
@@ -100,22 +109,24 @@ func UpdateMediaFormat(ctx *gin.Context) {
 	config.Media.Format = req
 	err = recognize_controller.InitFormatTemplates()
 	if err != nil {
-		ErrResp.Message = "初始化格式模板失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, ErrResp)
-		goto initErr
-	}
-	err = config.WriteConfig()
-	if err != nil {
-		ErrResp.Message = "更新配置失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, ErrResp)
+		resp.Message = "初始化格式模板失败: " + err.Error()
+		config.Media.Format = oldConfig
+		recognize_controller.Init()
+		logrus.Debugf("恢复旧的媒体格式配置: %+v", config.Media.Format)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, config.Media.Format)
-	return
-initErr:
-	config.Media.Format = oldConfig
-	recognize_controller.Init()
+	err = config.WriteConfig()
+	if err != nil {
+		resp.Message = "写入配置文件失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		return
+	}
+
+	resp.Success = true
+	resp.Data = &config.Media.Format
+	resp.RespondJSON(ctx, http.StatusOK)
 }
 
 // @Router /config/media/custom_word [get]
@@ -125,7 +136,11 @@ initErr:
 // @Accept json
 // @Produce json
 func CustomWord(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, config.Media.CustomWord)
+	var resp schemas.Response[*config.CustomWordConfig]
+	resp.Success = true
+	resp.Data = &config.Media.CustomWord
+	logrus.Debugf("获取自定义词配置: %+v", resp.Data)
+	resp.RespondJSON(ctx, http.StatusOK)
 }
 
 // @Router /config/media/custom_word [post]
@@ -137,14 +152,15 @@ func CustomWord(ctx *gin.Context) {
 // @Param config body config.CustomWordConfig true "自定义词配置"
 func UpdateCustomWord(ctx *gin.Context) {
 	var (
-		req     config.CustomWordConfig
-		errResp schemas.ErrResponse
+		req  config.CustomWordConfig
+		resp schemas.Response[*config.CustomWordConfig]
 	)
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		errResp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "请求参数错误: " + err.Error()
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusBadGateway)
 		return
 	}
 
@@ -152,21 +168,21 @@ func UpdateCustomWord(ctx *gin.Context) {
 	config.Media.CustomWord = req
 	err = recognize_controller.InitCustomWord()
 	if err != nil {
-		errResp.Message = "初始化自定义词失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
-		goto initErr
+		resp.Message = "初始化自定义词失败: " + err.Error()
+		logrus.Warning(resp.Message)
+		config.Media.CustomWord = oldConfig
+		recognize_controller.Init()
+		logrus.Debugf("恢复旧的自定义词配置: %+v", config.Media.CustomWord)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		return
 	}
 
 	err = config.WriteConfig()
 	if err != nil {
-		errResp.Message = "更新配置失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "写入配置文件失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
 	ctx.JSON(http.StatusOK, config.Media.CustomWord)
-	return
-initErr:
-	config.Media.CustomWord = oldConfig
-	recognize_controller.Init()
 }

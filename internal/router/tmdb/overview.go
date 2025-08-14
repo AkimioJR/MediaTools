@@ -20,15 +20,15 @@ import (
 // @Param season query uint false "季数"
 // @Param episode query uint false "集数"
 func Overview(ctx *gin.Context) {
-	var errResp schemas.ErrResponse
+	var resp schemas.Response[*string]
 
 	// 获取类型和 ID
 	mediaTypeStr := ctx.Param("media_type")
 	tmdbIDStr := ctx.Param("tmdb_id")
 	tmdbID, err := strconv.Atoi(tmdbIDStr)
 	if err != nil {
-		errResp.Message = "非法 TMDB ID: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "非法 TMDB ID: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 	var (
@@ -40,16 +40,16 @@ func Overview(ctx *gin.Context) {
 	if seasonStr != "" {
 		season, err = strconv.Atoi(seasonStr)
 		if err != nil {
-			errResp.Message = "非法季数参数: " + err.Error()
-			ctx.JSON(http.StatusBadRequest, errResp)
+			resp.Message = "非法季数参数: " + err.Error()
+			resp.RespondJSON(ctx, http.StatusBadRequest)
 			return
 		}
 	}
 	if episodeStr != "" {
 		episode, err = strconv.Atoi(episodeStr)
 		if err != nil {
-			errResp.Message = "非法集数参数: " + err.Error()
-			ctx.JSON(http.StatusBadRequest, errResp)
+			resp.Message = "非法集数参数: " + err.Error()
+			resp.RespondJSON(ctx, http.StatusBadRequest)
 			return
 		}
 	}
@@ -57,50 +57,51 @@ func Overview(ctx *gin.Context) {
 	var overview string
 	switch meta.ParseMediaType(mediaTypeStr) {
 	case meta.MediaTypeUnknown:
-		errResp.Message = "无效的媒体类型"
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "无效的媒体类型"
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
+
 	case meta.MediaTypeMovie: // 处理电影类型
 		movieInfo, err := tmdb_controller.GetMovieDetail(tmdbID)
 		if err != nil {
-			errResp.Message = "获取电影详情失败: " + err.Error()
-			ctx.JSON(http.StatusInternalServerError, errResp)
+			resp.Message = "获取电影详情失败: " + err.Error()
+			resp.RespondJSON(ctx, http.StatusInternalServerError)
 			return
 		}
 		overview = movieInfo.TMDBInfo.MovieInfo.Overview
+
 	case meta.MediaTypeTV: // 处理电视剧类型
 		switch {
 		case season >= 0 && episode > 0: // 获取特定季集的概述
 			episodeInfo, err := tmdb_controller.GetTVEpisodeDetail(tmdbID, season, episode)
 			if err != nil {
-				errResp.Message = "获取电视剧集详情失败: " + err.Error()
-				ctx.JSON(http.StatusInternalServerError, errResp)
+				resp.Message = "获取电视剧集详情失败: " + err.Error()
+				resp.RespondJSON(ctx, http.StatusInternalServerError)
 				return
 			}
 			overview = episodeInfo.TMDBInfo.TVInfo.EpisodeInfo.Overview
+
 		case season >= 0: // 获取特定季的概述
 			seasonInfo, err := tmdb_controller.GetTVSeasonDetail(tmdbID, season)
 			if err != nil {
-				errResp.Message = "获取电视剧季详情失败: " + err.Error()
-				ctx.JSON(http.StatusInternalServerError, errResp)
+				resp.Message = "获取电视剧季详情失败: " + err.Error()
+				resp.RespondJSON(ctx, http.StatusInternalServerError)
 				return
 			}
 			overview = seasonInfo.TMDBInfo.TVInfo.SeasonInfo.Overview
+
 		default: // 获取整部剧的概述
 			tvInfo, err := tmdb_controller.GetTVSerieDetail(tmdbID)
 			if err != nil {
-				errResp.Message = "获取电视剧详情失败: " + err.Error()
-				ctx.JSON(http.StatusInternalServerError, errResp)
+				resp.Message = "获取电视剧详情失败: " + err.Error()
+				resp.RespondJSON(ctx, http.StatusInternalServerError)
 				return
 			}
 			overview = tvInfo.TMDBInfo.TVInfo.SerieInfo.Overview
 		}
 	}
 
-	if overview == "" {
-		errResp.Message = "未找到媒体概述信息"
-		ctx.JSON(http.StatusNotFound, errResp)
-		return
-	}
-	ctx.JSON(http.StatusOK, overview)
+	resp.Success = true
+	resp.Data = &overview
+	ctx.JSON(http.StatusOK, resp)
 }

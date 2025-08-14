@@ -16,7 +16,10 @@ import (
 // @Tags 存储,存储器
 // @Products json
 func ProviderList(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, storage_controller.ListStorageProviders())
+	var resp schemas.Response[[]schemas.StorageProviderItem]
+	resp.Success = true
+	resp.Data = storage_controller.ListStorageProviders()
+	resp.RespondJSON(ctx, http.StatusOK)
 }
 
 // @Route /storage/provider/{storage_type} [get]
@@ -27,26 +30,28 @@ func ProviderList(ctx *gin.Context) {
 // @Accept json
 // @Products json
 func ProviderGet(ctx *gin.Context) {
-	var errResp schemas.ErrResponse
+	var resp schemas.Response[*schemas.StorageProviderItem]
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		errResp.Message = "未知的存储类型: " + storageTypeStr
-		logrus.Warning(errResp.Message)
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "未知的存储类型: " + storageTypeStr
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 
 	item, err := storage_controller.GetStorageProvider(storageType)
 	if err != nil {
-		errResp.Message = "获取存储提供者失败: " + err.Error()
-		logrus.Warning(errResp.Message)
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "获取存储提供者失败: " + err.Error()
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, item)
+	resp.Success = true
+	resp.Data = item
+	resp.RespondJSON(ctx, http.StatusOK)
 }
 
 // @Route /storage/provider/{storage_type} [post]
@@ -59,8 +64,8 @@ func ProviderGet(ctx *gin.Context) {
 // @Products json
 func ProviderRegister(ctx *gin.Context) {
 	var (
-		req     map[string]string
-		errResp schemas.ErrResponse
+		req  map[string]string
+		resp schemas.Response[*schemas.StorageProviderItem]
 	)
 
 	logrus.Debugf("请求体: %+v", ctx.Request.Body)
@@ -68,15 +73,16 @@ func ProviderRegister(ctx *gin.Context) {
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	if storageType == schemas.StorageUnknown {
-		errResp.Message = "未知的存储类型: " + storageTypeStr
-		logrus.Warning(errResp.Message)
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "未知的存储类型: " + storageTypeStr
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusBadRequest)
+		return
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		errResp.Message = "解析请求参数失败: " + err.Error()
-		logrus.Warning(errResp.Message)
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "解析请求参数失败: " + err.Error()
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 
@@ -89,14 +95,16 @@ func ProviderRegister(ctx *gin.Context) {
 
 	item, err := storage_controller.RegisterStorageProvider(c)
 	if err != nil {
-		errResp.Message = "注册存储器失败: " + err.Error()
-		logrus.Warning(errResp.Message)
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "注册存储器失败: " + err.Error()
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
 	logrus.Debugf("存储器注册成功: %+v", item)
-	ctx.JSON(http.StatusOK, item)
+	resp.Success = true
+	resp.Data = item
+	resp.RespondJSON(ctx, http.StatusOK)
 }
 
 // @Route /storage/provider/{storage_type} [delete]
@@ -107,30 +115,34 @@ func ProviderRegister(ctx *gin.Context) {
 // @Accept json
 // @Products json
 func ProviderDelete(ctx *gin.Context) {
-	var errResp schemas.ErrResponse
+	var resp schemas.Response[*schemas.StorageProviderItem]
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := schemas.ParseStorageType(storageTypeStr)
 	switch storageType {
 	case schemas.StorageUnknown:
-		errResp.Message = "未知的存储类型"
-		logrus.Warning(errResp.Message)
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "未知的存储类型"
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
+
 	case schemas.StorageLocal:
-		errResp.Message = "无法删除本地存储器"
-		logrus.Warning(errResp.Message)
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "无法删除本地存储器"
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusBadRequest)
+		return
 	}
 
 	item, err := storage_controller.UnRegisterStorageProvider(storageType)
 	if err != nil {
-		errResp.Message = "删除存储器失败: " + err.Error()
-		logrus.Warning(errResp.Message)
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "删除存储器失败: " + err.Error()
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
 	logrus.Debugf("已删除存储器: %s", storageType)
-	ctx.JSON(http.StatusOK, item)
+	resp.Success = true
+	resp.Data = item
+	resp.RespondJSON(ctx, http.StatusOK)
 }

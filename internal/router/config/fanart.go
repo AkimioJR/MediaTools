@@ -16,7 +16,11 @@ import (
 // @Tags 应用配置,Fanart
 // @Produce json
 func Fanart(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, config.Fanart)
+	var resp schemas.Response[*config.FanartConfig]
+	resp.Success = true
+	resp.Data = &config.Fanart
+	logrus.Debugf("获取 Fanart 配置: %+v", resp.Data)
+	resp.RespondJSON(ctx, http.StatusOK)
 }
 
 // @Router /config/fanart [post]
@@ -27,11 +31,16 @@ func Fanart(ctx *gin.Context) {
 // @Produce json
 // @Param config body config.FanartConfig true "Fanart 配置"
 func UpdateFanart(ctx *gin.Context) {
-	var req config.FanartConfig
+	var (
+		req  config.FanartConfig
+		resp schemas.Response[*config.FanartConfig]
+	)
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, schemas.ErrResponse{Message: "请求参数错误: " + err.Error()})
+		resp.Message = "请求参数错误: " + err.Error()
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 
@@ -41,22 +50,27 @@ func UpdateFanart(ctx *gin.Context) {
 	config.Fanart = req
 	err = fanart_controller.Init()
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, schemas.ErrResponse{Message: "初始化 Fanart 控制器失败: " + err.Error()})
-		goto initErr
+		resp.Message = "初始化 Fanart 控制器失败: " + err.Error()
+		logrus.Warning(resp.Message)
+		logrus.Debugf("开始恢复 Fanart 配置: %+v", oldConfig)
+		config.Fanart = oldConfig
+		fanart_controller.Init()
+		logrus.Debugf("恢复 Fanart 配置成功: %+v", config.Fanart)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		return
 	}
 
 	logrus.Debugf("Fanart 控制器初始化成功: %+v", config.Fanart)
 
 	err = config.WriteConfig()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, schemas.ErrResponse{Message: "写入配置文件失败: " + err.Error()})
+		resp.Message = "写入配置文件失败: " + err.Error()
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, config.Fanart)
-	return
-
-initErr:
-	config.Fanart = oldConfig
-	fanart_controller.Init()
+	resp.Success = true
+	resp.Data = &config.Fanart
+	ctx.JSON(http.StatusOK, resp)
 }

@@ -19,16 +19,14 @@ import (
 // @Param request body schemas.ScrapeRequest true "刮削请求参数"
 func Video(ctx *gin.Context) {
 	var (
-		req     schemas.ScrapeRequest
-		errResp schemas.ErrResponse
+		req  schemas.ScrapeRequest
+		resp schemas.Response[*schemas.FileInfo]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			errResp.Message = "请求参数错误: " + err.Error()
-			ctx.JSON(http.StatusBadRequest, errResp)
-			return
-		}
+		resp.Message = "请求参数错误: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusBadRequest)
+		return
 	}
 
 	dstFile := schemas.FileInfo{
@@ -49,10 +47,12 @@ func Video(ctx *gin.Context) {
 
 	err := scrape_controller.RecognizeAndScrape(&dstFile, req.MediaType, req.TMDBID)
 	if err != nil {
-		errResp.Message = "刮削失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "刮削失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, dstFile)
+	resp.Success = true
+	resp.Data = &dstFile
+	ctx.JSON(http.StatusOK, resp)
 }

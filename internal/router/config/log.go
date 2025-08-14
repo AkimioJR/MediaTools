@@ -16,7 +16,11 @@ import (
 // @Tags 应用配置,日志
 // @Produce json
 func Log(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, config.Log)
+	var resp schemas.Response[*config.LogConfig]
+	resp.Success = true
+	resp.Data = &config.Log
+	logrus.Debugf("获取日志配置: %+v", resp.Data)
+	ctx.JSON(http.StatusOK, resp)
 }
 
 // @Router /config/log [post]
@@ -30,12 +34,14 @@ func UpdateLog(ctx *gin.Context) {
 	var (
 		req       config.LogConfig
 		oldConfig = config.Log
-		errResp   schemas.ErrResponse
+		resp      schemas.Response[*config.LogConfig]
 	)
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, schemas.ErrResponse{Message: "请求参数错误: " + err.Error()})
+		resp.Message = "请求参数错误: " + err.Error()
+		logrus.Warningf("请求参数绑定失败: %v", err)
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 
@@ -45,16 +51,22 @@ func UpdateLog(ctx *gin.Context) {
 		config.Log.ConsoleLevel = req.ConsoleLevel
 		err = logging.SetLevel(req.ConsoleLevel)
 		if err != nil {
-			errResp.Message = "设置终端日志级别失败: " + err.Error()
-			goto initErr
+			resp.Message = "设置日志级别失败: " + err.Error()
+			logrus.Warning(resp.Message)
+			logging.SetLevel(oldConfig.ConsoleLevel) // 恢复旧级别
+			resp.RespondJSON(ctx, http.StatusInternalServerError)
+			return
 		}
 	}
 	if config.Log.FileLevel != req.FileLevel {
 		config.Log.FileLevel = req.FileLevel
 		err = logging.SetFileLevel(req.FileLevel)
 		if err != nil {
-			errResp.Message = "设置文件日志级别失败: " + err.Error()
-			goto initErr
+			resp.Message = "设置文件日志级别失败: " + err.Error()
+			logrus.Warning(resp.Message)
+			logging.SetFileLevel(oldConfig.FileLevel) // 恢复旧级别
+			resp.RespondJSON(ctx, http.StatusInternalServerError)
+			return
 		}
 	}
 	if config.Log.FileDir != req.FileDir {
@@ -67,18 +79,13 @@ func UpdateLog(ctx *gin.Context) {
 	logrus.Debug("开始更新配置文件")
 	err = config.WriteConfig()
 	if err != nil {
-		errResp.Message = "更新配置失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "写入新配置文件失败: " + err.Error()
+		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, config.Log)
-	return
-
-initErr:
-	logrus.Errorf("更新日志配置失败: %s", errResp.Message)
-	config.Log = oldConfig // 恢复旧配置
-	logging.Init()         // 重新初始化日志系统
-	logrus.Debugf("日志配置恢复成功: %+v", config.Log)
-	ctx.JSON(http.StatusInternalServerError, errResp)
+	resp.Success = true
+	resp.Data = &config.Log
+	resp.RespondJSON(ctx, http.StatusOK)
 }

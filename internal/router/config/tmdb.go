@@ -16,7 +16,10 @@ import (
 // @Tags 应用配置,TMDB
 // @Produce json
 func TMDB(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, config.TMDB)
+	var resp schemas.Response[*config.TMDBConfig]
+	resp.Success = true
+	resp.Data = &config.TMDB
+	resp.RespondJSON(ctx, http.StatusOK)
 }
 
 // @Router /config/tmdb [post]
@@ -27,14 +30,14 @@ func TMDB(ctx *gin.Context) {
 // @Param config body config.TMDBConfig true "TMDB 配置"
 func UpdateTMDB(ctx *gin.Context) {
 	var (
-		req     config.TMDBConfig
-		errResp schemas.ErrResponse
+		req  config.TMDBConfig
+		resp schemas.Response[*config.TMDBConfig]
 	)
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		errResp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "请求参数错误: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 
@@ -45,24 +48,22 @@ func UpdateTMDB(ctx *gin.Context) {
 	err = tmdb_controller.Init()
 	if err != nil {
 		logrus.Errorf("初始化 TMDB 控制器失败: %v", err)
-		errResp.Message = "初始化 TMDB 控制器失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
-		goto initErr
+		resp.Message = "初始化 TMDB 控制器失败: " + err.Error()
+		config.TMDB = oldConfig
+		tmdb_controller.Init()
+		logrus.Debugf("恢复 TMDB 原始数据: %+v", config.TMDB)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		return
 	}
 
 	logrus.Debugf("TMDB 控制器初始化成功: %+v", config.TMDB)
 
 	err = config.WriteConfig()
 	if err != nil {
-		errResp.Message = "更新配置失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "写入新配置文件失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, config.TMDB)
-	return
-
-initErr:
-	config.TMDB = oldConfig
-	tmdb_controller.Init()
+	resp.RespondJSON(ctx, http.StatusOK)
 }

@@ -17,30 +17,36 @@ import (
 // @Param title query string true "媒体标题"
 // @Produce json
 func RecognizeMedia(ctx *gin.Context) {
-	var errResp schemas.ErrResponse
+	var resp schemas.Response[*schemas.RecognizeMediaDetail]
+
 	title := ctx.Query("title")
 	if title == "" {
-		errResp.Message = "标题不能为空"
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "标题不能为空"
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
+
 	logrus.Infof("正在识别媒体：%s", title)
 	videoMeta, customRule, metaRule := recognize_controller.ParseVideoMeta(title)
 	mediaInfo, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
 	if err != nil {
-		errResp.Message = "识别失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "识别失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
+
 	item, err := schemas.NewMediaItem(videoMeta, mediaInfo)
 	if err != nil {
-		errResp.Message = "创建媒体项失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "创建媒体项失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
-	ctx.JSON(http.StatusOK, schemas.RecognizeMediaDetail{
+
+	resp.Success = true
+	resp.Data = &schemas.RecognizeMediaDetail{
 		Item:       item,
 		CustomRule: customRule,
 		MetaRule:   metaRule,
-	})
+	}
+	resp.RespondJSON(ctx, http.StatusOK)
 }

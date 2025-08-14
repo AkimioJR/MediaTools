@@ -2,6 +2,8 @@ package log
 
 import (
 	"MediaTools/internal/logging"
+	"MediaTools/internal/pkg/loghook"
+	"MediaTools/internal/schemas"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,5 +15,8 @@ import (
 // @Tags 日志
 // @Produce json
 func GetRecentLogs(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, logging.GetRecentLogs())
+	var resp schemas.Response[[]loghook.LogDetail]
+	resp.Success = true
+	resp.Data = logging.GetRecentLogs()
+	resp.RespondJSON(ctx, http.StatusOK)
 }

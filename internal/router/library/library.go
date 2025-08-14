@@ -22,26 +22,27 @@ import (
 // @Param request body schemas.LibraryArchiveMediaRequest true "请求参数"
 func LibraryArchiveMedia(ctx *gin.Context) {
 	var (
-		req     schemas.LibraryArchiveMediaRequest
-		errResp schemas.ErrResponse
+		req  schemas.LibraryArchiveMediaRequest
+		resp schemas.Response[*schemas.FileInfo]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		errResp.Message = "请求参数错误: " + err.Error()
-		ctx.JSON(http.StatusBadRequest, errResp)
+		resp.Message = "请求参数错误: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 
 	srcFile, err := storage_controller.GetFile(req.SrcFile.Path, req.SrcFile.StorageType)
 	if err != nil {
-		errResp.Message = "获取源文件失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "获取源文件失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
+
 	dstDir, err := storage_controller.GetFile(req.DstDir.Path, req.DstDir.StorageType)
 	if err != nil {
-		errResp.Message = "获取目标目录失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "获取目标目录失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
@@ -49,32 +50,35 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 	videoMeta, _, _ := recognize_controller.ParseVideoMeta(srcFile.Name)
 	info, err := tmdb_controller.RecognizeMedia(videoMeta)
 	if err != nil {
-		errResp.Message = "识别媒体信息失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "识别媒体信息失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
+
 	if info.MediaType == meta.MediaTypeTV {
 		seasonDetail, err := tmdb_controller.GetTVSeasonDetail(info.TMDBID, videoMeta.Season)
 		if err != nil {
-			errResp.Message = "获取电视剧季节信息失败: " + err.Error()
-			ctx.JSON(http.StatusInternalServerError, errResp)
+			resp.Message = "获取电视剧季节信息失败: " + err.Error()
+			resp.RespondJSON(ctx, http.StatusInternalServerError)
 			return
 		}
 		info.TMDBInfo.TVInfo.SeasonInfo = seasonDetail.TMDBInfo.TVInfo.SeasonInfo
 		episodeDetail, err := tmdb_controller.GetTVEpisodeDetail(info.TMDBID, videoMeta.Season, videoMeta.Episode)
 		if err != nil {
-			errResp.Message = "获取电视剧集信息失败: " + err.Error()
-			ctx.JSON(http.StatusInternalServerError, errResp)
+			resp.Message = "获取电视剧集信息失败: " + err.Error()
+			resp.RespondJSON(ctx, http.StatusInternalServerError)
 			return
 		}
 		info.TMDBInfo.TVInfo.EpisodeInfo = episodeDetail.TMDBInfo.TVInfo.EpisodeInfo
 	}
+
 	item, err := schemas.NewMediaItem(videoMeta, info)
 	if err != nil {
-		errResp.Message = "创建媒体项失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "创建媒体项失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
+
 	var dst *schemas.FileInfo
 	if req.NeedScrape {
 		dst, err = library_controller.ArchiveMedia(srcFile, dstDir, schemas.TransferLink, item, info)
@@ -82,10 +86,12 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 		dst, err = library_controller.ArchiveMedia(srcFile, dstDir, schemas.TransferLink, item, nil)
 	}
 	if err != nil {
-		errResp.Message = "转移媒体文件失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, errResp)
+		resp.Message = "转移媒体文件失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 	logrus.Infof("%s 媒体文件转移完成", srcFile)
-	ctx.JSON(http.StatusOK, dst)
+	resp.Success = true
+	resp.Data = dst
+	resp.RespondJSON(ctx, http.StatusOK)
 }
