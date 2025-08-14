@@ -26,14 +26,7 @@ const docTemplate = `{
                     "Fanart"
                 ],
                 "summary": "获取 Fanart 配置",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.FanartConfig"
-                        }
-                    }
-                }
+                "responses": {}
             },
             "post": {
                 "description": "更新 Fanart 配置",
@@ -59,26 +52,7 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.FanartConfig"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/config/libraries": {
@@ -91,17 +65,7 @@ const docTemplate = `{
                     "应用配置"
                 ],
                 "summary": "获取媒体库配置",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/config.LibraryConfig"
-                            }
-                        }
-                    }
-                }
+                "responses": {}
             },
             "post": {
                 "description": "更新媒体库配置",
@@ -129,29 +93,7 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/config.LibraryConfig"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/config/log": {
@@ -165,14 +107,7 @@ const docTemplate = `{
                     "日志"
                 ],
                 "summary": "获取日志配置",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.LogConfig"
-                        }
-                    }
-                }
+                "responses": {}
             },
             "post": {
                 "description": "更新日志配置",
@@ -198,26 +133,7 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.LogConfig"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/config/media/custom_word": {
@@ -233,14 +149,7 @@ const docTemplate = `{
                     "应用配置"
                 ],
                 "summary": "获取自定义词配置",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.CustomWordConfig"
-                        }
-                    }
-                }
+                "responses": {}
             },
             "post": {
                 "description": "更新自定义词配置",
@@ -265,26 +174,7 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.CustomWordConfig"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/config/media/format": {
@@ -297,14 +187,7 @@ const docTemplate = `{
                     "应用配置"
                 ],
                 "summary": "获取媒体格式配置",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.FormatConfig"
-                        }
-                    }
-                }
+                "responses": {}
             },
             "post": {
                 "description": "更新媒体格式配置",
@@ -329,26 +212,7 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.FormatConfig"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/config/tmdb": {
@@ -362,14 +226,7 @@ const docTemplate = `{
                     "TMDB"
                 ],
                 "summary": "获取 TMDB 配置",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.TMDBConfig"
-                        }
-                    }
-                }
+                "responses": {}
             },
             "post": {
                 "description": "更新 TMDB 配置",
@@ -392,26 +249,7 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/config.TMDBConfig"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/library/archive": {
@@ -438,26 +276,7 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "成功响应",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.FileInfo"
-                        }
-                    },
-                    "400": {
-                        "description": "请求参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "服务器错误",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/log/recent": {
@@ -470,17 +289,7 @@ const docTemplate = `{
                     "日志"
                 ],
                 "summary": "获取最近日志",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/loghook.LogDetail"
-                            }
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/overview/{media_type}/{tmdb_id}": {
@@ -522,32 +331,7 @@ const docTemplate = `{
                         "in": "query"
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "成功响应，返回概述信息",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "请求参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "未找到概述信息",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "服务器错误",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/poster/{media_type}/{tmdb_id}": {
@@ -577,26 +361,7 @@ const docTemplate = `{
                         "required": true
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "成功响应，返回图片 URL",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "请求参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "服务器错误",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/scrape/video": {
@@ -623,26 +388,7 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "刮削成功",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.FileInfo"
-                        }
-                    },
-                    "400": {
-                        "description": "请求参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "刮削失败",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         }
     },
@@ -795,167 +541,6 @@ const docTemplate = `{
                 }
             }
         },
-        "encode.AudioEncode": {
-            "type": "integer",
-            "format": "int32",
-            "enum": [
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12,
-                13
-            ],
-            "x-enum-comments": {
-                "AudioEncodeAAC": "AAC",
-                "AudioEncodeAC3": "AC-3",
-                "AudioEncodeAtmos": "Dolby Atmos",
-                "AudioEncodeDTS": "DTS",
-                "AudioEncodeDTSHD": "DTS-HD",
-                "AudioEncodeDTSHDMA": "DTS-HD MA",
-                "AudioEncodeEAC3": "E-AC-3/DD+",
-                "AudioEncodeFLAC": "FLAC",
-                "AudioEncodeLPCM": "LPCM",
-                "AudioEncodeMP3": "MP3",
-                "AudioEncodeOpus": "Opus",
-                "AudioEncodeTrueHD": "TrueHD",
-                "AudioEncodeUnknown": "未知编码",
-                "AudioEncodeVorbis": "Vorbis"
-            },
-            "x-enum-descriptions": [
-                "未知编码",
-                "AAC",
-                "AC-3",
-                "E-AC-3/DD+",
-                "DTS",
-                "DTS-HD",
-                "DTS-HD MA",
-                "TrueHD",
-                "Dolby Atmos",
-                "FLAC",
-                "LPCM",
-                "Opus",
-                "Vorbis",
-                "MP3"
-            ],
-            "x-enum-varnames": [
-                "AudioEncodeUnknown",
-                "AudioEncodeAAC",
-                "AudioEncodeAC3",
-                "AudioEncodeEAC3",
-                "AudioEncodeDTS",
-                "AudioEncodeDTSHD",
-                "AudioEncodeDTSHDMA",
-                "AudioEncodeTrueHD",
-                "AudioEncodeAtmos",
-                "AudioEncodeFLAC",
-                "AudioEncodeLPCM",
-                "AudioEncodeOpus",
-                "AudioEncodeVorbis",
-                "AudioEncodeMP3"
-            ]
-        },
-        "encode.VideoEncode": {
-            "type": "integer",
-            "format": "int32",
-            "enum": [
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12,
-                13,
-                14
-            ],
-            "x-enum-comments": {
-                "VideoEncode10bit": "纯10bit编码（未指定具体编码格式）",
-                "VideoEncodeAV1": "AV1",
-                "VideoEncodeAV1_10bit": "AV1 10bit",
-                "VideoEncodeAVS2": "AVS2",
-                "VideoEncodeAVS3": "AVS3",
-                "VideoEncodeDivX": "DivX",
-                "VideoEncodeH264": "H.264/AVC",
-                "VideoEncodeH264_10bit": "H.264 10bit",
-                "VideoEncodeH265": "H.265/HEVC",
-                "VideoEncodeH265_10bit": "H.265 10bit",
-                "VideoEncodeMPEG2": "MPEG-2",
-                "VideoEncodeMPEG4": "MPEG-4",
-                "VideoEncodeUnknown": "未知编码",
-                "VideoEncodeVC1": "VC-1",
-                "VideoEncodeXvid": "Xvid"
-            },
-            "x-enum-descriptions": [
-                "未知编码",
-                "H.264/AVC",
-                "H.265/HEVC",
-                "H.264 10bit",
-                "H.265 10bit",
-                "AV1",
-                "AV1 10bit",
-                "Xvid",
-                "DivX",
-                "MPEG-2",
-                "MPEG-4",
-                "VC-1",
-                "AVS2",
-                "AVS3",
-                "纯10bit编码（未指定具体编码格式）"
-            ],
-            "x-enum-varnames": [
-                "VideoEncodeUnknown",
-                "VideoEncodeH264",
-                "VideoEncodeH265",
-                "VideoEncodeH264_10bit",
-                "VideoEncodeH265_10bit",
-                "VideoEncodeAV1",
-                "VideoEncodeAV1_10bit",
-                "VideoEncodeXvid",
-                "VideoEncodeDivX",
-                "VideoEncodeMPEG2",
-                "VideoEncodeMPEG4",
-                "VideoEncodeVC1",
-                "VideoEncodeAVS2",
-                "VideoEncodeAVS3",
-                "VideoEncode10bit"
-            ]
-        },
-        "loghook.LogDetail": {
-            "type": "object",
-            "properties": {
-                "caller": {
-                    "description": "日志调用者",
-                    "type": "string"
-                },
-                "level": {
-                    "description": "日志级别",
-                    "type": "string"
-                },
-                "message": {
-                    "description": "日志消息",
-                    "type": "string"
-                },
-                "time": {
-                    "description": "日志时间",
-                    "type": "string"
-                }
-            }
-        },
         "meta.MediaType": {
             "type": "integer",
             "format": "int32",
@@ -979,268 +564,6 @@ const docTemplate = `{
                 "MediaTypeMovie",
                 "MediaTypeTV"
             ]
-        },
-        "meta.ResourceEffect": {
-            "type": "integer",
-            "format": "int32",
-            "enum": [
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12
-            ],
-            "x-enum-comments": {
-                "ResourceEffect3D": "3D",
-                "ResourceEffectDV": "DV",
-                "ResourceEffectDolby": "Dolby",
-                "ResourceEffectDovi": "DOVI",
-                "ResourceEffectEDR": "EDR",
-                "ResourceEffectHDR": "HDR",
-                "ResourceEffectHDR10": "HDR10",
-                "ResourceEffectHDR10Plus": "HDR10+",
-                "ResourceEffectHLG": "HLG",
-                "ResourceEffectHQ": "HQ",
-                "ResourceEffectRepack": "REPACK",
-                "ResourceEffectSDR": "SDR",
-                "ResourceEffectUnknown": "未知"
-            },
-            "x-enum-descriptions": [
-                "未知",
-                "SDR",
-                "HDR",
-                "HDR10",
-                "HDR10+",
-                "Dolby",
-                "DOVI",
-                "DV",
-                "3D",
-                "REPACK",
-                "HLG",
-                "EDR",
-                "HQ"
-            ],
-            "x-enum-varnames": [
-                "ResourceEffectUnknown",
-                "ResourceEffectSDR",
-                "ResourceEffectHDR",
-                "ResourceEffectHDR10",
-                "ResourceEffectHDR10Plus",
-                "ResourceEffectDolby",
-                "ResourceEffectDovi",
-                "ResourceEffectDV",
-                "ResourceEffect3D",
-                "ResourceEffectRepack",
-                "ResourceEffectHLG",
-                "ResourceEffectEDR",
-                "ResourceEffectHQ"
-            ]
-        },
-        "meta.ResourcePix": {
-            "type": "integer",
-            "format": "int32",
-            "enum": [
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6
-            ],
-            "x-enum-comments": {
-                "ResourcePix1080p": "1080p",
-                "ResourcePix1440p": "1440p (2K)",
-                "ResourcePix2160p": "2160p (4K)",
-                "ResourcePix4320p": "4320p (8K)",
-                "ResourcePix480p": "480p",
-                "ResourcePix720p": "720p",
-                "ResourcePixUnknown": "未知分辨率"
-            },
-            "x-enum-descriptions": [
-                "未知分辨率",
-                "480p",
-                "720p",
-                "1080p",
-                "1440p (2K)",
-                "2160p (4K)",
-                "4320p (8K)"
-            ],
-            "x-enum-varnames": [
-                "ResourcePixUnknown",
-                "ResourcePix480p",
-                "ResourcePix720p",
-                "ResourcePix1080p",
-                "ResourcePix1440p",
-                "ResourcePix2160p",
-                "ResourcePix4320p"
-            ]
-        },
-        "meta.ResourceType": {
-            "type": "integer",
-            "format": "int32",
-            "enum": [
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12,
-                13,
-                14,
-                15,
-                16
-            ],
-            "x-enum-comments": {
-                "ResourceTypeBD": "BD",
-                "ResourceTypeBDRip": "BDRip",
-                "ResourceTypeBlu": "Blu",
-                "ResourceTypeBluRay": "BluRay",
-                "ResourceTypeBluRayRemux": "BluRay REMUX",
-                "ResourceTypeDVDRip": "DVDRip",
-                "ResourceTypeHDDVD": "HDDVD",
-                "ResourceTypeHDRip": "HDRip",
-                "ResourceTypeHDTV": "HDTV",
-                "ResourceTypeRemux": "Remux",
-                "ResourceTypeUHD": "UHD",
-                "ResourceTypeUHDBluRay": "UHD BluRay",
-                "ResourceTypeUHDTV": "UHDTV",
-                "ResourceTypeUnknown": "未知",
-                "ResourceTypeWeb": "Web",
-                "ResourceTypeWebDL": "WEB-DL",
-                "ResourceTypeWebRip": "WebRip"
-            },
-            "x-enum-descriptions": [
-                "未知",
-                "BluRay",
-                "HDTV",
-                "UHDTV",
-                "HDDVD",
-                "WebRip",
-                "DVDRip",
-                "BDRip",
-                "Blu",
-                "Web",
-                "BD",
-                "HDRip",
-                "Remux",
-                "UHD",
-                "WEB-DL",
-                "UHD BluRay",
-                "BluRay REMUX"
-            ],
-            "x-enum-varnames": [
-                "ResourceTypeUnknown",
-                "ResourceTypeBluRay",
-                "ResourceTypeHDTV",
-                "ResourceTypeUHDTV",
-                "ResourceTypeHDDVD",
-                "ResourceTypeWebRip",
-                "ResourceTypeDVDRip",
-                "ResourceTypeBDRip",
-                "ResourceTypeBlu",
-                "ResourceTypeWeb",
-                "ResourceTypeBD",
-                "ResourceTypeHDRip",
-                "ResourceTypeRemux",
-                "ResourceTypeUHD",
-                "ResourceTypeWebDL",
-                "ResourceTypeUHDBluRay",
-                "ResourceTypeBluRayRemux"
-            ]
-        },
-        "meta.StreamingPlatform": {
-            "type": "integer",
-            "format": "int32",
-            "enum": [
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10
-            ],
-            "x-enum-varnames": [
-                "UnknownStreamingPlatform",
-                "Amazon",
-                "Netflix",
-                "AppleTV",
-                "ITunes",
-                "Disney",
-                "Baha",
-                "BiliBili",
-                "BiliGlobal",
-                "Crunchyroll",
-                "YouTube"
-            ]
-        },
-        "schemas.ErrResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "schemas.FileInfo": {
-            "type": "object",
-            "properties": {
-                "ext": {
-                    "description": "文件扩展名",
-                    "type": "string"
-                },
-                "is_dir": {
-                    "description": "是否为目录",
-                    "type": "boolean"
-                },
-                "mod_time": {
-                    "description": "文件修改时间",
-                    "type": "string"
-                },
-                "name": {
-                    "description": "文件名",
-                    "type": "string"
-                },
-                "path": {
-                    "description": "文件路径",
-                    "type": "string"
-                },
-                "size": {
-                    "description": "文件大小",
-                    "type": "integer"
-                },
-                "storage_type": {
-                    "description": "存储系统类型",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/schemas.StorageType"
-                        }
-                    ]
-                }
-            }
         },
         "schemas.FileInfoRequest": {
             "type": "object",
@@ -1278,165 +601,6 @@ const docTemplate = `{
                 }
             }
         },
-        "schemas.MediaItem": {
-            "type": "object",
-            "properties": {
-                "audio_encode": {
-                    "description": "音频编码",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/encode.AudioEncode"
-                        }
-                    ]
-                },
-                "customization": {
-                    "description": "自定义词",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "episode": {
-                    "description": "集数 -1表示无集数",
-                    "type": "integer"
-                },
-                "episode_date": {
-                    "description": "集发布日期",
-                    "type": "string"
-                },
-                "episode_str": {
-                    "description": "集 E12 E12-E15",
-                    "type": "string"
-                },
-                "episode_title": {
-                    "description": "集标题",
-                    "type": "string"
-                },
-                "file_extension": {
-                    "description": "文件扩展名",
-                    "type": "string"
-                },
-                "imdb_id": {
-                    "description": "IMDb ID",
-                    "type": "string"
-                },
-                "media_type": {
-                    "description": "电影、电视剧",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/meta.MediaType"
-                        }
-                    ]
-                },
-                "original_title": {
-                    "description": "原始标题",
-                    "type": "string"
-                },
-                "part": {
-                    "description": "分段",
-                    "type": "string"
-                },
-                "platform": {
-                    "description": "流媒体平台",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/meta.StreamingPlatform"
-                        }
-                    ]
-                },
-                "release_groups": {
-                    "description": "发布组",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "resource_effect": {
-                    "description": "资源效果",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/meta.ResourceEffect"
-                    }
-                },
-                "resource_pix": {
-                    "description": "分辨率",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/meta.ResourcePix"
-                        }
-                    ]
-                },
-                "resource_type": {
-                    "description": "资源相关信息",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/meta.ResourceType"
-                        }
-                    ]
-                },
-                "season": {
-                    "description": "电视剧数据",
-                    "type": "integer"
-                },
-                "season_str": {
-                    "description": "季 S01 S01-S03",
-                    "type": "string"
-                },
-                "season_year": {
-                    "description": "季年份",
-                    "type": "integer"
-                },
-                "title": {
-                    "description": "标题",
-                    "type": "string"
-                },
-                "tmdb_id": {
-                    "description": "ID 信息",
-                    "type": "integer"
-                },
-                "tvdb_id": {
-                    "description": "TVDB ID",
-                    "type": "integer"
-                },
-                "version": {
-                    "description": "版本号",
-                    "type": "integer"
-                },
-                "video_encode": {
-                    "description": "视频编码",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/encode.VideoEncode"
-                        }
-                    ]
-                },
-                "year": {
-                    "description": "年份",
-                    "type": "integer"
-                }
-            }
-        },
-        "schemas.RecognizeMediaResponse": {
-            "type": "object",
-            "properties": {
-                "custom_rule": {
-                    "description": "应用自定义规则",
-                    "type": "string"
-                },
-                "item": {
-                    "description": "识别到的媒体项",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/schemas.MediaItem"
-                        }
-                    ]
-                },
-                "meta_rule": {
-                    "description": "应用的媒体规则",
-                    "type": "string"
-                }
-            }
-        },
         "schemas.ScrapeRequest": {
             "type": "object",
             "required": [
@@ -1451,20 +615,6 @@ const docTemplate = `{
                 },
                 "tmdb_id": {
                     "type": "integer"
-                }
-            }
-        },
-        "schemas.StorageProviderItem": {
-            "type": "object",
-            "properties": {
-                "storage_type": {
-                    "$ref": "#/definitions/schemas.StorageType"
-                },
-                "transfer_type": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/schemas.TransferType"
-                    }
                 }
             }
         },
