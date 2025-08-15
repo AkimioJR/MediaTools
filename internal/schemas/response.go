@@ -23,3 +23,8 @@ func (r *Response[T]) RespondJSON(ctx *gin.Context, code int) {
 	}
 	ctx.JSON(code, r)
 }
+
+func (r *Response[T]) RespondSuccessJSON(ctx *gin.Context, data T) {
+	r.Data = data
+	r.RespondJSON(ctx, http.StatusOK)
+}
