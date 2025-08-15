@@ -5,27 +5,27 @@ import (
 	"fmt"
 )
 
-func TransferFile(srcFile *storage.StorageFileInfo, dstFile *storage.StorageFileInfo, transferType storage.TransferType) error {
-	if srcFile.StorageType != dstFile.StorageType &&
+func TransferFile(srcPath storage.StoragePath, dstPath storage.StoragePath, transferType storage.TransferType) error {
+	if srcPath.GetStorageType() != dstPath.GetStorageType() &&
 		(transferType == storage.TransferLink || transferType == storage.TransferSoftLink) {
-		return fmt.Errorf("不支持使用转移方式 %s 将 %s 转移到 %s", transferType, srcFile, dstFile)
+		return fmt.Errorf("不支持使用转移方式 %s 将 %s 转移到 %s", transferType, srcPath, dstPath)
 	}
 
 	var err error
 	switch transferType {
 	case storage.TransferCopy:
-		err = Copy(srcFile, dstFile)
+		err = Copy(srcPath, dstPath)
 	case storage.TransferMove:
-		err = Move(srcFile, dstFile)
+		err = Move(srcPath, dstPath)
 	case storage.TransferLink:
-		err = Link(srcFile, dstFile)
+		err = Link(srcPath, dstPath)
 	case storage.TransferSoftLink:
-		err = SoftLink(srcFile, dstFile)
+		err = SoftLink(srcPath, dstPath)
 	default:
 		err = fmt.Errorf("未知传输方式")
 	}
 	if err != nil {
-		return fmt.Errorf("使用转移方式 %s 将 %s 转移到 %s 失败: %v", transferType, srcFile, dstFile, err)
+		return fmt.Errorf("使用转移方式 %s 将 %s 转移到 %s 失败: %v", transferType, srcPath, dstPath, err)
 	}
 	return nil
 }

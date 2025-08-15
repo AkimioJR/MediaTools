@@ -13,10 +13,10 @@ import (
 // 根据传输类型执行相应的文件传输操作
 // 传输类型可以是复制、移动、硬链接或软链接
 // 如果传输类型未知，则返回错误
-func handleFileTransfer(ctx *gin.Context, expectedTransferType storage.TransferType, transferFunc func(*storage.StorageFileInfo, *storage.StorageFileInfo) error) {
+func handleFileTransfer(ctx *gin.Context, expectedTransferType storage.TransferType, transferFunc func(storage.StoragePath, storage.StoragePath) error) {
 	var (
 		req  schemas.TransferRequest
-		resp schemas.Response[*storage.StorageFileInfo]
+		resp schemas.Response[*string]
 	)
 
 	// 绑定并验证请求参数
@@ -34,8 +34,8 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType storage.TransferT
 	}
 
 	// 创建源文件和目标文件信息
-	srcFile := storage.NewBasicFileInfo(req.SrcFile.StorageType, req.SrcFile.Path)
-	dstFile := storage.NewBasicFileInfo(req.DstFile.StorageType, req.DstFile.Path)
+	srcFile := storage.NewStoragePath(req.SrcFile.StorageType, req.SrcFile.Path)
+	dstFile := storage.NewStoragePath(req.DstFile.StorageType, req.DstFile.Path)
 
 	// 执行传输操作
 	err := transferFunc(srcFile, dstFile)
@@ -45,7 +45,8 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType storage.TransferT
 		return
 	}
 
-	resp.Data = dstFile
+	p := dstFile.GetPath()
+	resp.Data = &p
 	ctx.JSON(http.StatusOK, resp)
 }
 
@@ -108,7 +109,7 @@ func StorageSoftLinkFile(ctx *gin.Context) {
 func StorageTransferFile(ctx *gin.Context) {
 	var (
 		req  schemas.TransferRequest
-		resp schemas.Response[*storage.StorageFileInfo]
+		resp schemas.Response[*string]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -123,9 +124,8 @@ func StorageTransferFile(ctx *gin.Context) {
 		return
 	}
 
-	srcFile := storage.NewBasicFileInfo(req.SrcFile.StorageType, req.SrcFile.Path)
-
-	dstFile := storage.NewBasicFileInfo(req.DstFile.StorageType, req.DstFile.Path)
+	srcFile := storage.NewStoragePath(req.SrcFile.StorageType, req.SrcFile.Path)
+	dstFile := storage.NewStoragePath(req.DstFile.StorageType, req.DstFile.Path)
 
 	err := storage_controller.TransferFile(srcFile, dstFile, req.TransferType)
 	if err != nil {
@@ -134,6 +134,7 @@ func StorageTransferFile(ctx *gin.Context) {
 		return
 	}
 
-	resp.Data = dstFile
+	p := dstFile.GetPath()
+	resp.Data = &p
 	ctx.JSON(http.StatusOK, resp)
 }

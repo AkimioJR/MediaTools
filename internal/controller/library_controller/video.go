@@ -23,12 +23,12 @@ import (
 // info: 识别到的媒体信息（为nil代表无需刮削）
 // 返回值: 目标文件信息和可能的错误
 func ArchiveMedia(
-	srcFile *storage.StorageFileInfo,
-	dstDir *storage.StorageFileInfo,
+	srcFile storage.StoragePath,
+	dstDir storage.StoragePath,
 	transferType storage.TransferType,
 	item *schemas.MediaItem,
 	info *schemas.MediaInfo,
-) (*storage.StorageFileInfo, error) {
+) (storage.StoragePath, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -36,10 +36,10 @@ func ArchiveMedia(
 	if err != nil {
 		return nil, err
 	}
-	dstFile := storage_controller.Join(dstDir, targetName)
-	logrus.Infof("开始转移媒体文件：%s -> %s，转移类型类型：%s", srcFile, dstFile, transferType)
+	dstPath := storage_controller.Join(dstDir, targetName)
+	logrus.Infof("开始转移媒体文件：%s -> %s，转移类型类型：%s", srcFile, dstPath, transferType)
 
-	err = storage_controller.TransferFile(srcFile, dstFile, transferType)
+	err = storage_controller.TransferFile(srcFile, dstPath, transferType)
 	if err != nil {
 		return nil, err
 	}
@@ -53,19 +53,19 @@ func ArchiveMedia(
 		} else {
 			exts := append(extensions.SubtitleExtensions, extensions.AudioTrackExtensions...)
 			for _, fi := range fileInfos {
-				if fi.IsDir || fi.Path == srcDir.Path {
+				if fi.IsDir || fi.Path == srcDir.GetPath() {
 					continue // 跳过目录和源文件本身
 				}
 
 				if slices.Contains(exts, fi.LowerExt()) {
-					otherDstFilePath := utils.ChangeExt(dstFile.Path, fi.Ext)
-					otherDstFile, err := storage_controller.GetFile(otherDstFilePath, dstFile.StorageType)
+					otherdstPathPath := utils.ChangeExt(dstPath.GetPath(), fi.Ext)
+					otherdstPath, err := storage_controller.GetPath(otherdstPathPath, dstPath.GetStorageType())
 					if err != nil {
-						logrus.Warningf("获取文件 %s:%s 失败: %v", dstFile.StorageType, otherDstFilePath, err)
+						logrus.Warningf("获取文件 %s:%s 失败: %v", dstPath.GetStorageType(), otherdstPathPath, err)
 						continue
 					}
-					logrus.Debugf("转移字幕/音轨文件：%s -> %s", fi.String(), otherDstFile)
-					err = storage_controller.TransferFile(&fi, otherDstFile, transferType) // 转移字幕或音轨文件
+					logrus.Debugf("转移字幕/音轨文件：%s -> %s", fi.String(), otherdstPath)
+					err = storage_controller.TransferFile(&fi, otherdstPath, transferType) // 转移字幕或音轨文件
 					if err != nil {
 						logrus.Warningf("转移字幕/音轨文件失败：%v", err)
 					}
@@ -77,12 +77,16 @@ func ArchiveMedia(
 
 	if info != nil {
 		logrus.Info("开始生成刮削元数据")
+		dstFile, err := storage_controller.GetDetail(dstPath)
+		if err != nil {
+			return nil, fmt.Errorf("获取目标文件路径失败：%w", err)
+		}
 		err = scrape_controller.Scrape(dstFile, info)
 		if err != nil {
 			logrus.Warningf("刮削数据失败：%v", err)
 		}
 	}
-	return dstFile, nil
+	return dstPath, nil
 }
 
 // ArchiveMediaSmart 处理媒体文件，智能识别并归档
@@ -106,7 +110,7 @@ func ArchiveMediaSmart(src *storage.StorageFileInfo) error {
 			return fmt.Errorf("识别媒体信息失败：%w", err)
 		}
 
-		libraryBaseDir, err := storage_controller.GetFile(libConfig.DstPath, libConfig.DstType)
+		libraryBaseDir, err := storage_controller.GetPath(libConfig.DstPath, libConfig.DstType)
 		if err != nil {
 			return err
 		}

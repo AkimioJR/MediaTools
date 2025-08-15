@@ -22,165 +22,165 @@ func Exists(path storage.StoragePath) (bool, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	provider, exists := getStorageProvider(file.StorageType)
+	provider, exists := getStorageProvider(path.GetStorageType())
 	if !exists {
 		return false, errs.ErrStorageProviderNotFound
 	}
-	return provider.Exists(file.Path)
+	return provider.Exists(path.GetPath())
 }
 
-func Mkdir(file *storage.StorageFileInfo) error {
+func Mkdir(path storage.StoragePath) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	provider, exists := getStorageProvider(file.StorageType)
+	provider, exists := getStorageProvider(path.GetStorageType())
 	if !exists {
 		return errs.ErrStorageProviderNotFound
 	}
-	return provider.Mkdir(file.Path)
+	return provider.Mkdir(path.GetPath())
 }
 
-func Rename(file *storage.StorageFileInfo, newName string) error {
+func Rename(path storage.StoragePath, newName string) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	provider, exists := getStorageProvider(file.StorageType)
+	provider, exists := getStorageProvider(path.GetStorageType())
 	if !exists {
 		return errs.ErrStorageProviderNotFound
 	}
-	err := provider.Rename(file.Path, newName)
+	err := provider.Rename(path.GetPath(), newName)
 	switch err {
 	case nil:
 		return nil
 	case errs.ErrStorageProvideNoSupport: // 如果不支持重命名，则尝试使用移动的方式
-		return provider.Move(file.Path, filepath.Join(filepath.Dir(file.Path), newName))
+		return provider.Move(path.GetPath(), filepath.Join(filepath.Dir(path.GetPath()), newName))
 	default:
 		return err
 	}
 }
 
-func Delete(file *storage.StorageFileInfo) error {
+func Delete(path storage.StoragePath) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	provider, exists := getStorageProvider(file.StorageType)
+	provider, exists := getStorageProvider(path.GetStorageType())
 	if !exists {
 		return errs.ErrStorageProviderNotFound
 	}
-	return provider.Delete(file.Path)
+	return provider.Delete(path.GetPath())
 }
 
-func CreateFile(file *storage.StorageFileInfo, reader io.Reader) error {
+func CreateFile(path storage.StoragePath, reader io.Reader) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	provider, exists := getStorageProvider(file.StorageType)
+	provider, exists := getStorageProvider(path.GetStorageType())
 	if !exists {
 		return errs.ErrStorageProviderNotFound
 	}
-	return provider.CreateFile(file.Path, reader)
+	return provider.CreateFile(path.GetPath(), reader)
 }
 
-func ReadFile(file *storage.StorageFileInfo) (io.ReadCloser, error) {
+func ReadFile(path storage.StoragePath) (io.ReadCloser, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	provider, exists := getStorageProvider(file.StorageType)
+	provider, exists := getStorageProvider(path.GetStorageType())
 	if !exists {
 		return nil, errs.ErrStorageProviderNotFound
 	}
-	return provider.ReadFile(file.Path)
+	return provider.ReadFile(path.GetPath())
 }
 
-func List(dir *storage.StorageFileInfo) ([]storage.StorageFileInfo, error) {
+func List(dir storage.StoragePath) ([]storage.StorageFileInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	provider, exists := getStorageProvider(dir.StorageType)
+	provider, exists := getStorageProvider(dir.GetStorageType())
 	if !exists {
 		return nil, errs.ErrStorageProviderNotFound
 	}
-	return provider.List(dir.Path)
+	return provider.List(dir.GetPath())
 }
 
-func Copy(srcFile *storage.StorageFileInfo, dstFile *storage.StorageFileInfo) error {
+func Copy(srcPath storage.StoragePath, dstPath storage.StoragePath) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	srcProvider, exists := getStorageProvider(srcFile.StorageType)
+	srcProvider, exists := getStorageProvider(srcPath.GetStorageType())
 	if !exists {
 		return errs.ErrStorageProviderNotFound
 	}
-	if srcFile.StorageType != dstFile.StorageType {
-		reader, err := srcProvider.ReadFile(srcFile.Path)
+	if srcPath.GetStorageType() != dstPath.GetStorageType() {
+		reader, err := srcProvider.ReadFile(srcPath.GetPath())
 		if err != nil {
 			return err
 		}
 		defer reader.Close()
-		return CreateFile(dstFile, reader)
+		return CreateFile(dstPath, reader)
 	}
-	return srcProvider.Copy(srcFile.Path, dstFile.Path)
+	return srcProvider.Copy(srcPath.GetPath(), dstPath.GetPath())
 }
 
-func Move(srcFile *storage.StorageFileInfo, dstFile *storage.StorageFileInfo) error {
+func Move(srcPath storage.StoragePath, dstPath storage.StoragePath) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	srcProvider, exists := getStorageProvider(srcFile.StorageType)
+	srcProvider, exists := getStorageProvider(srcPath.GetStorageType())
 	if !exists {
 		return errs.ErrStorageProviderNotFound
 	}
-	if srcFile.StorageType != dstFile.StorageType {
-		reader, err := srcProvider.ReadFile(srcFile.Path)
+	if srcPath.GetStorageType() != dstPath.GetStorageType() {
+		reader, err := srcProvider.ReadFile(srcPath.GetPath())
 		if err != nil {
 			return err
 		}
 		defer reader.Close()
-		err = CreateFile(dstFile, reader)
+		err = CreateFile(dstPath, reader)
 		if err != nil {
 			return err
 		}
-		return srcProvider.Delete(srcFile.Path)
+		return srcProvider.Delete(srcPath.GetPath())
 	}
-	return srcProvider.Move(srcFile.Path, dstFile.Path)
+	return srcProvider.Move(srcPath.GetPath(), dstPath.GetPath())
 }
 
-func Link(srcFile *storage.StorageFileInfo, dstFile *storage.StorageFileInfo) error {
+func Link(srcPath storage.StoragePath, dstPath storage.StoragePath) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	if srcFile.StorageType != dstFile.StorageType {
+	if srcPath.GetStorageType() != dstPath.GetStorageType() {
 		return errs.ErrStorageProvideNoSupport
 	}
 
-	provider, exists := getStorageProvider(srcFile.StorageType)
+	provider, exists := getStorageProvider(srcPath.GetStorageType())
 	if !exists {
 		return errs.ErrStorageProviderNotFound
 	}
-	return provider.Link(srcFile.Path, dstFile.Path)
+	return provider.Link(srcPath.GetPath(), dstPath.GetPath())
 }
 
-func SoftLink(srcFile *storage.StorageFileInfo, dstFile *storage.StorageFileInfo) error {
+func SoftLink(srcPath storage.StoragePath, dstPath storage.StoragePath) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	provider, exists := getStorageProvider(srcFile.StorageType)
+	provider, exists := getStorageProvider(srcPath.GetStorageType())
 	if !exists {
 		return errs.ErrStorageProviderNotFound
 	}
-	return provider.SoftLink(srcFile.Path, dstFile.Path)
+	return provider.SoftLink(srcPath.GetPath(), dstPath.GetPath())
 }
 
-func IterFiles(dir *storage.StorageFileInfo, fn func(file *storage.StorageFileInfo) error) error {
+func IterFiles(dir storage.StoragePath, fn func(file *storage.StorageFileInfo) error) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	provider, exists := getStorageProvider(dir.StorageType)
+	provider, exists := getStorageProvider(dir.GetStorageType())
 	if !exists {
 		return errs.ErrStorageProviderNotFound
 	}
 
-	files, err := provider.List(dir.Path)
+	files, err := provider.List(dir.GetPath())
 	if err != nil {
 		return err
 	}

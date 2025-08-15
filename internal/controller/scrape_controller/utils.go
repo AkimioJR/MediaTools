@@ -18,12 +18,12 @@ import (
 // 保存图片到指定路径
 // imgPath: 图片保存路径
 // img: 要保存的图片
-func SaveImage(imgFile *storage.StorageFileInfo, img image.Image) error {
+func SaveImage(imgFile storage.StoragePath, img image.Image) error {
 	var (
 		buff bytes.Buffer
 		err  error
 	)
-	switch filepath.Ext(imgFile.Name) {
+	switch filepath.Ext(imgFile.GetPath()) {
 	case ".jpg", ".jpeg": // 保存为 JPEG
 		err = png.Encode(&buff, img)
 	default: // 保存为 PNG
@@ -41,7 +41,7 @@ func SaveImage(imgFile *storage.StorageFileInfo, img image.Image) error {
 // target: 目标路径，不带后缀名
 func DownloadTMDBImageAndSave(p string, target string, storageType storage.StorageType) error {
 	target += filepath.Ext(p)
-	dstFile, err := storage_controller.GetFile(target, storageType)
+	dstFile, err := storage_controller.GetPath(target, storageType)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func DownloadTMDBImageAndSave(p string, target string, storageType storage.Stora
 // target: 目标路径，不带后缀名
 func DownloadFanartImageAndSave(url string, target string, storageType storage.StorageType) error {
 	target += filepath.Ext(url)
-	dstFile, err := storage_controller.GetFile(target, storageType)
+	dstFile, err := storage_controller.GetPath(target, storageType)
 	if err != nil {
 		return err
 	}

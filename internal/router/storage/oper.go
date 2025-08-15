@@ -6,6 +6,7 @@ import (
 	"MediaTools/internal/schemas/storage"
 	"io"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -36,7 +37,14 @@ func StorageGetFileInfo(ctx *gin.Context) {
 		return
 	}
 
-	fileInfo, err := storage_controller.GetFile(path, storageType)
+	filePath, err := storage_controller.GetPath(path, storageType)
+	if err != nil {
+		resp.Message = err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		return
+	}
+
+	fileInfo, err := storage_controller.GetDetail(filePath)
 	if err != nil {
 		resp.Message = err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
@@ -72,9 +80,7 @@ func StorageCheckExists(ctx *gin.Context) {
 		return
 	}
 
-	fileInfo := storage.NewBasicFileInfo(storageType, path)
-
-	exists, err := storage_controller.Exists(fileInfo)
+	exists, err := storage_controller.Exists(storage.NewStoragePath(storageType, path))
 	if err != nil {
 		resp.Message = err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
@@ -110,10 +116,7 @@ func StorageList(ctx *gin.Context) {
 		return
 	}
 
-	dirInfo := storage.NewBasicFileInfo(storageType, path)
-	dirInfo.IsDir = true
-
-	files, err := storage_controller.List(dirInfo)
+	files, err := storage_controller.List(storage.NewStoragePath(storageType, path))
 	if err != nil {
 		resp.Message = err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
@@ -135,7 +138,7 @@ func StorageList(ctx *gin.Context) {
 func StorageMkdir(ctx *gin.Context) {
 	var (
 		req  schemas.PathRequest
-		resp schemas.Response[*storage.StorageFileInfo]
+		resp schemas.Response[*string]
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
@@ -152,17 +155,16 @@ func StorageMkdir(ctx *gin.Context) {
 		return
 	}
 
-	dirInfo := storage.NewBasicFileInfo(storageType, req.Path)
-	dirInfo.IsDir = true
-
-	err := storage_controller.Mkdir(dirInfo)
+	dirPath := storage.NewStoragePath(storageType, req.Path)
+	err := storage_controller.Mkdir(dirPath)
 	if err != nil {
 		resp.Message = err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	resp.Data = dirInfo
+	p := dirPath.GetPath()
+	resp.Data = &p
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
@@ -177,7 +179,7 @@ func StorageMkdir(ctx *gin.Context) {
 func StorageDelete(ctx *gin.Context) {
 	var (
 		req  schemas.PathRequest
-		resp schemas.Response[*storage.StorageFileInfo]
+		resp schemas.Response[*string]
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
@@ -194,17 +196,17 @@ func StorageDelete(ctx *gin.Context) {
 		return
 	}
 
-	fileInfo := storage.NewBasicFileInfo(storageType, req.Path)
+	path := storage.NewStoragePath(storageType, req.Path)
 
-	err := storage_controller.Delete(fileInfo)
+	err := storage_controller.Delete(path)
 	if err != nil {
-
 		resp.Message = err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	resp.Data = fileInfo
+	p := path.GetPath()
+	resp.Data = &p
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
@@ -219,7 +221,7 @@ func StorageDelete(ctx *gin.Context) {
 func StorageRename(ctx *gin.Context) {
 	var (
 		req  schemas.RenameRequest
-		resp schemas.Response[*storage.StorageFileInfo]
+		resp schemas.Response[*string]
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
@@ -236,16 +238,17 @@ func StorageRename(ctx *gin.Context) {
 		return
 	}
 
-	fileInfo := storage.NewBasicFileInfo(storageType, req.Path)
+	path := storage.NewStoragePath(storageType, req.Path)
 
-	err := storage_controller.Rename(fileInfo, req.NewName)
+	err := storage_controller.Rename(path, req.NewName)
 	if err != nil {
 		resp.Message = err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	resp.Data = fileInfo
+	p := path.GetPath()
+	resp.Data = &p
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
@@ -259,7 +262,7 @@ func StorageRename(ctx *gin.Context) {
 // @Accept multipart/form-data
 // @Products json
 func StorageUploadFile(ctx *gin.Context) {
-	var resp schemas.Response[*storage.StorageFileInfo]
+	var resp schemas.Response[*string]
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := storage.ParseStorageType(storageTypeStr)
@@ -291,17 +294,17 @@ func StorageUploadFile(ctx *gin.Context) {
 	}
 	defer src.Close()
 
-	fileInfo := storage.NewBasicFileInfo(storageType, path)
-	fileInfo.Size = file.Size
+	filePath := storage.NewStoragePath(storageType, path)
 
-	err = storage_controller.CreateFile(fileInfo, src)
+	err = storage_controller.CreateFile(filePath, src)
 	if err != nil {
 		resp.Message = err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	resp.Data = fileInfo
+	p := filePath.GetPath()
+	resp.Data = &p
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
@@ -334,9 +337,9 @@ func StorageDownloadFile(ctx *gin.Context) {
 		return
 	}
 
-	fileInfo := storage.NewBasicFileInfo(storageType, path)
+	filePath := storage.NewStoragePath(storageType, path)
 
-	reader, err := storage_controller.ReadFile(fileInfo)
+	reader, err := storage_controller.ReadFile(filePath)
 	if err != nil {
 		resp.Message = err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
@@ -345,7 +348,7 @@ func StorageDownloadFile(ctx *gin.Context) {
 	defer reader.Close()
 
 	// 设置下载响应头
-	ctx.Header("Content-Disposition", "attachment; filename="+fileInfo.Name)
+	ctx.Header("Content-Disposition", "attachment; filename="+filepath.Base(filePath.GetPath()))
 	ctx.Header("Content-Type", "application/octet-stream")
 
 	// 流式传输文件内容

@@ -9,6 +9,7 @@ import (
 	"MediaTools/internal/schemas"
 	"MediaTools/internal/schemas/storage"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -33,22 +34,22 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 		return
 	}
 
-	srcFile, err := storage_controller.GetFile(req.SrcFile.Path, req.SrcFile.StorageType)
+	srcPath, err := storage_controller.GetPath(req.SrcFile.Path, req.SrcFile.StorageType)
 	if err != nil {
 		resp.Message = "获取源文件失败: " + err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	dstDir, err := storage_controller.GetFile(req.DstDir.Path, req.DstDir.StorageType)
+	dstDir, err := storage_controller.GetPath(req.DstDir.Path, req.DstDir.StorageType)
 	if err != nil {
 		resp.Message = "获取目标目录失败: " + err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	logrus.Info("正在解析视频元数据：", srcFile.Name)
-	videoMeta, _, _ := recognize_controller.ParseVideoMeta(srcFile.Name)
+	logrus.Infof("正在解析视频元数据：%s", srcPath.String())
+	videoMeta, _, _ := recognize_controller.ParseVideoMeta(filepath.Base(srcPath.GetPath()))
 	info, err := tmdb_controller.RecognizeMedia(videoMeta)
 	if err != nil {
 		resp.Message = "识别媒体信息失败: " + err.Error()
@@ -80,19 +81,25 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 		return
 	}
 
-	var dst *storage.StorageFileInfo
+	var dst storage.StoragePath
 	if req.NeedScrape {
-		dst, err = library_controller.ArchiveMedia(srcFile, dstDir, storage.TransferLink, item, info)
+		dst, err = library_controller.ArchiveMedia(srcPath, dstDir, storage.TransferLink, item, info)
 	} else {
-		dst, err = library_controller.ArchiveMedia(srcFile, dstDir, storage.TransferLink, item, nil)
+		dst, err = library_controller.ArchiveMedia(srcPath, dstDir, storage.TransferLink, item, nil)
 	}
 	if err != nil {
 		resp.Message = "转移媒体文件失败: " + err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
-	logrus.Infof("%s 媒体文件转移完成", srcFile)
+	logrus.Infof("%s 媒体文件转移完成", srcPath)
 
-	resp.Data = dst
+	fileInfo, err := storage_controller.GetDetail(dst)
+	if err != nil {
+		resp.Message = "获取目标文件信息失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		return
+	}
+	resp.Data = fileInfo
 	resp.RespondJSON(ctx, http.StatusOK)
 }
