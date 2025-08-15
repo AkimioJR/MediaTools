@@ -4,6 +4,7 @@ import (
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +21,7 @@ import (
 func Video(ctx *gin.Context) {
 	var (
 		req  schemas.ScrapeRequest
-		resp schemas.Response[*schemas.FileInfo]
+		resp schemas.Response[*storage.FileInfo]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -29,7 +30,7 @@ func Video(ctx *gin.Context) {
 		return
 	}
 
-	dstFile := schemas.FileInfo{
+	dstFile := storage.FileInfo{
 		StorageType: req.DstFile.StorageType,
 		Path:        req.DstFile.Path,
 	}

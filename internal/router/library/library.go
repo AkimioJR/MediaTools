@@ -7,6 +7,7 @@ import (
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +24,7 @@ import (
 func LibraryArchiveMedia(ctx *gin.Context) {
 	var (
 		req  schemas.LibraryArchiveMediaRequest
-		resp schemas.Response[*schemas.FileInfo]
+		resp schemas.Response[*storage.FileInfo]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -79,11 +80,11 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 		return
 	}
 
-	var dst *schemas.FileInfo
+	var dst *storage.FileInfo
 	if req.NeedScrape {
-		dst, err = library_controller.ArchiveMedia(srcFile, dstDir, schemas.TransferLink, item, info)
+		dst, err = library_controller.ArchiveMedia(srcFile, dstDir, storage.TransferLink, item, info)
 	} else {
-		dst, err = library_controller.ArchiveMedia(srcFile, dstDir, schemas.TransferLink, item, nil)
+		dst, err = library_controller.ArchiveMedia(srcFile, dstDir, storage.TransferLink, item, nil)
 	}
 	if err != nil {
 		resp.Message = "转移媒体文件失败: " + err.Error()

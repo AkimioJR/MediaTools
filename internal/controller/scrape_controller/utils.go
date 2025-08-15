@@ -4,7 +4,7 @@ import (
 	"MediaTools/internal/controller/fanart_controller"
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
-	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"bytes"
 	"image"
 	"image/jpeg"
@@ -18,7 +18,7 @@ import (
 // 保存图片到指定路径
 // imgPath: 图片保存路径
 // img: 要保存的图片
-func SaveImage(imgFile *schemas.FileInfo, img image.Image) error {
+func SaveImage(imgFile *storage.FileInfo, img image.Image) error {
 	var (
 		buff bytes.Buffer
 		err  error
@@ -39,7 +39,7 @@ func SaveImage(imgFile *schemas.FileInfo, img image.Image) error {
 // 自动根据 TMDB 图片的扩展名决定保存格式
 // p: TMDB 中图片地址
 // target: 目标路径，不带后缀名
-func DownloadTMDBImageAndSave(p string, target string, storageType schemas.StorageType) error {
+func DownloadTMDBImageAndSave(p string, target string, storageType storage.StorageType) error {
 	target += filepath.Ext(p)
 	dstFile, err := storage_controller.GetFile(target, storageType)
 	if err != nil {
@@ -64,7 +64,7 @@ func DownloadTMDBImageAndSave(p string, target string, storageType schemas.Stora
 // 自动根据 Fanart 图片的扩展名决定保存格式
 // url: Fanart 中图片地址
 // target: 目标路径，不带后缀名
-func DownloadFanartImageAndSave(url string, target string, storageType schemas.StorageType) error {
+func DownloadFanartImageAndSave(url string, target string, storageType storage.StorageType) error {
 	target += filepath.Ext(url)
 	dstFile, err := storage_controller.GetFile(target, storageType)
 	if err != nil {

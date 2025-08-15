@@ -2,12 +2,12 @@ package storage_controller
 
 import (
 	"MediaTools/internal/errs"
-	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"io"
 	"path/filepath"
 )
 
-func Exists(file *schemas.FileInfo) (bool, error) {
+func Exists(file *storage.FileInfo) (bool, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -18,7 +18,7 @@ func Exists(file *schemas.FileInfo) (bool, error) {
 	return provider.Exists(file.Path)
 }
 
-func Mkdir(file *schemas.FileInfo) error {
+func Mkdir(file *storage.FileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -29,7 +29,7 @@ func Mkdir(file *schemas.FileInfo) error {
 	return provider.Mkdir(file.Path)
 }
 
-func Rename(file *schemas.FileInfo, newName string) error {
+func Rename(file *storage.FileInfo, newName string) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -48,7 +48,7 @@ func Rename(file *schemas.FileInfo, newName string) error {
 	}
 }
 
-func Delete(file *schemas.FileInfo) error {
+func Delete(file *storage.FileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -59,7 +59,7 @@ func Delete(file *schemas.FileInfo) error {
 	return provider.Delete(file.Path)
 }
 
-func CreateFile(file *schemas.FileInfo, reader io.Reader) error {
+func CreateFile(file *storage.FileInfo, reader io.Reader) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -70,7 +70,7 @@ func CreateFile(file *schemas.FileInfo, reader io.Reader) error {
 	return provider.CreateFile(file.Path, reader)
 }
 
-func ReadFile(file *schemas.FileInfo) (io.ReadCloser, error) {
+func ReadFile(file *storage.FileInfo) (io.ReadCloser, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -81,7 +81,7 @@ func ReadFile(file *schemas.FileInfo) (io.ReadCloser, error) {
 	return provider.ReadFile(file.Path)
 }
 
-func List(dir *schemas.FileInfo) ([]schemas.FileInfo, error) {
+func List(dir *storage.FileInfo) ([]storage.FileInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -92,7 +92,7 @@ func List(dir *schemas.FileInfo) ([]schemas.FileInfo, error) {
 	return provider.List(dir.Path)
 }
 
-func Copy(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo) error {
+func Copy(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -111,7 +111,7 @@ func Copy(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo) error {
 	return srcProvider.Copy(srcFile.Path, dstFile.Path)
 }
 
-func Move(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo) error {
+func Move(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -134,7 +134,7 @@ func Move(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo) error {
 	return srcProvider.Move(srcFile.Path, dstFile.Path)
 }
 
-func Link(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo) error {
+func Link(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -149,7 +149,7 @@ func Link(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo) error {
 	return provider.Link(srcFile.Path, dstFile.Path)
 }
 
-func SoftLink(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo) error {
+func SoftLink(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -160,7 +160,7 @@ func SoftLink(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo) error {
 	return provider.SoftLink(srcFile.Path, dstFile.Path)
 }
 
-func IterFiles(dir *schemas.FileInfo, fn func(file *schemas.FileInfo) error) error {
+func IterFiles(dir *storage.FileInfo, fn func(file *storage.FileInfo) error) error {
 	lock.RLock()
 	defer lock.RUnlock()
 

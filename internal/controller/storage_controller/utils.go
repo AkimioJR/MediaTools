@@ -2,11 +2,11 @@ package storage_controller
 
 import (
 	"MediaTools/internal/errs"
-	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"path/filepath"
 )
 
-func GetFile(path string, storageType schemas.StorageType) (*schemas.FileInfo, error) {
+func GetFile(path string, storageType storage.StorageType) (*storage.FileInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -14,19 +14,19 @@ func GetFile(path string, storageType schemas.StorageType) (*schemas.FileInfo, e
 	if !exists {
 		return nil, errs.ErrStorageProviderNotFound
 	}
-	fi := schemas.NewBasicFileInfo(storageType, path)
+	fi := storage.NewBasicFileInfo(storageType, path)
 	return fi, nil
 }
 
-func GetParent(file *schemas.FileInfo) *schemas.FileInfo {
+func GetParent(file *storage.FileInfo) *storage.FileInfo {
 	parentPath := filepath.Dir(file.Path)
-	return schemas.NewBasicFileInfo(file.StorageType, parentPath)
+	return storage.NewBasicFileInfo(file.StorageType, parentPath)
 }
 
-func Join(file *schemas.FileInfo, elem ...string) *schemas.FileInfo {
+func Join(file *storage.FileInfo, elem ...string) *storage.FileInfo {
 	paths := make([]string, len(elem)+1)
 	paths = append(paths, file.Path)
 	paths = append(paths, elem...)
 	path := filepath.Join(paths...)
-	return schemas.NewBasicFileInfo(file.StorageType, path)
+	return storage.NewBasicFileInfo(file.StorageType, path)
 }

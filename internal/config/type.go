@@ -1,7 +1,7 @@
 package config
 
 import (
-	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 )
 
 type LogConfig struct {
@@ -53,10 +53,10 @@ type FormatConfig struct {
 type LibraryConfig struct {
 	Name               string               `json:"name" yaml:"name"`                                 // 媒体库名称
 	SrcPath            string               `json:"src_path" yaml:"src_path"`                         // 源路径
-	SrcType            schemas.StorageType  `json:"src_type" yaml:"src_type"`                         // 源类型
-	DstType            schemas.StorageType  `json:"dst_type" yaml:"dst_type"`                         // 目标类型
+	SrcType            storage.StorageType  `json:"src_type" yaml:"src_type"`                         // 源类型
+	DstType            storage.StorageType  `json:"dst_type" yaml:"dst_type"`                         // 目标类型
 	DstPath            string               `json:"dst_path" yaml:"dst_path"`                         // 目标路径
-	TransferType       schemas.TransferType `json:"transfer_type" yaml:"transfer_type"`               // 传输类型
+	TransferType       storage.TransferType `json:"transfer_type" yaml:"transfer_type"`               // 传输类型
 	OrganizeByType     bool                 `json:"organize_by_type" yaml:"organize_by_type"`         // 是否按类型分文件夹
 	OrganizeByCategory bool                 `json:"organize_by_category" yaml:"organize_by_category"` // 是否按分类分文件夹
 }
@@ -68,6 +68,6 @@ type CustomWordConfig struct {
 }
 
 type StorageConfig struct {
-	Type schemas.StorageType `json:"type" yaml:"type"`
+	Type storage.StorageType `json:"type" yaml:"type"`
 	Data map[string]string   `json:"data" yaml:"data"`
 }

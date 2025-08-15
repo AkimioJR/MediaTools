@@ -2,7 +2,7 @@ package local
 
 import (
 	"MediaTools/internal/errs"
-	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"io"
 	"os"
 	"path/filepath"
@@ -15,12 +15,12 @@ func (s *LocalStorage) Init(config map[string]string) error {
 	return nil
 }
 
-func (s *LocalStorage) GetType() schemas.StorageType {
-	return schemas.StorageLocal
+func (s *LocalStorage) GetType() storage.StorageType {
+	return storage.StorageLocal
 }
 
-func (s *LocalStorage) GetTransferType() []schemas.TransferType {
-	return []schemas.TransferType{schemas.TransferCopy, schemas.TransferMove, schemas.TransferLink, schemas.TransferSoftLink}
+func (s *LocalStorage) GetTransferType() []storage.TransferType {
+	return []storage.TransferType{storage.TransferCopy, storage.TransferMove, storage.TransferLink, storage.TransferSoftLink}
 }
 
 func (s *LocalStorage) Exists(path string) (bool, error) {
@@ -68,21 +68,21 @@ func (s *LocalStorage) ReadFile(path string) (io.ReadCloser, error) {
 	return file, nil
 }
 
-func (s *LocalStorage) List(path string) ([]schemas.FileInfo, error) {
+func (s *LocalStorage) List(path string) ([]storage.FileInfo, error) {
 	files, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var fileInfos []schemas.FileInfo
+	var fileInfos []storage.FileInfo
 	for _, file := range files {
 		info, err := file.Info()
 		if err != nil {
 			return nil, err
 		}
 		filePath := filepath.Join(path, file.Name())
-		fileInfos = append(fileInfos, *schemas.NewFileInfo(
-			schemas.StorageLocal,
+		fileInfos = append(fileInfos, *storage.NewFileInfo(
+			storage.StorageLocal,
 			filePath,
 			info.Size(),
 			info.IsDir(),
@@ -130,4 +130,4 @@ func (s *LocalStorage) SoftLink(srcPath string, dstPath string) error {
 	return os.Symlink(srcPath, dstPath)
 }
 
-var _ schemas.StorageProvider = (*LocalStorage)(nil)
+var _ storage.StorageProvider = (*LocalStorage)(nil)

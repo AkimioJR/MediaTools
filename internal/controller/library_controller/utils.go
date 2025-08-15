@@ -4,11 +4,12 @@ import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"slices"
 	"strings"
 )
 
-func MatchLibrary(fi *schemas.FileInfo) *config.LibraryConfig {
+func MatchLibrary(fi *storage.FileInfo) *config.LibraryConfig {
 	lock.RLock()
 	defer lock.RUnlock()
 

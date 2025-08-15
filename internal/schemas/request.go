@@ -2,20 +2,21 @@ package schemas
 
 import (
 	"MediaTools/internal/pkg/meta"
+	"MediaTools/internal/schemas/storage"
 )
 
 type PathRequest struct {
 	Path string `json:"path" binding:"required"`
 }
 type FileInfoRequest struct {
-	StorageType StorageType `json:"storage_type" binding:"required"`
-	Path        string      `json:"path" binding:"required"`
+	StorageType storage.StorageType `json:"storage_type" binding:"required"`
+	Path        string              `json:"path" binding:"required"`
 }
 
 type TransferRequest struct {
-	SrcFile      FileInfoRequest `json:"src_file" binding:"required"`
-	DstFile      FileInfoRequest `json:"dst_file" binding:"required"`
-	TransferType TransferType    `json:"transfer_type"`
+	SrcFile      FileInfoRequest      `json:"src_file" binding:"required"`
+	DstFile      FileInfoRequest      `json:"dst_file" binding:"required"`
+	TransferType storage.TransferType `json:"transfer_type"`
 }
 
 type ScrapeRequest struct {
@@ -25,10 +26,10 @@ type ScrapeRequest struct {
 }
 
 type LibraryArchiveMediaRequest struct {
-	SrcFile      FileInfoRequest `json:"src_file" binding:"required"`
-	DstDir       FileInfoRequest `json:"dst_dir" binding:"required"`
-	TransferType TransferType    `json:"transfer_type"`
-	NeedScrape   bool            `json:"need_scrape"`
+	SrcFile      FileInfoRequest      `json:"src_file" binding:"required"`
+	DstDir       FileInfoRequest      `json:"dst_dir" binding:"required"`
+	TransferType storage.TransferType `json:"transfer_type"`
+	NeedScrape   bool                 `json:"need_scrape"`
 }
 
 type RenameRequest struct {

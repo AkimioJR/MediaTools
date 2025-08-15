@@ -1,25 +1,25 @@
 package storage_controller
 
 import (
-	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"fmt"
 )
 
-func TransferFile(srcFile *schemas.FileInfo, dstFile *schemas.FileInfo, transferType schemas.TransferType) error {
+func TransferFile(srcFile *storage.FileInfo, dstFile *storage.FileInfo, transferType storage.TransferType) error {
 	if srcFile.StorageType != dstFile.StorageType &&
-		(transferType == schemas.TransferLink || transferType == schemas.TransferSoftLink) {
+		(transferType == storage.TransferLink || transferType == storage.TransferSoftLink) {
 		return fmt.Errorf("不支持使用转移方式 %s 将 %s 转移到 %s", transferType, srcFile, dstFile)
 	}
 
 	var err error
 	switch transferType {
-	case schemas.TransferCopy:
+	case storage.TransferCopy:
 		err = Copy(srcFile, dstFile)
-	case schemas.TransferMove:
+	case storage.TransferMove:
 		err = Move(srcFile, dstFile)
-	case schemas.TransferLink:
+	case storage.TransferLink:
 		err = Link(srcFile, dstFile)
-	case schemas.TransferSoftLink:
+	case storage.TransferSoftLink:
 		err = SoftLink(srcFile, dstFile)
 	default:
 		err = fmt.Errorf("未知传输方式")

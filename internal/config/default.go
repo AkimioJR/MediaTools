@@ -1,12 +1,12 @@
 package config
 
-import "MediaTools/internal/schemas"
+import "MediaTools/internal/schemas/storage"
 
 var defaultConfig = Configuration{
 	Log: LogConfig{
 		ConsoleLevel: "info",
 		FileLevel:    "debug",
-		FileDir:         "logs",
+		FileDir:      "logs",
 	},
 	TMDB: TMDBConfig{
 		ApiKey:   "YOUR_TMDB_API_KEY", // 请替换为您的 TMDB API Key
@@ -19,7 +19,7 @@ var defaultConfig = Configuration{
 	},
 	Storages: []StorageConfig{
 		{
-			Type: schemas.StorageLocal, // 默认使用本地存储
+			Type: storage.StorageLocal, // 默认使用本地存储
 			Data: map[string]string{},
 		},
 	},

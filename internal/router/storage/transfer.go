@@ -3,6 +3,7 @@ package storage
 import (
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,10 +13,10 @@ import (
 // 根据传输类型执行相应的文件传输操作
 // 传输类型可以是复制、移动、硬链接或软链接
 // 如果传输类型未知，则返回错误
-func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferType, transferFunc func(*schemas.FileInfo, *schemas.FileInfo) error) {
+func handleFileTransfer(ctx *gin.Context, expectedTransferType storage.TransferType, transferFunc func(*storage.FileInfo, *storage.FileInfo) error) {
 	var (
 		req  schemas.TransferRequest
-		resp schemas.Response[*schemas.FileInfo]
+		resp schemas.Response[*storage.FileInfo]
 	)
 
 	// 绑定并验证请求参数
@@ -26,15 +27,15 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferT
 	}
 
 	// 验证传输类型
-	if req.TransferType != expectedTransferType && req.TransferType != schemas.TransferUnknown {
+	if req.TransferType != expectedTransferType && req.TransferType != storage.TransferUnknown {
 		resp.Message = "传输类型错误: " + req.TransferType.String()
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 
 	// 创建源文件和目标文件信息
-	srcFile := schemas.NewBasicFileInfo(req.SrcFile.StorageType, req.SrcFile.Path)
-	dstFile := schemas.NewBasicFileInfo(req.DstFile.StorageType, req.DstFile.Path)
+	srcFile := storage.NewBasicFileInfo(req.SrcFile.StorageType, req.SrcFile.Path)
+	dstFile := storage.NewBasicFileInfo(req.DstFile.StorageType, req.DstFile.Path)
 
 	// 执行传输操作
 	err := transferFunc(srcFile, dstFile)
@@ -57,7 +58,7 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferT
 // @Products json
 
 func StorageCopyFile(ctx *gin.Context) {
-	handleFileTransfer(ctx, schemas.TransferCopy, storage_controller.Copy)
+	handleFileTransfer(ctx, storage.TransferCopy, storage_controller.Copy)
 }
 
 // @Route /storage/move [post]
@@ -69,7 +70,7 @@ func StorageCopyFile(ctx *gin.Context) {
 // @Products json
 
 func StorageMoveFile(ctx *gin.Context) {
-	handleFileTransfer(ctx, schemas.TransferMove, storage_controller.Move)
+	handleFileTransfer(ctx, storage.TransferMove, storage_controller.Move)
 }
 
 // @Route /storage/link [post]
@@ -81,7 +82,7 @@ func StorageMoveFile(ctx *gin.Context) {
 // @Products json
 
 func StorageLinkFile(ctx *gin.Context) {
-	handleFileTransfer(ctx, schemas.TransferLink, storage_controller.Link)
+	handleFileTransfer(ctx, storage.TransferLink, storage_controller.Link)
 }
 
 // @Route /storage/softlink [post]
@@ -93,7 +94,7 @@ func StorageLinkFile(ctx *gin.Context) {
 // @Products json
 
 func StorageSoftLinkFile(ctx *gin.Context) {
-	handleFileTransfer(ctx, schemas.TransferSoftLink, storage_controller.SoftLink)
+	handleFileTransfer(ctx, storage.TransferSoftLink, storage_controller.SoftLink)
 }
 
 // @Route /storage/transfer [post]
@@ -107,7 +108,7 @@ func StorageSoftLinkFile(ctx *gin.Context) {
 func StorageTransferFile(ctx *gin.Context) {
 	var (
 		req  schemas.TransferRequest
-		resp schemas.Response[*schemas.FileInfo]
+		resp schemas.Response[*storage.FileInfo]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -116,15 +117,15 @@ func StorageTransferFile(ctx *gin.Context) {
 		return
 	}
 
-	if req.TransferType == schemas.TransferUnknown {
+	if req.TransferType == storage.TransferUnknown {
 		resp.Message = "传输类型错误: " + req.TransferType.String()
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
 
-	srcFile := schemas.NewBasicFileInfo(req.SrcFile.StorageType, req.SrcFile.Path)
+	srcFile := storage.NewBasicFileInfo(req.SrcFile.StorageType, req.SrcFile.Path)
 
-	dstFile := schemas.NewBasicFileInfo(req.DstFile.StorageType, req.DstFile.Path)
+	dstFile := storage.NewBasicFileInfo(req.DstFile.StorageType, req.DstFile.Path)
 
 	err := storage_controller.TransferFile(srcFile, dstFile, req.TransferType)
 	if err != nil {

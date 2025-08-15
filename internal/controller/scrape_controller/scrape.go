@@ -3,6 +3,7 @@ package scrape_controller
 import (
 	"MediaTools/internal/controller/fanart_controller"
 	"MediaTools/internal/controller/recognize_controller"
+	"MediaTools/internal/schemas/storage"
 
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
@@ -16,7 +17,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Scrape(dstFile *schemas.FileInfo, info *schemas.MediaInfo) error {
+func Scrape(dstFile *storage.FileInfo, info *schemas.MediaInfo) error {
 	switch info.MediaType {
 	case meta.MediaTypeMovie:
 		ScrapeMovieInfo(dstFile, info)
@@ -35,7 +36,7 @@ func Scrape(dstFile *schemas.FileInfo, info *schemas.MediaInfo) error {
 
 // RecognizeAndScrape 识别并刮削媒体信息
 // 识别目标文件的元数据，查询 TMDB 获取媒体信息，并在该文件夹进行刮削
-func RecognizeAndScrape(dstFile *schemas.FileInfo, mediaType meta.MediaType, tmdbID int) error {
+func RecognizeAndScrape(dstFile *storage.FileInfo, mediaType meta.MediaType, tmdbID int) error {
 	videoMeta, _, _ := recognize_controller.ParseVideoMeta(dstFile.Name)
 	if mediaType != meta.MediaTypeUnknown && videoMeta.MediaType == meta.MediaTypeUnknown {
 		videoMeta.MediaType = mediaType
@@ -51,7 +52,7 @@ func RecognizeAndScrape(dstFile *schemas.FileInfo, mediaType meta.MediaType, tmd
 	return Scrape(dstFile, info)
 }
 
-func ScrapeMovieInfo(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
+func ScrapeMovieInfo(dstFile *storage.FileInfo, info *schemas.MediaInfo) {
 	metaData := genMovieMetaInfo(info)
 	xmlData, err := metaData.XML()
 	if err != nil {
@@ -70,7 +71,7 @@ func ScrapeMovieInfo(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 	}
 }
 
-func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
+func ScrapeMovieImage(dstFile *storage.FileInfo, info *schemas.MediaInfo) {
 	var (
 		wg    sync.WaitGroup
 		errCh = make(chan error, 10)
@@ -275,7 +276,7 @@ func ScrapeMovieImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 	}
 }
 
-func ScrapeTVInfo(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
+func ScrapeTVInfo(dstFile *storage.FileInfo, info *schemas.MediaInfo) {
 	tvSeasonDir := storage_controller.GetParent(dstFile)
 	tvSerieDir := storage_controller.GetParent(tvSeasonDir)
 
@@ -336,7 +337,7 @@ func ScrapeTVInfo(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
 	}
 }
 
-func ScrapeTVImage(dstFile *schemas.FileInfo, info *schemas.MediaInfo) {
+func ScrapeTVImage(dstFile *storage.FileInfo, info *schemas.MediaInfo) {
 	tvSeasonDir := storage_controller.GetParent(dstFile)
 	tvSerieDir := storage_controller.GetParent(tvSeasonDir)
 

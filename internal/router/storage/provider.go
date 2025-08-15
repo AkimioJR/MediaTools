@@ -4,6 +4,7 @@ import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ import (
 // @Tags 存储,存储器
 // @Products json
 func ProviderList(ctx *gin.Context) {
-	var resp schemas.Response[[]schemas.StorageProviderItem]
+	var resp schemas.Response[[]storage.StorageProviderItem]
 	resp.Data = storage_controller.ListStorageProviders()
 	resp.RespondJSON(ctx, http.StatusOK)
 }
@@ -29,11 +30,11 @@ func ProviderList(ctx *gin.Context) {
 // @Accept json
 // @Products json
 func ProviderGet(ctx *gin.Context) {
-	var resp schemas.Response[*schemas.StorageProviderItem]
+	var resp schemas.Response[*storage.StorageProviderItem]
 
 	storageTypeStr := ctx.Param("storage_type")
-	storageType := schemas.ParseStorageType(storageTypeStr)
-	if storageType == schemas.StorageUnknown {
+	storageType := storage.ParseStorageType(storageTypeStr)
+	if storageType == storage.StorageUnknown {
 		resp.Message = "未知的存储类型: " + storageTypeStr
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
@@ -61,14 +62,14 @@ func ProviderGet(ctx *gin.Context) {
 func ProviderRegister(ctx *gin.Context) {
 	var (
 		req  map[string]string
-		resp schemas.Response[*schemas.StorageProviderItem]
+		resp schemas.Response[*storage.StorageProviderItem]
 	)
 
 	logrus.Debugf("请求体: %+v", ctx.Request.Body)
 
 	storageTypeStr := ctx.Param("storage_type")
-	storageType := schemas.ParseStorageType(storageTypeStr)
-	if storageType == schemas.StorageUnknown {
+	storageType := storage.ParseStorageType(storageTypeStr)
+	if storageType == storage.StorageUnknown {
 		resp.Message = "未知的存储类型: " + storageTypeStr
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
@@ -108,17 +109,17 @@ func ProviderRegister(ctx *gin.Context) {
 // @Accept json
 // @Products json
 func ProviderDelete(ctx *gin.Context) {
-	var resp schemas.Response[*schemas.StorageProviderItem]
+	var resp schemas.Response[*storage.StorageProviderItem]
 
 	storageTypeStr := ctx.Param("storage_type")
-	storageType := schemas.ParseStorageType(storageTypeStr)
+	storageType := storage.ParseStorageType(storageTypeStr)
 	switch storageType {
-	case schemas.StorageUnknown:
+	case storage.StorageUnknown:
 		resp.Message = "未知的存储类型: " + storageTypeStr
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 
-	case schemas.StorageLocal:
+	case storage.StorageLocal:
 		resp.Message = "无法删除本地存储器"
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
@@ -132,7 +133,7 @@ func ProviderDelete(ctx *gin.Context) {
 	}
 
 	logrus.Debugf("已删除存储器: %s", storageType)
-	
+
 	resp.Data = item
 	resp.RespondJSON(ctx, http.StatusOK)
 }

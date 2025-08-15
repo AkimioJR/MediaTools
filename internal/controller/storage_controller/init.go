@@ -3,7 +3,7 @@ package storage_controller
 import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/pkg/storage/local"
-	"MediaTools/internal/schemas"
+	"MediaTools/internal/schemas/storage"
 	"fmt"
 	"sync"
 
@@ -12,7 +12,7 @@ import (
 
 var (
 	lock             = sync.RWMutex{}
-	storageProviders = make(map[schemas.StorageType]schemas.StorageProvider)
+	storageProviders = make(map[storage.StorageType]storage.StorageProvider)
 )
 
 func Init() error {
@@ -20,7 +20,7 @@ func Init() error {
 	for _, storageConfig := range config.Storages {
 		_, err := RegisterStorageProvider(storageConfig)
 		if err != nil {
-			if storageConfig.Type != schemas.StorageUnknown {
+			if storageConfig.Type != storage.StorageUnknown {
 				return fmt.Errorf("初始化 %s 存储器失败: %v", storageConfig.Type, err)
 			} else {
 				return err
@@ -32,17 +32,17 @@ func Init() error {
 	return nil
 }
 
-func RegisterStorageProvider(c config.StorageConfig) (*schemas.StorageProviderItem, error) {
+func RegisterStorageProvider(c config.StorageConfig) (*storage.StorageProviderItem, error) {
 	lock.Lock()
 	defer lock.Unlock()
 
 	logrus.Debugf("开始初始化 %s 存储器...", c.Type)
-	var provider schemas.StorageProvider
+	var provider storage.StorageProvider
 	switch c.Type {
-	case schemas.StorageLocal:
+	case storage.StorageLocal:
 		provider = &local.LocalStorage{}
-		storageProviders[schemas.StorageLocal] = provider
-	case schemas.StorageUnknown:
+		storageProviders[storage.StorageLocal] = provider
+	case storage.StorageUnknown:
 		return nil, fmt.Errorf("未知的存储类型: %s", c.Type)
 	}
 	err := provider.Init(c.Data)
@@ -50,11 +50,11 @@ func RegisterStorageProvider(c config.StorageConfig) (*schemas.StorageProviderIt
 		return nil, err
 	}
 	logrus.Infof("%s 存储器已注册", c.Type)
-	item := schemas.NewStorageProviderItem(provider)
+	item := storage.NewStorageProviderItem(provider)
 	return &item, nil
 }
 
-func getStorageProvider(storageType schemas.StorageType) (schemas.StorageProvider, bool) {
+func getStorageProvider(storageType storage.StorageType) (storage.StorageProvider, bool) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -62,27 +62,27 @@ func getStorageProvider(storageType schemas.StorageType) (schemas.StorageProvide
 	return provider, exists
 }
 
-func ListStorageProviders() []schemas.StorageProviderItem {
+func ListStorageProviders() []storage.StorageProviderItem {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	providers := make([]schemas.StorageProviderItem, 0, len(storageProviders))
+	providers := make([]storage.StorageProviderItem, 0, len(storageProviders))
 	for _, provider := range storageProviders {
-		providers = append(providers, schemas.NewStorageProviderItem(provider))
+		providers = append(providers, storage.NewStorageProviderItem(provider))
 	}
 	return providers
 }
 
-func GetStorageProvider(storageType schemas.StorageType) (*schemas.StorageProviderItem, error) {
+func GetStorageProvider(storageType storage.StorageType) (*storage.StorageProviderItem, error) {
 	provider, exists := getStorageProvider(storageType)
 	if !exists {
 		return nil, fmt.Errorf("存储器 %s 不存在", storageType)
 	}
-	item := schemas.NewStorageProviderItem(provider)
+	item := storage.NewStorageProviderItem(provider)
 	return &item, nil
 }
 
-func UnRegisterStorageProvider(storageType schemas.StorageType) (*schemas.StorageProviderItem, error) {
+func UnRegisterStorageProvider(storageType storage.StorageType) (*storage.StorageProviderItem, error) {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -91,7 +91,7 @@ func UnRegisterStorageProvider(storageType schemas.StorageType) (*schemas.Storag
 		return nil, fmt.Errorf("存储器 %s 不存在", storageType)
 	}
 
-	item := schemas.NewStorageProviderItem(provider)
+	item := storage.NewStorageProviderItem(provider)
 	delete(storageProviders, storageType)
 	logrus.Infof("已删除存储器: %s", storageType)
 	return &item, nil
