@@ -63,7 +63,7 @@ func StorageGetFileInfo(ctx *gin.Context) {
 // @Param path query string true "文件或目录路径"
 // @Products json
 func StorageCheckExists(ctx *gin.Context) {
-	var resp schemas.Response[*bool]
+	var resp schemas.Response[bool]
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := storage.ParseStorageType(storageTypeStr)
@@ -87,7 +87,7 @@ func StorageCheckExists(ctx *gin.Context) {
 		return
 	}
 
-	resp.Data = &exists
+	resp.Data = exists
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
@@ -138,7 +138,7 @@ func StorageList(ctx *gin.Context) {
 func StorageMkdir(ctx *gin.Context) {
 	var (
 		req  schemas.PathRequest
-		resp schemas.Response[*string]
+		resp schemas.Response[string]
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
@@ -163,8 +163,7 @@ func StorageMkdir(ctx *gin.Context) {
 		return
 	}
 
-	p := dirPath.GetPath()
-	resp.Data = &p
+	resp.Data = dirPath.GetPath()
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
@@ -179,7 +178,7 @@ func StorageMkdir(ctx *gin.Context) {
 func StorageDelete(ctx *gin.Context) {
 	var (
 		req  schemas.PathRequest
-		resp schemas.Response[*string]
+		resp schemas.Response[string]
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
@@ -205,8 +204,7 @@ func StorageDelete(ctx *gin.Context) {
 		return
 	}
 
-	p := path.GetPath()
-	resp.Data = &p
+	resp.Data = path.GetPath()
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
@@ -221,7 +219,7 @@ func StorageDelete(ctx *gin.Context) {
 func StorageRename(ctx *gin.Context) {
 	var (
 		req  schemas.RenameRequest
-		resp schemas.Response[*string]
+		resp schemas.Response[string]
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
@@ -247,8 +245,7 @@ func StorageRename(ctx *gin.Context) {
 		return
 	}
 
-	p := path.GetPath()
-	resp.Data = &p
+	resp.Data = storage_controller.Join(storage_controller.GetParent(path), req.NewName).GetPath()
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
@@ -262,7 +259,7 @@ func StorageRename(ctx *gin.Context) {
 // @Accept multipart/form-data
 // @Products json
 func StorageUploadFile(ctx *gin.Context) {
-	var resp schemas.Response[*string]
+	var resp schemas.Response[string]
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := storage.ParseStorageType(storageTypeStr)
@@ -303,8 +300,7 @@ func StorageUploadFile(ctx *gin.Context) {
 		return
 	}
 
-	p := filePath.GetPath()
-	resp.Data = &p
+	resp.Data = filePath.GetPath()
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
