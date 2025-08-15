@@ -23,6 +23,24 @@ func (s *LocalStorage) GetTransferType() []storage.TransferType {
 	return []storage.TransferType{storage.TransferCopy, storage.TransferMove, storage.TransferLink, storage.TransferSoftLink}
 }
 
+func (*LocalStorage) GetDetail(path string) (*storage.StorageFileInfo, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, errs.ErrFileNotFound
+		}
+		return nil, err
+	}
+
+	return storage.NewFileInfo(
+		storage.StorageLocal,
+		path,
+		info.Size(),
+		info.IsDir(),
+		info.ModTime(),
+	), nil
+}
+
 func (s *LocalStorage) Exists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err != nil {
