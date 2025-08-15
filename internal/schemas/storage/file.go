@@ -9,6 +9,7 @@ import (
 type StoragePath interface {
 	GetStorageType() StorageType
 	GetPath() string
+	String() string
 }
 
 type StorageFileInfo struct {
