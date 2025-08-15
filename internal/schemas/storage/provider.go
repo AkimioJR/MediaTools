@@ -9,7 +9,7 @@ type StorageProvider interface {
 
 	// 路径级操作
 	GetDetail(path string) (*StorageFileInfo, error) // 获取文件或目录的详细信息
-	Exists(path string) (bool, error)                // 判断文件是否存在
+	Exist(path string) (bool, error)                 // 判断文件是否存在
 	Mkdir(path string) error                         // 创建目录（如果父目录不存在也需要创建）
 	Delete(path string) error                        // 删除文件或目录
 	Rename(oldPath string, newName string) error     // 重命名文件或目录

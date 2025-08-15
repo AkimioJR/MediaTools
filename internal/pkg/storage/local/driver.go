@@ -41,7 +41,7 @@ func (*LocalStorage) GetDetail(path string) (*storage.StorageFileInfo, error) {
 	), nil
 }
 
-func (s *LocalStorage) Exists(path string) (bool, error) {
+func (s *LocalStorage) Exist(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {

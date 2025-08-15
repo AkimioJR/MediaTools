@@ -18,7 +18,7 @@ func GetDetail(path storage.StoragePath) (*storage.StorageFileInfo, error) {
 	return provider.GetDetail(path.GetPath())
 }
 
-func Exists(path storage.StoragePath) (bool, error) {
+func Exist(path storage.StoragePath) (bool, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -26,7 +26,7 @@ func Exists(path storage.StoragePath) (bool, error) {
 	if !exists {
 		return false, errs.ErrStorageProviderNotFound
 	}
-	return provider.Exists(path.GetPath())
+	return provider.Exist(path.GetPath())
 }
 
 func Mkdir(path storage.StoragePath) error {

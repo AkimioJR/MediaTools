@@ -80,14 +80,14 @@ func StorageCheckExists(ctx *gin.Context) {
 		return
 	}
 
-	exists, err := storage_controller.Exists(storage.NewStoragePath(storageType, path))
+	exist, err := storage_controller.Exist(storage.NewStoragePath(storageType, path))
 	if err != nil {
 		resp.Message = err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
-	resp.Data = exists
+	resp.Data = exist
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 

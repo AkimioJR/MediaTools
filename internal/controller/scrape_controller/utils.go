@@ -45,7 +45,7 @@ func DownloadTMDBImageAndSave(p string, target string, storageType storage.Stora
 	if err != nil {
 		return err
 	}
-	exists, err := storage_controller.Exists(dstFile)
+	exists, err := storage_controller.Exist(dstFile)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func DownloadFanartImageAndSave(url string, target string, storageType storage.S
 	if err != nil {
 		return err
 	}
-	exists, err := storage_controller.Exists(dstFile)
+	exists, err := storage_controller.Exist(dstFile)
 	if err != nil {
 		return err
 	}
