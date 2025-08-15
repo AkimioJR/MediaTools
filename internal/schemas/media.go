@@ -101,6 +101,10 @@ func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error
 		if err == nil {
 			item.Year = year
 		}
+		// 电影类型数据强制将季集数设置为 -1
+		item.Season = -1
+		item.Episode = -1
+
 	case meta.MediaTypeTV:
 		item.Title = info.TMDBInfo.TVInfo.SerieInfo.Name
 		item.OriginalTitle = info.TMDBInfo.TVInfo.SerieInfo.OriginalName
@@ -118,6 +122,7 @@ func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error
 		item.EpisodeStr = videoMeta.GetEpisodeStr()
 		item.EpisodeTitle = info.TMDBInfo.TVInfo.EpisodeInfo.Name
 		item.EpisodeDate = info.TMDBInfo.TVInfo.EpisodeInfo.AirDate
+
 	default:
 		return nil, fmt.Errorf("不支持的媒体类型: %s", info.MediaType.String())
 	}
