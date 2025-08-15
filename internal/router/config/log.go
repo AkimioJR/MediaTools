@@ -17,8 +17,7 @@ import (
 // @Produce json
 func Log(ctx *gin.Context) {
 	var resp schemas.Response[*config.LogConfig]
-	resp.Data = &config.Log
-	ctx.JSON(http.StatusOK, resp)
+	resp.RespondSuccessJSON(ctx, &config.Log)
 }
 
 // @Router /config/log [post]
