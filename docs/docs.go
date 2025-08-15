@@ -461,7 +461,7 @@ const docTemplate = `{
                     "description": "目标类型",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/schemas.StorageType"
+                            "$ref": "#/definitions/storage.StorageType"
                         }
                     ]
                 },
@@ -485,7 +485,7 @@ const docTemplate = `{
                     "description": "源类型",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/schemas.StorageType"
+                            "$ref": "#/definitions/storage.StorageType"
                         }
                     ]
                 },
@@ -493,7 +493,7 @@ const docTemplate = `{
                     "description": "传输类型",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/schemas.TransferType"
+                            "$ref": "#/definitions/storage.TransferType"
                         }
                     ]
                 }
@@ -576,7 +576,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "storage_type": {
-                    "$ref": "#/definitions/schemas.StorageType"
+                    "$ref": "#/definitions/storage.StorageType"
                 }
             }
         },
@@ -597,7 +597,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/schemas.FileInfoRequest"
                 },
                 "transfer_type": {
-                    "$ref": "#/definitions/schemas.TransferType"
+                    "$ref": "#/definitions/storage.TransferType"
                 }
             }
         },
@@ -618,7 +618,7 @@ const docTemplate = `{
                 }
             }
         },
-        "schemas.StorageType": {
+        "storage.StorageType": {
             "type": "integer",
             "format": "int32",
             "enum": [
@@ -638,7 +638,7 @@ const docTemplate = `{
                 "StorageLocal"
             ]
         },
-        "schemas.TransferType": {
+        "storage.TransferType": {
             "type": "integer",
             "format": "int32",
             "enum": [
@@ -653,10 +653,10 @@ const docTemplate = `{
                 "TransferLink": "硬链接",
                 "TransferMove": "移动",
                 "TransferSoftLink": "软链接",
-                "TransferUnknown": "未知传输类型"
+                "TransferUnknown": "未知转移类型"
             },
             "x-enum-descriptions": [
-                "未知传输类型",
+                "未知转移类型",
                 "复制",
                 "移动",
                 "硬链接",

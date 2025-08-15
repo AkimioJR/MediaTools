@@ -8,7 +8,7 @@ import (
 type TransferType uint8
 
 const (
-	TransferUnknown  TransferType = iota // 未知传输类型
+	TransferUnknown  TransferType = iota // 未知转移类型
 	TransferCopy                         // 复制
 	TransferMove                         // 移动
 	TransferLink                         // 硬链接

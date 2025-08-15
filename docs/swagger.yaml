@@ -45,7 +45,7 @@ definitions:
         type: string
       dst_type:
         allOf:
-        - $ref: '#/definitions/schemas.StorageType'
+        - $ref: '#/definitions/storage.StorageType'
         description: 目标类型
       name:
         description: 媒体库名称
@@ -61,11 +61,11 @@ definitions:
         type: string
       src_type:
         allOf:
-        - $ref: '#/definitions/schemas.StorageType'
+        - $ref: '#/definitions/storage.StorageType'
         description: 源类型
       transfer_type:
         allOf:
-        - $ref: '#/definitions/schemas.TransferType'
+        - $ref: '#/definitions/storage.TransferType'
         description: 传输类型
     type: object
   config.LogConfig:
@@ -122,7 +122,7 @@ definitions:
       path:
         type: string
       storage_type:
-        $ref: '#/definitions/schemas.StorageType'
+        $ref: '#/definitions/storage.StorageType'
     required:
     - path
     - storage_type
@@ -136,7 +136,7 @@ definitions:
       src_file:
         $ref: '#/definitions/schemas.FileInfoRequest'
       transfer_type:
-        $ref: '#/definitions/schemas.TransferType'
+        $ref: '#/definitions/storage.TransferType'
     required:
     - dst_dir
     - src_file
@@ -152,7 +152,7 @@ definitions:
     required:
     - dst_file
     type: object
-  schemas.StorageType:
+  storage.StorageType:
     enum:
     - 0
     - 1
@@ -167,7 +167,7 @@ definitions:
     x-enum-varnames:
     - StorageUnknown
     - StorageLocal
-  schemas.TransferType:
+  storage.TransferType:
     enum:
     - 0
     - 1
@@ -181,9 +181,9 @@ definitions:
       TransferLink: 硬链接
       TransferMove: 移动
       TransferSoftLink: 软链接
-      TransferUnknown: 未知传输类型
+      TransferUnknown: 未知转移类型
     x-enum-descriptions:
-    - 未知传输类型
+    - 未知转移类型
     - 复制
     - 移动
     - 硬链接
