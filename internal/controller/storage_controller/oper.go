@@ -7,7 +7,18 @@ import (
 	"path/filepath"
 )
 
-func Exists(file *storage.StorageFileInfo) (bool, error) {
+func GetDetail(path storage.StoragePath) (*storage.StorageFileInfo, error) {
+	lock.RLock()
+	defer lock.RUnlock()
+
+	provider, exists := getStorageProvider(path.GetStorageType())
+	if !exists {
+		return nil, errs.ErrStorageProviderNotFound
+	}
+	return provider.GetDetail(path.GetPath())
+}
+
+func Exists(path storage.StoragePath) (bool, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
