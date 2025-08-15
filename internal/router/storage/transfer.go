@@ -13,10 +13,10 @@ import (
 // 根据传输类型执行相应的文件传输操作
 // 传输类型可以是复制、移动、硬链接或软链接
 // 如果传输类型未知，则返回错误
-func handleFileTransfer(ctx *gin.Context, expectedTransferType storage.TransferType, transferFunc func(*storage.FileInfo, *storage.FileInfo) error) {
+func handleFileTransfer(ctx *gin.Context, expectedTransferType storage.TransferType, transferFunc func(*storage.StorageFileInfo, *storage.StorageFileInfo) error) {
 	var (
 		req  schemas.TransferRequest
-		resp schemas.Response[*storage.FileInfo]
+		resp schemas.Response[*storage.StorageFileInfo]
 	)
 
 	// 绑定并验证请求参数
@@ -108,7 +108,7 @@ func StorageSoftLinkFile(ctx *gin.Context) {
 func StorageTransferFile(ctx *gin.Context) {
 	var (
 		req  schemas.TransferRequest
-		resp schemas.Response[*storage.FileInfo]
+		resp schemas.Response[*storage.StorageFileInfo]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {

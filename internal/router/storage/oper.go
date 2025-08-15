@@ -19,7 +19,7 @@ import (
 // @Param path query string true "文件或目录路径"
 // @Products json
 func StorageGetFileInfo(ctx *gin.Context) {
-	var resp schemas.Response[*storage.FileInfo]
+	var resp schemas.Response[*storage.StorageFileInfo]
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := storage.ParseStorageType(storageTypeStr)
@@ -93,7 +93,7 @@ func StorageCheckExists(ctx *gin.Context) {
 // @Param path query string true "目录路径"
 // @Products json
 func StorageList(ctx *gin.Context) {
-	var resp schemas.Response[[]storage.FileInfo]
+	var resp schemas.Response[[]storage.StorageFileInfo]
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := storage.ParseStorageType(storageTypeStr)
@@ -135,7 +135,7 @@ func StorageList(ctx *gin.Context) {
 func StorageMkdir(ctx *gin.Context) {
 	var (
 		req  schemas.PathRequest
-		resp schemas.Response[*storage.FileInfo]
+		resp schemas.Response[*storage.StorageFileInfo]
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
@@ -177,7 +177,7 @@ func StorageMkdir(ctx *gin.Context) {
 func StorageDelete(ctx *gin.Context) {
 	var (
 		req  schemas.PathRequest
-		resp schemas.Response[*storage.FileInfo]
+		resp schemas.Response[*storage.StorageFileInfo]
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
@@ -219,7 +219,7 @@ func StorageDelete(ctx *gin.Context) {
 func StorageRename(ctx *gin.Context) {
 	var (
 		req  schemas.RenameRequest
-		resp schemas.Response[*storage.FileInfo]
+		resp schemas.Response[*storage.StorageFileInfo]
 	)
 
 	storageTypeStr := ctx.Param("storage_type")
@@ -259,7 +259,7 @@ func StorageRename(ctx *gin.Context) {
 // @Accept multipart/form-data
 // @Products json
 func StorageUploadFile(ctx *gin.Context) {
-	var resp schemas.Response[*storage.FileInfo]
+	var resp schemas.Response[*storage.StorageFileInfo]
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := storage.ParseStorageType(storageTypeStr)

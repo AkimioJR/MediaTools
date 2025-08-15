@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func MatchLibrary(fi *storage.FileInfo) *config.LibraryConfig {
+func MatchLibrary(fi *storage.StorageFileInfo) *config.LibraryConfig {
 	lock.RLock()
 	defer lock.RUnlock()
 

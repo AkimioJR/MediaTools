@@ -24,7 +24,7 @@ import (
 func LibraryArchiveMedia(ctx *gin.Context) {
 	var (
 		req  schemas.LibraryArchiveMediaRequest
-		resp schemas.Response[*storage.FileInfo]
+		resp schemas.Response[*storage.StorageFileInfo]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -80,7 +80,7 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 		return
 	}
 
-	var dst *storage.FileInfo
+	var dst *storage.StorageFileInfo
 	if req.NeedScrape {
 		dst, err = library_controller.ArchiveMedia(srcFile, dstDir, storage.TransferLink, item, info)
 	} else {

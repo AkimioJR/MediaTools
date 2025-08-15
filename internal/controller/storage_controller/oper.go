@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func Exists(file *storage.FileInfo) (bool, error) {
+func Exists(file *storage.StorageFileInfo) (bool, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -18,7 +18,7 @@ func Exists(file *storage.FileInfo) (bool, error) {
 	return provider.Exists(file.Path)
 }
 
-func Mkdir(file *storage.FileInfo) error {
+func Mkdir(file *storage.StorageFileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -29,7 +29,7 @@ func Mkdir(file *storage.FileInfo) error {
 	return provider.Mkdir(file.Path)
 }
 
-func Rename(file *storage.FileInfo, newName string) error {
+func Rename(file *storage.StorageFileInfo, newName string) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -48,7 +48,7 @@ func Rename(file *storage.FileInfo, newName string) error {
 	}
 }
 
-func Delete(file *storage.FileInfo) error {
+func Delete(file *storage.StorageFileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -59,7 +59,7 @@ func Delete(file *storage.FileInfo) error {
 	return provider.Delete(file.Path)
 }
 
-func CreateFile(file *storage.FileInfo, reader io.Reader) error {
+func CreateFile(file *storage.StorageFileInfo, reader io.Reader) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -70,7 +70,7 @@ func CreateFile(file *storage.FileInfo, reader io.Reader) error {
 	return provider.CreateFile(file.Path, reader)
 }
 
-func ReadFile(file *storage.FileInfo) (io.ReadCloser, error) {
+func ReadFile(file *storage.StorageFileInfo) (io.ReadCloser, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -81,7 +81,7 @@ func ReadFile(file *storage.FileInfo) (io.ReadCloser, error) {
 	return provider.ReadFile(file.Path)
 }
 
-func List(dir *storage.FileInfo) ([]storage.FileInfo, error) {
+func List(dir *storage.StorageFileInfo) ([]storage.StorageFileInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -92,7 +92,7 @@ func List(dir *storage.FileInfo) ([]storage.FileInfo, error) {
 	return provider.List(dir.Path)
 }
 
-func Copy(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
+func Copy(srcFile *storage.StorageFileInfo, dstFile *storage.StorageFileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -111,7 +111,7 @@ func Copy(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
 	return srcProvider.Copy(srcFile.Path, dstFile.Path)
 }
 
-func Move(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
+func Move(srcFile *storage.StorageFileInfo, dstFile *storage.StorageFileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -134,7 +134,7 @@ func Move(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
 	return srcProvider.Move(srcFile.Path, dstFile.Path)
 }
 
-func Link(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
+func Link(srcFile *storage.StorageFileInfo, dstFile *storage.StorageFileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -149,7 +149,7 @@ func Link(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
 	return provider.Link(srcFile.Path, dstFile.Path)
 }
 
-func SoftLink(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
+func SoftLink(srcFile *storage.StorageFileInfo, dstFile *storage.StorageFileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -160,7 +160,7 @@ func SoftLink(srcFile *storage.FileInfo, dstFile *storage.FileInfo) error {
 	return provider.SoftLink(srcFile.Path, dstFile.Path)
 }
 
-func IterFiles(dir *storage.FileInfo, fn func(file *storage.FileInfo) error) error {
+func IterFiles(dir *storage.StorageFileInfo, fn func(file *storage.StorageFileInfo) error) error {
 	lock.RLock()
 	defer lock.RUnlock()
 

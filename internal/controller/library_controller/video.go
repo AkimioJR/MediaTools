@@ -23,12 +23,12 @@ import (
 // info: 识别到的媒体信息（为nil代表无需刮削）
 // 返回值: 目标文件信息和可能的错误
 func ArchiveMedia(
-	srcFile *storage.FileInfo,
-	dstDir *storage.FileInfo,
+	srcFile *storage.StorageFileInfo,
+	dstDir *storage.StorageFileInfo,
 	transferType storage.TransferType,
 	item *schemas.MediaItem,
 	info *schemas.MediaInfo,
-) (*storage.FileInfo, error) {
+) (*storage.StorageFileInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -89,11 +89,11 @@ func ArchiveMedia(
 // src: 源文件或目录
 // 返回值: 可能的错误
 // 注意：如果是目录，会递归处理目录下的所有文件
-func ArchiveMediaSmart(src *storage.FileInfo) error {
+func ArchiveMediaSmart(src *storage.StorageFileInfo) error {
 	lock.RLock()
 	defer lock.RUnlock()
 	var successNum int
-	fn := func(file *storage.FileInfo) error {
+	fn := func(file *storage.StorageFileInfo) error {
 		libConfig := MatchLibrary(file)
 		if libConfig == nil {
 			return fmt.Errorf("未找到媒体库配置，跳过文件：%s", file.String())

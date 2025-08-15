@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type FileInfo struct {
+type StorageFileInfo struct {
 	StorageType StorageType `json:"storage_type"` // 存储系统类型
 	Path        string      `json:"path"`         // 文件路径
 	Name        string      `json:"name"`         // 文件名
@@ -16,8 +16,8 @@ type FileInfo struct {
 	ModTime     time.Time   `json:"mod_time"`     // 文件修改时间
 }
 
-func NewBasicFileInfo(storageType StorageType, path string) *FileInfo {
-	return &FileInfo{
+func NewBasicFileInfo(storageType StorageType, path string) *StorageFileInfo {
+	return &StorageFileInfo{
 		StorageType: storageType,
 		Path:        path,
 		Name:        filepath.Base(path),
@@ -25,7 +25,7 @@ func NewBasicFileInfo(storageType StorageType, path string) *FileInfo {
 	}
 }
 
-func NewFileInfo(storageType StorageType, path string, size int64, isDir bool, modTime time.Time) *FileInfo {
+func NewFileInfo(storageType StorageType, path string, size int64, isDir bool, modTime time.Time) *StorageFileInfo {
 	fi := NewBasicFileInfo(storageType, path)
 	fi.Size = size
 	fi.IsDir = isDir
@@ -33,10 +33,10 @@ func NewFileInfo(storageType StorageType, path string, size int64, isDir bool, m
 	return fi
 }
 
-func (fi *FileInfo) LowerExt() string {
+func (fi *StorageFileInfo) LowerExt() string {
 	return strings.ToLower(fi.Ext)
 }
 
-func (fi *FileInfo) String() string {
+func (fi *StorageFileInfo) String() string {
 	return fi.StorageType.String() + ":" + fi.Path
 }

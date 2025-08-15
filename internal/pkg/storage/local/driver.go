@@ -68,13 +68,13 @@ func (s *LocalStorage) ReadFile(path string) (io.ReadCloser, error) {
 	return file, nil
 }
 
-func (s *LocalStorage) List(path string) ([]storage.FileInfo, error) {
+func (s *LocalStorage) List(path string) ([]storage.StorageFileInfo, error) {
 	files, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var fileInfos []storage.FileInfo
+	var fileInfos []storage.StorageFileInfo
 	for _, file := range files {
 		info, err := file.Info()
 		if err != nil {

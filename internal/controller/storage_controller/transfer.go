@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func TransferFile(srcFile *storage.FileInfo, dstFile *storage.FileInfo, transferType storage.TransferType) error {
+func TransferFile(srcFile *storage.StorageFileInfo, dstFile *storage.StorageFileInfo, transferType storage.TransferType) error {
 	if srcFile.StorageType != dstFile.StorageType &&
 		(transferType == storage.TransferLink || transferType == storage.TransferSoftLink) {
 		return fmt.Errorf("不支持使用转移方式 %s 将 %s 转移到 %s", transferType, srcFile, dstFile)

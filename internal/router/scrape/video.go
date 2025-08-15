@@ -21,7 +21,7 @@ import (
 func Video(ctx *gin.Context) {
 	var (
 		req  schemas.ScrapeRequest
-		resp schemas.Response[*storage.FileInfo]
+		resp schemas.Response[*storage.StorageFileInfo]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -30,7 +30,7 @@ func Video(ctx *gin.Context) {
 		return
 	}
 
-	dstFile := storage.FileInfo{
+	dstFile := storage.StorageFileInfo{
 		StorageType: req.DstFile.StorageType,
 		Path:        req.DstFile.Path,
 	}

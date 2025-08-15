@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func GetFile(path string, storageType storage.StorageType) (*storage.FileInfo, error) {
+func GetFile(path string, storageType storage.StorageType) (*storage.StorageFileInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -18,12 +18,12 @@ func GetFile(path string, storageType storage.StorageType) (*storage.FileInfo, e
 	return fi, nil
 }
 
-func GetParent(file *storage.FileInfo) *storage.FileInfo {
+func GetParent(file *storage.StorageFileInfo) *storage.StorageFileInfo {
 	parentPath := filepath.Dir(file.Path)
 	return storage.NewBasicFileInfo(file.StorageType, parentPath)
 }
 
-func Join(file *storage.FileInfo, elem ...string) *storage.FileInfo {
+func Join(file *storage.StorageFileInfo, elem ...string) *storage.StorageFileInfo {
 	paths := make([]string, len(elem)+1)
 	paths = append(paths, file.Path)
 	paths = append(paths, elem...)

@@ -18,7 +18,7 @@ import (
 // 保存图片到指定路径
 // imgPath: 图片保存路径
 // img: 要保存的图片
-func SaveImage(imgFile *storage.FileInfo, img image.Image) error {
+func SaveImage(imgFile *storage.StorageFileInfo, img image.Image) error {
 	var (
 		buff bytes.Buffer
 		err  error
