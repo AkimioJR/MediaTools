@@ -184,5 +184,7 @@ func UpdateCustomWord(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, config.Media.CustomWord)
+	resp.Success = true
+	resp.Data = &config.Media.CustomWord
+	resp.RespondJSON(ctx, http.StatusOK)
 }
