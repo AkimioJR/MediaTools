@@ -101,7 +101,6 @@ func Overview(ctx *gin.Context) {
 		}
 	}
 
-	resp.Success = true
 	resp.Data = &overview
 	ctx.JSON(http.StatusOK, resp)
 }

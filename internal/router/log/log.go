@@ -16,7 +16,6 @@ import (
 // @Produce json
 func GetRecentLogs(ctx *gin.Context) {
 	var resp schemas.Response[[]loghook.LogDetail]
-	resp.Success = true
 	resp.Data = logging.GetRecentLogs()
 	resp.RespondJSON(ctx, http.StatusOK)
 }

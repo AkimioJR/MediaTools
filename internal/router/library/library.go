@@ -91,7 +91,7 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 		return
 	}
 	logrus.Infof("%s 媒体文件转移完成", srcFile)
-	resp.Success = true
+
 	resp.Data = dst
 	resp.RespondJSON(ctx, http.StatusOK)
 }

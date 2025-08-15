@@ -17,9 +17,7 @@ import (
 // @Produce json
 func Log(ctx *gin.Context) {
 	var resp schemas.Response[*config.LogConfig]
-	resp.Success = true
 	resp.Data = &config.Log
-	logrus.Debugf("获取日志配置: %+v", resp.Data)
 	ctx.JSON(http.StatusOK, resp)
 }
 
@@ -40,7 +38,6 @@ func UpdateLog(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		resp.Message = "请求参数错误: " + err.Error()
-		logrus.Warningf("请求参数绑定失败: %v", err)
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
@@ -52,9 +49,8 @@ func UpdateLog(ctx *gin.Context) {
 		err = logging.SetLevel(req.ConsoleLevel)
 		if err != nil {
 			resp.Message = "设置日志级别失败: " + err.Error()
-			logrus.Warning(resp.Message)
-			logging.SetLevel(oldConfig.ConsoleLevel) // 恢复旧级别
 			resp.RespondJSON(ctx, http.StatusInternalServerError)
+			logging.SetLevel(oldConfig.ConsoleLevel) // 恢复旧级别
 			return
 		}
 	}
@@ -63,9 +59,9 @@ func UpdateLog(ctx *gin.Context) {
 		err = logging.SetFileLevel(req.FileLevel)
 		if err != nil {
 			resp.Message = "设置文件日志级别失败: " + err.Error()
-			logrus.Warning(resp.Message)
-			logging.SetFileLevel(oldConfig.FileLevel) // 恢复旧级别
 			resp.RespondJSON(ctx, http.StatusInternalServerError)
+			logging.SetFileLevel(oldConfig.FileLevel) // 恢复旧级别
+			logrus.Debugf("恢复旧的文件日志级别: %s", oldConfig.FileLevel)
 			return
 		}
 	}
@@ -80,7 +76,6 @@ func UpdateLog(ctx *gin.Context) {
 	err = config.WriteConfig()
 	if err != nil {
 		resp.Message = "写入新配置文件失败: " + err.Error()
-		logrus.Warning(resp.Message)
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}

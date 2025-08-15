@@ -17,9 +17,7 @@ import (
 // @Produce json
 func Fanart(ctx *gin.Context) {
 	var resp schemas.Response[*config.FanartConfig]
-	resp.Success = true
 	resp.Data = &config.Fanart
-	logrus.Debugf("获取 Fanart 配置: %+v", resp.Data)
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
@@ -39,7 +37,6 @@ func UpdateFanart(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		resp.Message = "请求参数错误: " + err.Error()
-		logrus.Warning(resp.Message)
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
@@ -51,12 +48,11 @@ func UpdateFanart(ctx *gin.Context) {
 	err = fanart_controller.Init()
 	if err != nil {
 		resp.Message = "初始化 Fanart 控制器失败: " + err.Error()
-		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		logrus.Debugf("开始恢复 Fanart 配置: %+v", oldConfig)
 		config.Fanart = oldConfig
 		fanart_controller.Init()
-		logrus.Debugf("恢复 Fanart 配置成功: %+v", config.Fanart)
-		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		logrus.Debug("恢复 Fanart 配置成功")
 		return
 	}
 
@@ -65,7 +61,6 @@ func UpdateFanart(ctx *gin.Context) {
 	err = config.WriteConfig()
 	if err != nil {
 		resp.Message = "写入配置文件失败: " + err.Error()
-		logrus.Warning(resp.Message)
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}

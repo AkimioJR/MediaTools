@@ -52,7 +52,6 @@ func Video(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = &dstFile
-	ctx.JSON(http.StatusOK, resp)
+	resp.RespondJSON(ctx, http.StatusOK)
 }

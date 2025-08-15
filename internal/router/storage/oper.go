@@ -42,7 +42,6 @@ func StorageGetFileInfo(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = fileInfo
 	resp.RespondJSON(ctx, http.StatusOK)
 }
@@ -81,7 +80,6 @@ func StorageCheckExists(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = &exists
 	resp.RespondJSON(ctx, http.StatusOK)
 }
@@ -121,7 +119,6 @@ func StorageList(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = files
 	resp.RespondJSON(ctx, http.StatusOK)
 }
@@ -164,7 +161,6 @@ func StorageMkdir(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = dirInfo
 	resp.RespondJSON(ctx, http.StatusOK)
 }
@@ -207,7 +203,6 @@ func StorageDelete(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = fileInfo
 	resp.RespondJSON(ctx, http.StatusOK)
 }
@@ -249,7 +244,6 @@ func StorageRename(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = fileInfo
 	resp.RespondJSON(ctx, http.StatusOK)
 }
@@ -306,7 +300,6 @@ func StorageUploadFile(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = fileInfo
 	resp.RespondJSON(ctx, http.StatusOK)
 }

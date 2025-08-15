@@ -49,6 +49,7 @@ func UpdateTMDB(ctx *gin.Context) {
 	if err != nil {
 		logrus.Errorf("初始化 TMDB 控制器失败: %v", err)
 		resp.Message = "初始化 TMDB 控制器失败: " + err.Error()
+		logrus.Debug("开始恢复 TMDB 原始数据")
 		config.TMDB = oldConfig
 		tmdb_controller.Init()
 		logrus.Debugf("恢复 TMDB 原始数据: %+v", config.TMDB)

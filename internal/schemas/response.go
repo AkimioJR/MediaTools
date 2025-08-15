@@ -1,7 +1,10 @@
 package schemas
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type Response[T any] struct {
@@ -11,5 +14,12 @@ type Response[T any] struct {
 }
 
 func (r *Response[T]) RespondJSON(ctx *gin.Context, code int) {
+	if code == http.StatusOK {
+		r.Success = true
+		r.Message = "success"
+		logrus.Debugf("响应成功: %+v", r.Data)
+	} else {
+		logrus.Warning(r.Message)
+	}
 	ctx.JSON(code, r)
 }

@@ -42,7 +42,6 @@ func RecognizeMedia(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = &schemas.RecognizeMediaDetail{
 		Item:       item,
 		CustomRule: customRule,

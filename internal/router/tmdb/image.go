@@ -33,7 +33,7 @@ func PosterImage(ctx *gin.Context) {
 	var imgPath string
 	switch meta.ParseMediaType(mediaTypeStr) {
 	case meta.MediaTypeUnknown:
-		resp.Message = "无效的媒体类型"
+		resp.Message = "无效的媒体类型: " + mediaTypeStr
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 
@@ -66,7 +66,7 @@ func PosterImage(ctx *gin.Context) {
 		imgPath = imagesInfo.Posters[0].FilePath
 	}
 	imgURL := tmdb_controller.GetImageURL(imgPath)
-	resp.Success = true
+
 	resp.Data = &imgURL
 	resp.RespondJSON(ctx, http.StatusOK)
 }

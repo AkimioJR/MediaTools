@@ -44,7 +44,6 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType schemas.TransferT
 		return
 	}
 
-	resp.Success = true
 	resp.Data = dstFile
 	ctx.JSON(http.StatusOK, resp)
 }
@@ -134,7 +133,6 @@ func StorageTransferFile(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = dstFile
 	ctx.JSON(http.StatusOK, resp)
 }

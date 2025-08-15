@@ -100,7 +100,6 @@ func UpdateMediaFormat(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		resp.Message = "请求参数错误: " + err.Error()
-		logrus.Warning(resp.Message)
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
 	}
@@ -110,10 +109,11 @@ func UpdateMediaFormat(ctx *gin.Context) {
 	err = recognize_controller.InitFormatTemplates()
 	if err != nil {
 		resp.Message = "初始化格式模板失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		logrus.Info("开始恢复旧的媒体格式配置")
 		config.Media.Format = oldConfig
 		recognize_controller.Init()
 		logrus.Debugf("恢复旧的媒体格式配置: %+v", config.Media.Format)
-		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
@@ -124,7 +124,6 @@ func UpdateMediaFormat(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = &config.Media.Format
 	resp.RespondJSON(ctx, http.StatusOK)
 }
@@ -137,9 +136,7 @@ func UpdateMediaFormat(ctx *gin.Context) {
 // @Produce json
 func CustomWord(ctx *gin.Context) {
 	var resp schemas.Response[*config.CustomWordConfig]
-	resp.Success = true
 	resp.Data = &config.Media.CustomWord
-	logrus.Debugf("获取自定义词配置: %+v", resp.Data)
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
@@ -159,7 +156,6 @@ func UpdateCustomWord(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		resp.Message = "请求参数错误: " + err.Error()
-		logrus.Warning(resp.Message)
 		resp.RespondJSON(ctx, http.StatusBadGateway)
 		return
 	}
@@ -169,11 +165,11 @@ func UpdateCustomWord(ctx *gin.Context) {
 	err = recognize_controller.InitCustomWord()
 	if err != nil {
 		resp.Message = "初始化自定义词失败: " + err.Error()
-		logrus.Warning(resp.Message)
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		logrus.Debug("开始恢复旧的自定义词配置")
 		config.Media.CustomWord = oldConfig
 		recognize_controller.Init()
 		logrus.Debugf("恢复旧的自定义词配置: %+v", config.Media.CustomWord)
-		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
 
@@ -184,7 +180,6 @@ func UpdateCustomWord(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
 	resp.Data = &config.Media.CustomWord
 	resp.RespondJSON(ctx, http.StatusOK)
 }
