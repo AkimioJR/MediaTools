@@ -9,6 +9,9 @@ import (
 type StoragePath interface {
 	GetStorageType() StorageType
 	GetPath() string
+	GetName() string
+	GetExt() string
+	LowerExt() string
 	String() string
 }
 
@@ -45,6 +48,14 @@ func (fi *StorageFileInfo) GetStorageType() StorageType {
 
 func (fi *StorageFileInfo) GetPath() string {
 	return fi.Path
+}
+
+func (fi *StorageFileInfo) GetName() string {
+	return fi.Name
+}
+
+func (fi *StorageFileInfo) GetExt() string {
+	return fi.Ext
 }
 
 func (fi *StorageFileInfo) LowerExt() string {
