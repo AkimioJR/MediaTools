@@ -58,7 +58,7 @@ func ScrapeMovieInfo(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) 
 	if err != nil {
 		logrus.Errorf("生成电影「%s」元数据 XML 失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 	} else {
-		infoFile := storage_controller.Join(storage_controller.GetParent(dstFile), "movie.info")
+		infoFile := dstFile.Parent().Join("movie.info")
 		reader, err := bytes2Reader(xmlData)
 		if err != nil {
 			logrus.Warning("创建 reader 失败: %w", err)
@@ -277,15 +277,15 @@ func ScrapeMovieImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo)
 }
 
 func ScrapeTVInfo(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
-	tvSeasonDir := storage_controller.GetParent(dstFile)
-	tvSerieDir := storage_controller.GetParent(tvSeasonDir)
+	tvSeasonDir := dstFile.Parent()
+	tvSerieDir := tvSeasonDir.Parent()
 
 	serieMetaData := genTVSerieMetaInfo(info)
 	xmlData, err := serieMetaData.XML()
 	if err != nil {
 		logrus.Errorf("生成电视剧「%s」元数据 XML 失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 	} else {
-		infoFile := storage_controller.Join(tvSerieDir, "tv.info")
+		infoFile := tvSerieDir.Join("tv.info")
 		reader, err := bytes2Reader(xmlData)
 		if err != nil {
 			logrus.Warningf("创建 reader 失败: %v", err)
@@ -302,7 +302,7 @@ func ScrapeTVInfo(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 	if err != nil {
 		logrus.Errorf("生成电视剧「%s」第 %d 季元数据 XML 失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, err)
 	} else {
-		infoFile := storage_controller.Join(tvSeasonDir, "season.info")
+		infoFile := tvSeasonDir.Join("season.info")
 		reader, err := bytes2Reader(xmlData)
 		if err != nil {
 			logrus.Warning("创建 reader 失败: %w", err)
@@ -338,8 +338,8 @@ func ScrapeTVInfo(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 }
 
 func ScrapeTVImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
-	tvSeasonDir := storage_controller.GetParent(dstFile)
-	tvSerieDir := storage_controller.GetParent(tvSeasonDir)
+	tvSeasonDir := dstFile.Parent()
+	tvSerieDir := tvSeasonDir.Parent()
 
 	var (
 		errCh = make(chan error, 10)
@@ -365,7 +365,7 @@ func ScrapeTVImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 		default:
 			seasonPosterName = fmt.Sprintf("season%02d-poster", info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber)
 		}
-		seasonPosterFile := storage_controller.Join(tvSerieDir, seasonPosterName)
+		seasonPosterFile := tvSerieDir.Join(seasonPosterName)
 		err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.SeasonInfo.PosterPath, seasonPosterFile.GetPath(), seasonPosterFile.GetStorageType())
 		if err != nil {
 			errCh <- fmt.Errorf("刮削电视剧「%s」第 %d 季海报失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, info.TMDBInfo.TVInfo.SeasonInfo.SeasonNumber, err)
@@ -375,7 +375,7 @@ func ScrapeTVImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 	wg.Add(1)
 	go func() { // 电视剧剧照
 		defer wg.Done()
-		err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.SerieInfo.BackdropPath, storage_controller.Join(tvSerieDir, "backdrop").GetPath(), tvSerieDir.GetStorageType())
+		err := DownloadTMDBImageAndSave(info.TMDBInfo.TVInfo.SerieInfo.BackdropPath, tvSerieDir.Join("backdrop").GetPath(), tvSerieDir.GetStorageType())
 		if err != nil {
 			errCh <- fmt.Errorf("刮削电视剧「%s」剧照失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 		}

@@ -36,7 +36,7 @@ func ArchiveMedia(
 	if err != nil {
 		return nil, err
 	}
-	dstPath := storage_controller.Join(dstDir, targetName)
+	dstPath := dstDir.Join(targetName)
 	logrus.Infof("开始转移媒体文件：%s -> %s，转移类型类型：%s", srcFile, dstPath, transferType)
 
 	err = storage_controller.TransferFile(srcFile, dstPath, transferType)
@@ -46,7 +46,7 @@ func ArchiveMedia(
 
 	{
 		logrus.Info("开始转移字幕/音轨文件")
-		srcDir := storage_controller.GetParent(srcFile)
+		srcDir := srcFile.Parent()
 		paths, err := storage_controller.List(srcDir)
 		if err != nil {
 			logrus.Warningf("读取目录失败，跳过转移字幕/音轨文件：%v", err)
@@ -127,7 +127,7 @@ func ArchiveMediaSmart(src *storage.StorageFileInfo) error {
 		if err != nil {
 			return err
 		}
-		dstDir := storage_controller.Join(libraryBaseDir, GenFloder(libConfig, info)...)
+		dstDir := libraryBaseDir.Join(GenFloder(libConfig, info)...)
 
 		item, err := schemas.NewMediaItem(videoMeta, info)
 		if err != nil {

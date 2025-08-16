@@ -300,7 +300,7 @@ func StorageRename(ctx *gin.Context) {
 		return
 	}
 
-	resp.Data = storage_controller.Join(storage_controller.GetParent(path), req.NewName).GetPath()
+	resp.Data = path.Parent().Join(req.NewName).GetPath()
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
