@@ -9,7 +9,6 @@ import (
 	"MediaTools/internal/schemas"
 	"MediaTools/internal/schemas/storage"
 	"net/http"
-	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -49,7 +48,7 @@ func ArchiveMedia(ctx *gin.Context) {
 	}
 
 	logrus.Infof("正在解析视频元数据：%s", srcPath.String())
-	videoMeta, _, _ := recognize_controller.ParseVideoMeta(filepath.Base(srcPath.GetPath()))
+	videoMeta, _, _ := recognize_controller.ParseVideoMeta(srcPath.GetName())
 	info, err := tmdb_controller.RecognizeMedia(videoMeta)
 	if err != nil {
 		resp.Message = "识别媒体信息失败: " + err.Error()

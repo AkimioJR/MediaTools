@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -398,7 +397,7 @@ func StorageDownloadFile(ctx *gin.Context) {
 	defer reader.Close()
 
 	// 设置下载响应头
-	ctx.Header("Content-Disposition", "attachment; filename="+filepath.Base(filePath.GetPath()))
+	ctx.Header("Content-Disposition", "attachment; filename="+filePath.GetName())
 	ctx.Header("Content-Type", "application/octet-stream")
 
 	// 流式传输文件内容
