@@ -18,7 +18,7 @@ type StoragePath interface {
 func NewStoragePath(storageType StorageType, path string) StoragePath {
 	return &StorageFileInfo{
 		StorageType: storageType,
-		Path:        path,
+		Path:        filepath.Clean(path),
 		Name:        filepath.Base(path),
 		Ext:         filepath.Ext(path),
 	}
