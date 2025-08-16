@@ -56,14 +56,14 @@ func StorageGetFileInfo(ctx *gin.Context) {
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
-// @Route /storage/:storage_type/exists [get]
+// @Route /storage/:storage_type/exist [get]
 // @Summary 检查文件/目录是否存在
 // @Description 根据路径和存储类型检查文件或目录是否存在
 // @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "文件或目录路径"
 // @Products json
-func StorageCheckExists(ctx *gin.Context) {
+func StorageExist(ctx *gin.Context) {
 	var resp schemas.Response[bool]
 
 	storageTypeStr := ctx.Param("storage_type")

@@ -17,7 +17,7 @@ func RegisterStorageRouter(router *gin.Engine) {
 		{
 			// 基础操作接口
 			storageTypeRouter.GET("/info", StorageGetFileInfo)
-			storageTypeRouter.GET("/exists", StorageCheckExists)
+			storageTypeRouter.GET("/exist", StorageExist)
 			storageTypeRouter.GET("/list", StorageList)              // 列出目录内容（非详细信息）
 			storageTypeRouter.GET("/list_detail", StorageListDetail) // 列出目录内容（详细信息）
 
