@@ -5,6 +5,8 @@ import (
 	"MediaTools/internal/schemas/storage"
 	"io"
 	"iter"
+
+	"github.com/sirupsen/logrus"
 )
 
 func GetDetail(path storage.StoragePath) (*storage.StorageFileInfo, error) {
@@ -100,7 +102,26 @@ func List(dir storage.StoragePath) (iter.Seq2[storage.StoragePath, error], error
 	if !exists {
 		return nil, errs.ErrStorageProviderNotFound
 	}
-	return provider.List(dir.GetPath())
+	paths, err := provider.List(dir.GetPath())
+	if err != nil {
+		logrus.Warningf("列出目录内容失败: %s, 错误: %v", dir.GetPath(), err)
+		return nil, err
+	}
+
+	return func(yield func(storage.StoragePath, error) bool) {
+		for path, err := range paths {
+			if err != nil {
+				if !yield(nil, err) {
+					return // 如果迭代器被中断，则退出
+				}
+				continue
+			}
+			filePath := storage.NewStoragePath(dir.GetStorageType(), path)
+			if !yield(filePath, nil) {
+				return // 如果迭代器被中断，则退出
+			}
+		}
+	}, nil
 }
 
 func Copy(srcPath storage.StoragePath, dstPath storage.StoragePath) error {
@@ -205,7 +226,7 @@ func IterFiles(dir storage.StoragePath) (iter.Seq2[*storage.StorageFileInfo, err
 
 // iterFilesRecursive 递归遍历目录中的所有文件
 func iterFilesRecursive(provider storage.StorageProvider, dirPath string, yield func(*storage.StorageFileInfo, error) bool) {
-	iter, err := provider.List(dirPath)
+	paths, err := provider.List(dirPath)
 	if err != nil {
 		if !yield(nil, err) {
 			return
@@ -213,7 +234,7 @@ func iterFilesRecursive(provider storage.StorageProvider, dirPath string, yield 
 		return
 	}
 
-	for path, err := range iter {
+	for path, err := range paths {
 		if err != nil {
 			if !yield(nil, err) { // 如果迭代器被中断，则退出
 				return
@@ -221,7 +242,7 @@ func iterFilesRecursive(provider storage.StorageProvider, dirPath string, yield 
 			continue
 		}
 
-		info, err := provider.GetDetail(path.GetPath())
+		info, err := provider.GetDetail(path)
 		if err != nil {
 			if !yield(nil, err) {
 				return

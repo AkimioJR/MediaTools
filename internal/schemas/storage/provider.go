@@ -22,7 +22,7 @@ type StorageProvider interface {
 	ReadFile(path string) (io.ReadCloser, error)    // 读取文件内容
 
 	// 目录操作
-	List(path string) (iter.Seq2[StoragePath, error], error) // 列出目录下的所有文件
+	List(path string) (iter.Seq2[string, error], error) // 列出目录下的所有文件
 
 	// 文件传输操作
 	Copy(srcPath string, dstPath string) error     // 复制文件

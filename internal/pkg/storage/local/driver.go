@@ -87,15 +87,14 @@ func (s *LocalStorage) ReadFile(path string) (io.ReadCloser, error) {
 	return file, nil
 }
 
-func (s *LocalStorage) List(path string) (iter.Seq2[storage.StoragePath, error], error) {
+func (s *LocalStorage) List(path string) (iter.Seq2[string, error], error) {
 	files, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
-	return func(yield func(storage.StoragePath, error) bool) {
+	return func(yield func(string, error) bool) {
 		for _, file := range files {
-			filePath := pathlib.Join(path, file.Name())
-			if !yield(storage.NewStoragePath(storage.StorageLocal, filePath), nil) {
+			if !yield(pathlib.Join(path, file.Name()), nil) {
 				return // 如果迭代器被中断，则退出
 			}
 		}
