@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"path/filepath"
+	pathlib "path"
 	"strings"
 	"time"
 )
@@ -21,9 +21,9 @@ type StoragePath interface {
 func NewStoragePath(storageType StorageType, path string) StoragePath {
 	return &StorageFileInfo{
 		StorageType: storageType,
-		Path:        filepath.Clean(path),
-		Name:        filepath.Base(path),
-		Ext:         filepath.Ext(path),
+		Path:        pathlib.Clean(path),
+		Name:        pathlib.Base(path),
+		Ext:         pathlib.Ext(path),
 	}
 }
 
@@ -46,14 +46,14 @@ func NewFileInfo(storageType StorageType, path string, size int64, isDir bool, m
 }
 
 func (fi *StorageFileInfo) Parent() StoragePath {
-	return NewStoragePath(fi.StorageType, filepath.Dir(fi.Path))
+	return NewStoragePath(fi.StorageType, pathlib.Dir(fi.Path))
 }
 
 func (fi *StorageFileInfo) Join(elem ...string) StoragePath {
 	paths := make([]string, len(elem)+1)
 	paths[0] = fi.Path
 	paths = append(paths, elem...)
-	return NewStoragePath(fi.StorageType, filepath.Join(paths...))
+	return NewStoragePath(fi.StorageType, pathlib.Join(paths...))
 }
 
 func (fi *StorageFileInfo) GetStorageType() StorageType {

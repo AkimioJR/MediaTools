@@ -10,6 +10,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	pathlib "path"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -23,7 +24,7 @@ func SaveImage(imgFile storage.StoragePath, img image.Image) error {
 		buff bytes.Buffer
 		err  error
 	)
-	switch filepath.Ext(imgFile.GetPath()) {
+	switch pathlib.Ext(imgFile.GetPath()) {
 	case ".jpg", ".jpeg": // 保存为 JPEG
 		err = png.Encode(&buff, img)
 	default: // 保存为 PNG

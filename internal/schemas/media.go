@@ -5,7 +5,7 @@ import (
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/pkg/themoviedb/v3"
 	"fmt"
-	"path/filepath"
+	pathlib "path"
 	"strconv"
 )
 
@@ -85,7 +85,7 @@ func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error
 		ResourcePix:    videoMeta.ResourcePix,
 		VideoEncode:    videoMeta.VideoEncode,
 		AudioEncode:    videoMeta.AudioEncode,
-		FileExtension:  filepath.Ext(videoMeta.OrginalTitle),
+		FileExtension:  pathlib.Ext(videoMeta.OrginalTitle),
 		Customization:  videoMeta.Customization,
 
 		TMDBID: info.TMDBID,

@@ -3,7 +3,7 @@ package loghook
 import (
 	"fmt"
 	"os"
-	"path/filepath"
+	pathlib"path"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -105,7 +105,7 @@ func (f *FileLogsHook) writeLog() {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "create log directory failed: %v", err)
 			}
-			path := filepath.Join(f.logDir, entry.Time.Local().Format("2006-01-02")+".log")
+			path := pathlib.Join(f.logDir, entry.Time.Local().Format("2006-01-02")+".log")
 			file, err = os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "open log file '%s' failed: %v", path, err)

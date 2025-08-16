@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
-	"path/filepath"
+	pathlib "path"
 
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -39,7 +39,7 @@ func (c *Configuration) applyConfig() {
 }
 
 func (c *Configuration) writeConfig() error {
-	err := os.MkdirAll(filepath.Dir(ConfigFile), 0755)
+	err := os.MkdirAll(pathlib.Dir(ConfigFile), 0755)
 	if err != nil {
 		return fmt.Errorf("create config directory error: %w", err)
 	}

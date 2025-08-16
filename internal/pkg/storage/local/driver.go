@@ -6,7 +6,7 @@ import (
 	"io"
 	"iter"
 	"os"
-	"path/filepath"
+	pathlib "path"
 )
 
 type LocalStorage struct {
@@ -66,7 +66,7 @@ func (s *LocalStorage) Rename(oldPath string, newName string) error {
 }
 
 func (s *LocalStorage) CreateFile(path string, reader io.Reader) error {
-	err := s.Mkdir(filepath.Dir(path))
+	err := s.Mkdir(pathlib.Dir(path))
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func (s *LocalStorage) List(path string) (iter.Seq2[storage.StoragePath, error],
 	}
 	return func(yield func(storage.StoragePath, error) bool) {
 		for _, file := range files {
-			filePath := filepath.Join(path, file.Name())
+			filePath := pathlib.Join(path, file.Name())
 			if !yield(storage.NewStoragePath(storage.StorageLocal, filePath), nil) {
 				return // 如果迭代器被中断，则退出
 			}
@@ -103,7 +103,7 @@ func (s *LocalStorage) List(path string) (iter.Seq2[storage.StoragePath, error],
 }
 
 func (s *LocalStorage) Copy(srcPath string, dstPath string) error {
-	err := s.Mkdir(filepath.Dir(dstPath))
+	err := s.Mkdir(pathlib.Dir(dstPath))
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (s *LocalStorage) Copy(srcPath string, dstPath string) error {
 }
 
 func (s *LocalStorage) Move(srcPath string, dstPath string) error {
-	err := s.Mkdir(filepath.Dir(dstPath))
+	err := s.Mkdir(pathlib.Dir(dstPath))
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func (s *LocalStorage) Move(srcPath string, dstPath string) error {
 }
 
 func (s *LocalStorage) Link(srcPath string, dstPath string) error {
-	err := s.Mkdir(filepath.Dir(dstPath))
+	err := s.Mkdir(pathlib.Dir(dstPath))
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (s *LocalStorage) Link(srcPath string, dstPath string) error {
 }
 
 func (s *LocalStorage) SoftLink(srcPath string, dstPath string) error {
-	err := s.Mkdir(filepath.Dir(dstPath))
+	err := s.Mkdir(pathlib.Dir(dstPath))
 	if err != nil {
 		return err
 	}
