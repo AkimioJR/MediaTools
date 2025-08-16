@@ -22,7 +22,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param request body schemas.LibraryArchiveMediaRequest true "请求参数"
-func LibraryArchiveMedia(ctx *gin.Context) {
+func ArchiveMedia(ctx *gin.Context) {
 	var (
 		req  schemas.LibraryArchiveMediaRequest
 		resp schemas.Response[*storage.StorageFileInfo]
