@@ -13,6 +13,9 @@ type StoragePath interface {
 	GetExt() string
 	LowerExt() string
 	String() string
+
+	Parent() StoragePath
+	Join(elem ...string) StoragePath
 }
 
 func NewStoragePath(storageType StorageType, path string) StoragePath {
@@ -40,6 +43,17 @@ func NewFileInfo(storageType StorageType, path string, size int64, isDir bool, m
 	fi.IsDir = isDir
 	fi.ModTime = modTime
 	return fi
+}
+
+func (fi *StorageFileInfo) Parent() StoragePath {
+	return NewStoragePath(fi.StorageType, filepath.Dir(fi.Path))
+}
+
+func (fi *StorageFileInfo) Join(elem ...string) StoragePath {
+	paths := make([]string, len(elem)+1)
+	paths[0] = fi.Path
+	paths = append(paths, elem...)
+	return NewStoragePath(fi.StorageType, filepath.Join(paths...))
 }
 
 func (fi *StorageFileInfo) GetStorageType() StorageType {
