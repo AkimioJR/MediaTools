@@ -6,7 +6,9 @@ import (
 	"MediaTools/internal/schemas/storage"
 	"fmt"
 	"io"
+	"iter"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -92,56 +94,16 @@ func StorageExist(ctx *gin.Context) {
 }
 
 // @Route /storage/:storage_type/list [get]
-// @Summary 列出目录内容（非详细信息）
+// @Summary 列出目录内容
 // @Description 根据存储类型和路径列出目录下的所有文件和子目录的路径
 // @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
-// @Param path query string true "目录路径"
+// @Param path query string false "目录路径，如果为空则列出根目录内容"
+// @Param detail query bool false "是否返回详细信息，默认为 false"
 // @Products json
 func StorageList(ctx *gin.Context) {
-	var resp schemas.Response[[]string]
-
-	storageTypeStr := ctx.Param("storage_type")
-	storageType := storage.ParseStorageType(storageTypeStr)
-	if storageType == storage.StorageUnknown {
-		resp.Message = "无效的存储类型: " + storageTypeStr
-		resp.RespondJSON(ctx, http.StatusBadRequest)
-		return
-	}
-
-	path := ctx.Query("path")
-	if path == "" {
-		resp.Message = "路径不能为空"
-		resp.RespondJSON(ctx, http.StatusBadRequest)
-		return
-	}
-
-	paths, err := storage_controller.List(storage.NewStoragePath(storageType, path))
-	if err != nil {
-		resp.Message = err.Error()
-		resp.RespondJSON(ctx, http.StatusInternalServerError)
-		return
-	}
-	for p, err := range paths {
-		if err != nil {
-			resp.Message = fmt.Sprintf("列出目录内容失败: %s, 错误: %v", p, err)
-			resp.RespondJSON(ctx, http.StatusInternalServerError)
-			return
-		}
-		resp.Data = append(resp.Data, p.GetPath())
-	}
-	resp.RespondJSON(ctx, http.StatusOK)
-}
-
-// @Route /storage/:storage_type/list_detail [get]
-// @Summary 列出目录内容（详细信息）
-// @Description 根据存储类型和路径列出目录下的所有文件和子目录的详细信息
-// @Tags 存储,存储文件
-// @Param storage_type path string true "存储类型"
-// @Param path query string true "目录路径"
-// @Products json
-func StorageListDetail(ctx *gin.Context) {
 	var resp schemas.Response[[]*storage.StorageFileInfo]
+	resp.Data = make([]*storage.StorageFileInfo, 0)
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := storage.ParseStorageType(storageTypeStr)
@@ -151,33 +113,44 @@ func StorageListDetail(ctx *gin.Context) {
 		return
 	}
 
+	detailStr := ctx.DefaultQuery("detail", "false")
+	detailFlag, _ := strconv.ParseBool(detailStr) // 出错时默认 false
+	logrus.Debugf("解析请求详细信息字符串: %s, 值为: %v", detailStr, detailFlag)
+
+	var (
+		paths iter.Seq2[storage.StoragePath, error]
+		err   error
+	)
 	path := ctx.Query("path")
 	if path == "" {
-		resp.Message = "路径不能为空"
-		resp.RespondJSON(ctx, http.StatusBadRequest)
-		return
+		paths, err = storage_controller.ListRoot(storageType)
+	} else {
+		paths, err = storage_controller.List(storage.NewStoragePath(storageType, path))
 	}
-
-	paths, err := storage_controller.List(storage.NewStoragePath(storageType, path))
 	if err != nil {
-		resp.Message = err.Error()
+		resp.Message = "列出目录内容失败: " + err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
-	for p, err := range paths {
-		if err != nil {
-			resp.Message = fmt.Sprintf("列出目录内容失败: %s, 错误: %v", p, err)
+
+	for sp, itErr := range paths {
+		if itErr != nil {
+			resp.Message = fmt.Sprintf("列出目录内容失败: %s, 错误: %v", sp.String(), itErr)
 			resp.RespondJSON(ctx, http.StatusInternalServerError)
 			return
 		}
-		detail, err := storage_controller.GetDetail(p)
-		if err != nil {
-			logrus.Warningf("获取文件详情失败: %s, 错误: %v", p, err)
-			resp.Data = append(resp.Data, p.(*storage.StorageFileInfo)) // 如果获取详情失败，仍然返回路径
-		} else {
-			resp.Data = append(resp.Data, detail)
-		}
 
+		if detailFlag { // 请求详细信息
+			info, err := storage_controller.GetDetail(sp)
+			if err != nil {
+				logrus.Warningf("获取文件详情失败: %s, 错误: %v", sp.String(), err)
+				resp.Data = append(resp.Data, sp.(*storage.StorageFileInfo))
+			} else {
+				resp.Data = append(resp.Data, info)
+			}
+		} else { // 不请求详细信息，只返回基本路径信息
+			resp.Data = append(resp.Data, sp.(*storage.StorageFileInfo))
+		}
 	}
 	resp.RespondJSON(ctx, http.StatusOK)
 }
