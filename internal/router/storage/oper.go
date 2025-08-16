@@ -173,9 +173,8 @@ func StorageListDetail(ctx *gin.Context) {
 		}
 		detail, err := storage_controller.GetDetail(p)
 		if err != nil {
-			resp.Message = fmt.Sprintf("获取文件详情失败: %s, 错误: %v", p, err)
-			resp.RespondJSON(ctx, http.StatusInternalServerError)
-			return
+			logrus.Warningf("获取文件详情失败: %s, 错误: %v", p, err)
+			resp.Data = append(resp.Data, p.(*storage.StorageFileInfo)) // 如果获取详情失败，仍然返回路径
 		}
 		resp.Data = append(resp.Data, detail)
 	}
