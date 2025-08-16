@@ -46,7 +46,7 @@ func PosterImage(ctx *gin.Context) {
 		}
 		if len(imagesInfo.Posters) == 0 {
 			resp.Message = "未找到电影海报图片"
-			ctx.JSON(http.StatusNotFound, resp)
+			resp.RespondJSON(ctx, http.StatusNotFound)
 			return
 		}
 		imgPath = imagesInfo.Posters[0].FilePath
@@ -60,7 +60,7 @@ func PosterImage(ctx *gin.Context) {
 		}
 		if len(imagesInfo.Posters) == 0 {
 			resp.Message = "未找到电视剧海报图片"
-			ctx.JSON(http.StatusNotFound, resp)
+			resp.RespondJSON(ctx, http.StatusNotFound)
 			return
 		}
 		imgPath = imagesInfo.Posters[0].FilePath

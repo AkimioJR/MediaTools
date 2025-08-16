@@ -65,7 +65,5 @@ func UpdateFanart(ctx *gin.Context) {
 		return
 	}
 
-	resp.Success = true
-	resp.Data = &config.Fanart
-	ctx.JSON(http.StatusOK, resp)
+	resp.RespondSuccessJSON(ctx, &config.Fanart)
 }

@@ -20,7 +20,7 @@ import (
 // @Param season query uint false "季数"
 // @Param episode query uint false "集数"
 func Overview(ctx *gin.Context) {
-	var resp schemas.Response[*string]
+	var resp schemas.Response[string]
 
 	// 获取类型和 ID
 	mediaTypeStr := ctx.Param("media_type")
@@ -101,6 +101,5 @@ func Overview(ctx *gin.Context) {
 		}
 	}
 
-	resp.Data = &overview
-	ctx.JSON(http.StatusOK, resp)
+	resp.RespondSuccessJSON(ctx, overview)
 }

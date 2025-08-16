@@ -16,7 +16,7 @@ import (
 func handleFileTransfer(ctx *gin.Context, expectedTransferType storage.TransferType, transferFunc func(storage.StoragePath, storage.StoragePath) error) {
 	var (
 		req  schemas.TransferRequest
-		resp schemas.Response[*string]
+		resp schemas.Response[string]
 	)
 
 	// 绑定并验证请求参数
@@ -45,9 +45,7 @@ func handleFileTransfer(ctx *gin.Context, expectedTransferType storage.TransferT
 		return
 	}
 
-	p := dstFile.GetPath()
-	resp.Data = &p
-	ctx.JSON(http.StatusOK, resp)
+	resp.RespondSuccessJSON(ctx, dstFile.GetPath())
 }
 
 // @Route /storage/copy [post]
@@ -109,7 +107,7 @@ func StorageSoftLinkFile(ctx *gin.Context) {
 func StorageTransferFile(ctx *gin.Context) {
 	var (
 		req  schemas.TransferRequest
-		resp schemas.Response[*string]
+		resp schemas.Response[string]
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -134,7 +132,5 @@ func StorageTransferFile(ctx *gin.Context) {
 		return
 	}
 
-	p := dstFile.GetPath()
-	resp.Data = &p
-	ctx.JSON(http.StatusOK, resp)
+	resp.RespondSuccessJSON(ctx, dstFile.GetPath())
 }
