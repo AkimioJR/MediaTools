@@ -4,6 +4,7 @@ import (
 	"MediaTools/internal/errs"
 	"MediaTools/internal/schemas/storage"
 	"io"
+	"iter"
 	"os"
 	"path/filepath"
 )
@@ -86,28 +87,19 @@ func (s *LocalStorage) ReadFile(path string) (io.ReadCloser, error) {
 	return file, nil
 }
 
-func (s *LocalStorage) List(path string) ([]storage.StorageFileInfo, error) {
+func (s *LocalStorage) List(path string) (iter.Seq2[storage.StoragePath, error], error) {
 	files, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
-
-	var fileInfos []storage.StorageFileInfo
-	for _, file := range files {
-		info, err := file.Info()
-		if err != nil {
-			return nil, err
+	return func(yield func(storage.StoragePath, error) bool) {
+		for _, file := range files {
+			filePath := filepath.Join(path, file.Name())
+			if !yield(storage.NewStoragePath(storage.StorageLocal, filePath), nil) {
+				return // 如果迭代器被中断，则退出
+			}
 		}
-		filePath := filepath.Join(path, file.Name())
-		fileInfos = append(fileInfos, *storage.NewFileInfo(
-			storage.StorageLocal,
-			filePath,
-			info.Size(),
-			info.IsDir(),
-			info.ModTime(),
-		))
-	}
-	return fileInfos, nil
+	}, nil
 }
 
 func (s *LocalStorage) Copy(srcPath string, dstPath string) error {

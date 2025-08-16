@@ -4,6 +4,7 @@ import (
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/schemas"
 	"MediaTools/internal/schemas/storage"
+	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -92,14 +93,14 @@ func StorageCheckExists(ctx *gin.Context) {
 }
 
 // @Route /storage/:storage_type/list [get]
-// @Summary 列出目录内容
-// @Description 根据存储类型和路径列出目录下的所有文件和子目录
+// @Summary 列出目录内容（非详细信息）
+// @Description 根据存储类型和路径列出目录下的所有文件和子目录的路径
 // @Tags 存储,存储文件
 // @Param storage_type path string true "存储类型"
 // @Param path query string true "目录路径"
 // @Products json
 func StorageList(ctx *gin.Context) {
-	var resp schemas.Response[[]storage.StorageFileInfo]
+	var resp schemas.Response[[]string]
 
 	storageTypeStr := ctx.Param("storage_type")
 	storageType := storage.ParseStorageType(storageTypeStr)
@@ -116,14 +117,20 @@ func StorageList(ctx *gin.Context) {
 		return
 	}
 
-	files, err := storage_controller.List(storage.NewStoragePath(storageType, path))
+	paths, err := storage_controller.List(storage.NewStoragePath(storageType, path))
 	if err != nil {
 		resp.Message = err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
 		return
 	}
-
-	resp.Data = files
+	for p, err := range paths {
+		if err != nil {
+			resp.Message = fmt.Sprintf("列出目录内容失败: %s, 错误: %v", p, err)
+			resp.RespondJSON(ctx, http.StatusInternalServerError)
+			return
+		}
+		resp.Data = append(resp.Data, p.GetPath())
+	}
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 

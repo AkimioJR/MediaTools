@@ -47,25 +47,38 @@ func ArchiveMedia(
 	{
 		logrus.Info("开始转移字幕/音轨文件")
 		srcDir := storage_controller.GetParent(srcFile)
-		fileInfos, err := storage_controller.List(srcDir)
+		paths, err := storage_controller.List(srcDir)
 		if err != nil {
 			logrus.Warningf("读取目录失败，跳过转移字幕/音轨文件：%v", err)
 		} else {
 			exts := append(extensions.SubtitleExtensions, extensions.AudioTrackExtensions...)
-			for _, fi := range fileInfos {
-				if fi.IsDir || fi.Path == srcDir.GetPath() {
-					continue // 跳过目录和源文件本身
+			for path, err := range paths {
+				if err != nil {
+					logrus.Warningf("遍历目录 %s 失败，跳过转移字幕/音轨文件：%v", srcDir, err)
+					continue // 跳过错误的路径
+				}
+				if path.GetPath() == srcDir.GetPath() {
+					continue // 跳过源目录本身
+				}
+				info, err := storage_controller.GetDetail(path)
+				if err != nil {
+					logrus.Warningf("获取文件 %s 详情失败，跳过转移字幕/音轨文件：%v", path, err)
+					continue // 跳过获取详情失败的文件
+				}
+				if info.IsDir {
+					logrus.Debugf("跳过目录：%s", info.Path)
+					continue // 跳过目录
 				}
 
-				if slices.Contains(exts, fi.LowerExt()) {
-					otherdstPathPath := utils.ChangeExt(dstPath.GetPath(), fi.Ext)
+				if slices.Contains(exts, info.LowerExt()) {
+					otherdstPathPath := utils.ChangeExt(dstPath.GetPath(), info.Ext)
 					otherdstPath, err := storage_controller.GetPath(otherdstPathPath, dstPath.GetStorageType())
 					if err != nil {
 						logrus.Warningf("获取文件 %s:%s 失败: %v", dstPath.GetStorageType(), otherdstPathPath, err)
 						continue
 					}
-					logrus.Debugf("转移字幕/音轨文件：%s -> %s", fi.String(), otherdstPath)
-					err = storage_controller.TransferFile(&fi, otherdstPath, transferType) // 转移字幕或音轨文件
+					logrus.Debugf("转移字幕/音轨文件：%s -> %s", info.String(), otherdstPath)
+					err = storage_controller.TransferFile(info, otherdstPath, transferType) // 转移字幕或音轨文件
 					if err != nil {
 						logrus.Warningf("转移字幕/音轨文件失败：%v", err)
 					}
@@ -130,9 +143,23 @@ func ArchiveMediaSmart(src *storage.StorageFileInfo) error {
 
 	if src.IsDir {
 		logrus.Info("正在处理目录：", src.Path)
-		err := storage_controller.IterFiles(src, fn)
+		iter, err := storage_controller.IterFiles(src)
 		if err != nil {
-			return fmt.Errorf("处理目录 %s 时出错，已成功：%d 个，错误：%w", src.Path, successNum, err)
+			return fmt.Errorf("遍历目录 %s 失败：%w", src.Path, err)
+		}
+		for file, err := range iter {
+			if err != nil {
+				logrus.Warningf("处理文件 %s 时出错：%v", file.Path, err)
+				continue
+			}
+			if file.IsDir {
+				logrus.Debugf("跳过目录：%s", file.Path)
+				continue
+			}
+			err = fn(file)
+			if err != nil {
+				logrus.Warningf("处理文件 %s 时出错：%v", file.Path, err)
+			}
 		}
 		logrus.Infof("目录「%s」处理完成，成功：%d，", src.String(), successNum)
 	} else {
