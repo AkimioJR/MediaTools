@@ -11,7 +11,6 @@ import (
 	"MediaTools/internal/schemas"
 	"MediaTools/utils"
 	"fmt"
-	"path/filepath"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -107,7 +106,7 @@ func ScrapeMovieImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo)
 				if path == "" {
 					errCh <- fmt.Errorf("电影「%s」没有合适的剧照", info.TMDBInfo.MovieInfo.Title)
 				} else {
-					err = DownloadTMDBImageAndSave(path, filepath.Join(filepath.Dir(dstFile.Path), "backdrop"), dstFile.StorageType)
+					err = DownloadTMDBImageAndSave(path, dstFile.Parent().Join("backdrop").GetPath(), dstFile.StorageType)
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电影「%s」剧照失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 					}
@@ -126,7 +125,7 @@ func ScrapeMovieImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo)
 				if path == "" {
 					errCh <- fmt.Errorf("电影「%s」没有合适的海报", info.TMDBInfo.MovieInfo.Title)
 				} else {
-					err = DownloadTMDBImageAndSave(path, filepath.Join(filepath.Dir(dstFile.Path), "poster"), dstFile.StorageType)
+					err = DownloadTMDBImageAndSave(path, dstFile.Parent().Join("poster").GetPath(), dstFile.StorageType)
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电影「%s」海报失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 					}
@@ -145,7 +144,7 @@ func ScrapeMovieImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo)
 				if path == "" {
 					errCh <- fmt.Errorf("电影「%s」没有合适的 Logo", info.TMDBInfo.MovieInfo.Title)
 				} else {
-					err = DownloadTMDBImageAndSave(path, filepath.Join(filepath.Dir(dstFile.Path), "logo"), dstFile.StorageType)
+					err = DownloadTMDBImageAndSave(path, dstFile.Parent().Join("logo").GetPath(), dstFile.StorageType)
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电影「%s」Logo 失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 					}
@@ -175,7 +174,7 @@ func ScrapeMovieImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo)
 				if url == "" {
 					errCh <- fmt.Errorf("电影「%s」没有合适的 Fanart 背景图", info.TMDBInfo.MovieInfo.Title)
 				} else {
-					err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "background"), dstFile.StorageType)
+					err = DownloadFanartImageAndSave(url, dstFile.Parent().Join("background").GetPath(), dstFile.StorageType)
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电影「%s」Fanart 背景图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 					}
@@ -194,7 +193,7 @@ func ScrapeMovieImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo)
 				if url == "" {
 					errCh <- fmt.Errorf("电影「%s」没有合适的 Fanart 横幅图", info.TMDBInfo.MovieInfo.Title)
 				} else {
-					err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "banner"), dstFile.StorageType)
+					err = DownloadFanartImageAndSave(url, dstFile.Parent().Join("banner").GetPath(), dstFile.StorageType)
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电影「%s」Fanart 横幅图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 					}
@@ -204,7 +203,7 @@ func ScrapeMovieImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo)
 
 		go func() {
 			defer wg.Done()
-			fanartClearArtPath := filepath.Join(filepath.Dir(dstFile.Path), "clearart")
+			fanartClearArtPath := dstFile.Parent().Join("clearart").GetPath()
 			var urls []string
 			if len(fanartImagesData.HDMovieClearArt) > 0 { // Clear Art
 				for _, clearArt := range fanartImagesData.HDMovieClearArt {
@@ -238,7 +237,7 @@ func ScrapeMovieImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo)
 					errCh <- fmt.Errorf("电影「%s」没有合适的 Fanart 光盘图", info.TMDBInfo.MovieInfo.Title)
 				} else {
 
-					err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "disc"), dstFile.StorageType)
+					err = DownloadFanartImageAndSave(url, dstFile.Parent().Join("disc").GetPath(), dstFile.StorageType)
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电影「%s」Fanart 光盘图片失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 					}
@@ -257,7 +256,7 @@ func ScrapeMovieImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo)
 				if url == "" {
 					errCh <- fmt.Errorf("电影「%s」没有合适的 Fanart 缩略图", info.TMDBInfo.MovieInfo.Title)
 				} else {
-					err = DownloadFanartImageAndSave(url, filepath.Join(filepath.Dir(dstFile.Path), "thumb"), dstFile.StorageType)
+					err = DownloadFanartImageAndSave(url, dstFile.Parent().Join("thumb").GetPath(), dstFile.StorageType)
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电影「%s」Fanart 缩略图失败: %v", info.TMDBInfo.MovieInfo.Title, err)
 					}
@@ -404,7 +403,7 @@ func ScrapeTVImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 				if path == "" {
 					errCh <- fmt.Errorf("电视剧「%s」没有合适的海报", info.TMDBInfo.TVInfo.SerieInfo.Name)
 				} else {
-					err = DownloadTMDBImageAndSave(path, filepath.Join(tvSerieDir.GetPath(), "poster"), tvSerieDir.GetStorageType())
+					err = DownloadTMDBImageAndSave(path, tvSerieDir.Join("poster").GetPath(), tvSerieDir.GetStorageType())
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电视剧「%s」海报失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 					}
@@ -419,7 +418,7 @@ func ScrapeTVImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 				for _, logo := range serieImages.Logos {
 					paths = append(paths, logo.FilePath)
 				}
-				err = DownloadTMDBImageAndSave(getSupportImage(paths), filepath.Join(tvSerieDir.GetPath(), "logo"), tvSerieDir.GetStorageType())
+				err = DownloadTMDBImageAndSave(getSupportImage(paths), tvSerieDir.Join("logo").GetPath(), tvSerieDir.GetStorageType())
 				if err != nil {
 					errCh <- fmt.Errorf("刮削电视剧「%s」Logo 失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 				}
@@ -449,7 +448,7 @@ func ScrapeTVImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 				if url == "" {
 					errCh <- fmt.Errorf("电视剧「%s」没有合适的 Fanart 背景图", info.TMDBInfo.TVInfo.SerieInfo.Name)
 				} else {
-					err = DownloadFanartImageAndSave(url, filepath.Join(tvSerieDir.GetPath(), "background"), tvSerieDir.GetStorageType())
+					err = DownloadFanartImageAndSave(url, tvSerieDir.Join("background").GetPath(), tvSerieDir.GetStorageType())
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电视剧「%s」Fanart 背景图失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 					}
@@ -468,7 +467,7 @@ func ScrapeTVImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 				if url == "" {
 					errCh <- fmt.Errorf("电视剧「%s」没有合适的 Fanart 横幅图", info.TMDBInfo.TVInfo.SerieInfo.Name)
 				} else {
-					err = DownloadFanartImageAndSave(url, filepath.Join(tvSerieDir.GetPath(), "banner"), tvSerieDir.GetStorageType())
+					err = DownloadFanartImageAndSave(url, tvSerieDir.Join("banner").GetPath(), tvSerieDir.GetStorageType())
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电视剧「%s」Fanart 横幅图失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 					}
@@ -487,7 +486,7 @@ func ScrapeTVImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 				if url == "" {
 					errCh <- fmt.Errorf("电视剧「%s」没有合适的 Fanart 角色图", info.TMDBInfo.TVInfo.SerieInfo.Name)
 				} else {
-					err = DownloadFanartImageAndSave(url, filepath.Join(tvSerieDir.GetPath(), "characterart"), tvSerieDir.GetStorageType())
+					err = DownloadFanartImageAndSave(url, tvSerieDir.Join("characterart").GetPath(), tvSerieDir.GetStorageType())
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电视剧「%s」Fanart 角色图失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 					}
@@ -497,7 +496,7 @@ func ScrapeTVImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 
 		go func() { // 清晰艺术图
 			defer wg.Done()
-			cleanArtPath := filepath.Join(tvSerieDir.GetPath(), "clearart")
+			cleanArtPath := tvSerieDir.Join("clearart").GetPath()
 			var urls []string
 			if len(fanartImagesData.HDClearArt) > 0 { // HD clearart
 				for _, clearArt := range fanartImagesData.HDClearArt {
@@ -530,7 +529,7 @@ func ScrapeTVImage(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
 				if url == "" {
 					errCh <- fmt.Errorf("电视剧「%s」没有合适的 Fanart 缩略图", info.TMDBInfo.TVInfo.SerieInfo.Name)
 				} else {
-					err = DownloadFanartImageAndSave(url, filepath.Join(tvSerieDir.GetPath(), "thumb"), tvSerieDir.GetStorageType())
+					err = DownloadFanartImageAndSave(url, tvSerieDir.Join("thumb").GetPath(), tvSerieDir.GetStorageType())
 					if err != nil {
 						errCh <- fmt.Errorf("刮削电视剧「%s」Fanart 缩略图失败: %v", info.TMDBInfo.TVInfo.SerieInfo.Name, err)
 					}
