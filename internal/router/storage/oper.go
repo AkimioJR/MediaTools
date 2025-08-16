@@ -174,8 +174,10 @@ func StorageListDetail(ctx *gin.Context) {
 		if err != nil {
 			logrus.Warningf("获取文件详情失败: %s, 错误: %v", p, err)
 			resp.Data = append(resp.Data, p.(*storage.StorageFileInfo)) // 如果获取详情失败，仍然返回路径
+		} else {
+			resp.Data = append(resp.Data, detail)
 		}
-		resp.Data = append(resp.Data, detail)
+
 	}
 	resp.RespondJSON(ctx, http.StatusOK)
 }
