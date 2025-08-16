@@ -82,7 +82,7 @@ func LibraryArchiveMedia(ctx *gin.Context) {
 	}
 
 	var dst storage.StoragePath
-	if req.NeedScrape {
+	if req.Scrape {
 		dst, err = library_controller.ArchiveMedia(srcPath, dstDir, storage.TransferLink, item, info)
 	} else {
 		dst, err = library_controller.ArchiveMedia(srcPath, dstDir, storage.TransferLink, item, nil)

@@ -29,7 +29,7 @@ type LibraryArchiveMediaRequest struct {
 	SrcFile      FileInfoRequest      `json:"src_file" binding:"required"`
 	DstDir       FileInfoRequest      `json:"dst_dir" binding:"required"`
 	TransferType storage.TransferType `json:"transfer_type"`
-	NeedScrape   bool                 `json:"need_scrape"`
+	Scrape       bool                 `json:"scrape"`
 }
 
 type RenameRequest struct {
