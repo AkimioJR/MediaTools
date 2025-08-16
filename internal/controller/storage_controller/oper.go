@@ -124,6 +124,34 @@ func List(dir storage.StoragePath) (iter.Seq2[storage.StoragePath, error], error
 	}, nil
 }
 
+func ListRoot(storageType storage.StorageType) (iter.Seq2[storage.StoragePath, error], error) {
+	lock.RLock()
+	defer lock.RUnlock()
+
+	provider, exists := getStorageProvider(storageType)
+	if !exists {
+		return nil, errs.ErrStorageProviderNotFound
+	}
+	paths, err := provider.ListRoot()
+	if err != nil {
+		logrus.Warningf("列出根目录内容失败, 错误: %v", err)
+		return nil, err
+	}
+	return func(yield func(storage.StoragePath, error) bool) {
+		for path, err := range paths {
+			if err != nil {
+				if !yield(nil, err) {
+					return // 如果迭代器被中断，则退出
+				}
+				continue
+			}
+			if !yield(storage.NewStoragePath(storageType, path), nil) {
+				return // 如果迭代器被中断，则退出
+			}
+		}
+	}, nil
+}
+
 func Copy(srcPath storage.StoragePath, dstPath storage.StoragePath) error {
 	lock.RLock()
 	defer lock.RUnlock()
