@@ -5,7 +5,6 @@ import (
 	"MediaTools/internal/schemas/storage"
 	"io"
 	"iter"
-	"path/filepath"
 )
 
 func GetDetail(path storage.StoragePath) (*storage.StorageFileInfo, error) {
@@ -54,7 +53,7 @@ func Rename(path storage.StoragePath, newName string) error {
 	case nil:
 		return nil
 	case errs.ErrStorageProvideNoSupport: // 如果不支持重命名，则尝试使用移动的方式
-		return provider.Move(path.GetPath(), filepath.Join(filepath.Dir(path.GetPath()), newName))
+		return provider.Move(path.GetPath(), path.Parent().Join(newName).GetPath())
 	default:
 		return err
 	}
