@@ -5,7 +5,6 @@ import (
 	"MediaTools/internal/controller/recognize_controller"
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/controller/storage_controller"
-	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/schemas"
 	"MediaTools/internal/schemas/storage"
 	"MediaTools/utils"
@@ -100,76 +99,4 @@ func ArchiveMedia(
 		}
 	}
 	return dstPath, nil
-}
-
-// ArchiveMediaSmart 处理媒体文件，智能识别并归档
-// src: 源文件或目录
-// 返回值: 可能的错误
-// 注意：如果是目录，会递归处理目录下的所有文件
-func ArchiveMediaSmart(src *storage.StorageFileInfo) error {
-	lock.RLock()
-	defer lock.RUnlock()
-	var successNum int
-	fn := func(file *storage.StorageFileInfo) error {
-		libConfig := MatchLibrary(file)
-		if libConfig == nil {
-			return fmt.Errorf("未找到媒体库配置，跳过文件：%s", file.String())
-		}
-
-		logrus.Info("正在解析视频元数据：", src.Name)
-		videoMeta, _, _ := recognize_controller.ParseVideoMeta(src.Name)
-		info, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
-		if err != nil {
-			return fmt.Errorf("识别媒体信息失败：%w", err)
-		}
-
-		libraryBaseDir, err := storage_controller.GetPath(libConfig.DstPath, libConfig.DstType)
-		if err != nil {
-			return err
-		}
-		dstDir := libraryBaseDir.Join(GenFloder(libConfig, info)...)
-
-		item, err := schemas.NewMediaItem(videoMeta, info)
-		if err != nil {
-			return fmt.Errorf("创建媒体项失败：%w", err)
-		}
-		_, err = ArchiveMedia(src, dstDir, libConfig.TransferType, item, info)
-		if err != nil {
-			return fmt.Errorf("转移媒体文件失败：%w", err)
-		}
-		successNum++
-		return nil
-	}
-
-	if src.Type == storage.FileTypeDirectory {
-		logrus.Info("正在处理目录：", src.Path)
-		iter, err := storage_controller.IterFiles(src)
-		if err != nil {
-			return fmt.Errorf("遍历目录 %s 失败：%w", src.Path, err)
-		}
-		for file, err := range iter {
-			if err != nil {
-				logrus.Warningf("处理文件 %s 时出错：%v", file.Path, err)
-				continue
-			}
-			if file.Type == storage.FileTypeDirectory {
-				logrus.Debugf("跳过目录：%s", file.Path)
-				continue
-			}
-			err = fn(file)
-			if err != nil {
-				logrus.Warningf("处理文件 %s 时出错：%v", file.Path, err)
-			}
-		}
-		logrus.Infof("目录「%s」处理完成，成功：%d，", src.String(), successNum)
-	} else {
-		logrus.Info("正在处理文件：", src.Path)
-		err := fn(src)
-		if err != nil {
-			return fmt.Errorf("处理文件 %s 时出错：%w", src.Path, err)
-		}
-		logrus.Info("媒体文件处理完成：", src.Path)
-	}
-
-	return nil
 }
