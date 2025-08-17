@@ -67,6 +67,64 @@ func MatchCategory(cs []Category, countries []string, language string, genreIDs 
 	return "未分类"
 }
 
+// GenMediaTypeFloderName 生成媒体类型的文件夹名称
+// mediaType: 媒体类型
+// 返回值: 文件夹名称
+// 注意：如果不支持的媒体类型，返回空字符串
+func GenMediaTypeFloderName(mediaType meta.MediaType) string {
+	lock.RLock()
+	defer lock.RUnlock()
+
+	switch mediaType {
+	case meta.MediaTypeMovie:
+		return "电影"
+	case meta.MediaTypeTV:
+		return "电视剧"
+	default:
+		return ""
+	}
+}
+
+// GenCategoryFloderName 生成分类文件夹名称
+// info: 媒体信息
+// 返回值: 分类文件夹名称
+// 注意：如果没有匹配的分类，返回空字符串
+func GenCategoryFloderName(info *schemas.MediaInfo) string {
+	lock.RLock()
+	defer lock.RUnlock()
+
+	switch info.MediaType {
+	case meta.MediaTypeMovie:
+		var genres []int
+		var countries []string
+
+		for _, country := range info.TMDBInfo.MovieInfo.ProductionCountries {
+			countries = append(countries, country.Iso31661)
+		}
+		language := info.TMDBInfo.MovieInfo.OriginalLanguage
+		for _, genre := range info.TMDBInfo.MovieInfo.Genres {
+			genres = append(genres, genre.ID)
+		}
+		return MatchCategory(categoryConfig.MovieCategories, countries, language, genres)
+
+	case meta.MediaTypeTV:
+		var genres []int
+		var countries []string
+
+		for _, country := range info.TMDBInfo.TVInfo.SerieInfo.ProductionCountries {
+			countries = append(countries, country.Iso31661)
+		}
+		language := info.TMDBInfo.TVInfo.SerieInfo.OriginalLanguage
+		for _, genre := range info.TMDBInfo.TVInfo.SerieInfo.Genres {
+			genres = append(genres, genre.ID)
+		}
+		return MatchCategory(categoryConfig.TVCategories, countries, language, genres)
+
+	default:
+		return ""
+	}
+}
+
 func GenFloder(libConfig *config.LibraryConfig, info *schemas.MediaInfo) []string {
 	lock.RLock()
 	defer lock.RUnlock()
