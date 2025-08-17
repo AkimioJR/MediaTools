@@ -590,7 +590,7 @@ const docTemplate = `{
                 "dst_dir": {
                     "$ref": "#/definitions/schemas.FileInfoRequest"
                 },
-                "need_scrape": {
+                "scrape": {
                     "type": "boolean"
                 },
                 "src_file": {

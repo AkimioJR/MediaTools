@@ -131,7 +131,7 @@ definitions:
     properties:
       dst_dir:
         $ref: '#/definitions/schemas.FileInfoRequest'
-      need_scrape:
+      scrape:
         type: boolean
       src_file:
         $ref: '#/definitions/schemas.FileInfoRequest'
