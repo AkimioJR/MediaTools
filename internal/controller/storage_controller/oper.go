@@ -243,7 +243,7 @@ func IterFiles(dir storage.StoragePath) (iter.Seq2[*storage.StorageFileInfo, err
 	if err != nil {
 		return nil, err
 	}
-	if dirInfo.FileType != storage.FileTypeDirectory {
+	if dirInfo.Type != storage.FileTypeDirectory {
 		return nil, errs.ErrNotADirectory
 	}
 
@@ -278,7 +278,7 @@ func iterFilesRecursive(provider storage.StorageProvider, dirPath string, yield 
 			continue
 		}
 
-		if info.FileType == storage.FileTypeDirectory {
+		if info.Type == storage.FileTypeDirectory {
 			// 如果是目录，递归遍历
 			iterFilesRecursive(provider, info.Path, yield)
 		} else {
