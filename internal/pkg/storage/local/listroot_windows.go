@@ -25,7 +25,7 @@ func (s *LocalStorage) ListRoot() (iter.Seq2[string, error], error) {
 	return func(yield func(string, error) bool) {
 		for i := range uint(26) { // 遍历所有驱动器
 			if drives&(1<<i) != 0 {
-				drive := string([]byte{byte('C' + i), ':', '/'})
+				drive := string([]byte{byte('A' + i), ':', '/'})
 				if !yield(drive, nil) {
 					return
 				}
