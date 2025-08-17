@@ -157,7 +157,7 @@ func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePat
 			return nil, fmt.Errorf("解析集数偏移表达式失败：%w", err)
 		}
 		videoMeta.Episode = offsetEpisode
-		msgs = append(msgs, fmt.Sprintf("集数偏移：%s，计算结果：%d", episodeOffset, offsetEpisode))
+		msgs = append(msgs, fmt.Sprintf("集数偏移：%s, 计算结果: %d", episodeOffset, offsetEpisode))
 	}
 
 	if part != "" {
@@ -180,7 +180,7 @@ func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePat
 		dstDir = dstDir.Join(GenCategoryFloderName(info))
 	}
 
-	logrus.Infof("开始转移媒体文件：%s，目标目录：%s，转移类型：%s，组织方式：%t，分类方式：%t，刮削：%t",
+	logrus.Infof("开始转移媒体文件：%s, 目标目录: %s, 转移方式: %s, 是否按照类型分类整理: %t, 是否按照分类整理: %t, 是否刮削: %t",
 		srcFile.String(), dstDir.String(), transferType, organizeByType, organizeByCategory, scrape)
 
 	item, err := schemas.NewMediaItem(videoMeta, info)
