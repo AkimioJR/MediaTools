@@ -109,7 +109,7 @@ func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePat
 	transferType storage.TransferType, mediaType meta.MediaType,
 	tmdbID int, season int, episodeStr string, episodeOffset string,
 	part string, organizeByType bool, organizeByCategory bool, scrape bool,
-) error {
+) (storage.StoragePath, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -142,7 +142,7 @@ func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePat
 	if episodeStr != "" {
 		startEpisode, endEpisode, err := parseEpisodeStr(episodeStr)
 		if err != nil {
-			return fmt.Errorf("解析集数失败: %w", err)
+			return nil, fmt.Errorf("解析集数失败: %w", err)
 		}
 		videoMeta.Episode = startEpisode
 		videoMeta.EndEpisode = endEpisode
@@ -154,7 +154,7 @@ func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePat
 	} else if episodeOffset != "" { // 当 episodeStr 为空时，才使用 episodeOffset
 		offsetEpisode, err := wordmatch.ParseOffsetExpr(episodeOffset, videoMeta.Episode)
 		if err != nil {
-			return fmt.Errorf("解析集数偏移表达式失败：%w", err)
+			return nil, fmt.Errorf("解析集数偏移表达式失败：%w", err)
 		}
 		videoMeta.Episode = offsetEpisode
 		msgs = append(msgs, fmt.Sprintf("集数偏移：%s，计算结果：%d", episodeOffset, offsetEpisode))
@@ -170,7 +170,7 @@ func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePat
 
 	info, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
 	if err != nil {
-		return fmt.Errorf("识别媒体信息失败：%w", err)
+		return nil, fmt.Errorf("识别媒体信息失败：%w", err)
 	}
 
 	if organizeByType {
@@ -185,19 +185,19 @@ func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePat
 
 	item, err := schemas.NewMediaItem(videoMeta, info)
 	if err != nil {
-		return fmt.Errorf("创建媒体项失败：%w", err)
+		return nil, fmt.Errorf("创建媒体项失败：%w", err)
 	}
 
-	var dst storage.StoragePath
+	var dstFile storage.StoragePath
 	if scrape {
-		dst, err = ArchiveMedia(srcFile, dstDir, transferType, item, info)
+		dstFile, err = ArchiveMedia(srcFile, dstDir, transferType, item, info)
 	} else {
-		dst, err = ArchiveMedia(srcFile, dstDir, transferType, item, nil)
+		dstFile, err = ArchiveMedia(srcFile, dstDir, transferType, item, nil)
 	}
 
 	if err != nil {
-		return fmt.Errorf("转移媒体文件失败：%w", err)
+		return nil, fmt.Errorf("转移媒体文件失败：%w", err)
 	}
-	logrus.Infof("媒体文件转移成功：%s -> %s", srcFile.String(), dst.String())
-	return nil
+	logrus.Infof("媒体文件转移成功：%s -> %s", srcFile.String(), dstFile.String())
+	return dstFile, nil
 }
