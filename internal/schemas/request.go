@@ -38,15 +38,18 @@ type RenameRequest struct {
 }
 
 type ArchiveMediaManualRequest struct {
-	SrcFile            FileInfoRequest `json:"src_file" binding:"required"`
-	DstDir             FileInfoRequest `json:"dst_dir" binding:"required"`
-	MediaType          meta.MediaType  `json:"media_type"`
-	TMDBID             int             `json:"tmdb_id"`
-	Season             int             `json:"season"`
-	EpisodeStr         string          `json:"episode_str"`
-	EpisodeOffset      string          `json:"episode_offset"`
-	Part               string          `json:"part"`
-	OrganizeByType     bool            `json:"organize_by_type"`
-	OrganizeByCategory bool            `json:"organize_by_category"`
-	Scrape             bool            `json:"scrape"`
+	SrcFile            FileInfoRequest      `json:"src_file" binding:"required"`
+	DstDir             FileInfoRequest      `json:"dst_dir" binding:"required"`
+	TransferType       storage.TransferType `json:"transfer_type" binding:"required"`
+	OrganizeByType     bool                 `json:"organize_by_type" binding:"required"`
+	OrganizeByCategory bool                 `json:"organize_by_category" binding:"required"`
+	Scrape             bool                 `json:"scrape" binding:"required"`
+
+	// 可选字段
+	MediaType     meta.MediaType `json:"media_type"`
+	TMDBID        int            `json:"tmdb_id"`
+	Season        int            `json:"season"`
+	EpisodeStr    string         `json:"episode_str"`
+	EpisodeOffset string         `json:"episode_offset"`
+	Part          string         `json:"part"`
 }
