@@ -244,7 +244,7 @@ func IterFiles(dir storage.StoragePath) (iter.Seq2[*storage.StorageFileInfo, err
 		return nil, err
 	}
 	if !dirInfo.IsDir {
-		return nil, errs.ErrStorageProviderNotFound // 或者定义一个新的错误类型
+		return nil, errs.ErrNotADirectory
 	}
 
 	return func(yield func(*storage.StorageFileInfo, error) bool) {
