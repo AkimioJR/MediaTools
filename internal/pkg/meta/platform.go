@@ -1,6 +1,9 @@
 package meta
 
-import "strings"
+import (
+	"encoding/json"
+	"strings"
+)
 
 // StreamingPlatforms 表示流媒体平台的唯一标识符（uint32的别名）
 type StreamingPlatform uint32
@@ -74,4 +77,17 @@ func ParseStreamingPlatform(s string) StreamingPlatform {
 	default:
 		return UnknownStreamingPlatform
 	}
+}
+
+func (sp StreamingPlatform) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + sp.String() + `"`), nil
+}
+
+func (sp *StreamingPlatform) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	*sp = ParseStreamingPlatform(s)
+	return nil
 }
