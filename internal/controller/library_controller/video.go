@@ -5,11 +5,15 @@ import (
 	"MediaTools/internal/controller/recognize_controller"
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/controller/storage_controller"
+	"MediaTools/internal/controller/tmdb_controller"
+	"MediaTools/internal/pkg/meta"
+	"MediaTools/internal/pkg/wordmatch"
 	"MediaTools/internal/schemas"
 	"MediaTools/internal/schemas/storage"
 	"MediaTools/utils"
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -99,4 +103,101 @@ func ArchiveMedia(
 		}
 	}
 	return dstPath, nil
+}
+
+func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePath,
+	transferType storage.TransferType, mediaType meta.MediaType,
+	tmdbID int, season int, episodeStr string, episodeOffset string,
+	part string, organizeByType bool, organizeByCategory bool, scrape bool,
+) error {
+	lock.RLock()
+	defer lock.RUnlock()
+
+	videoMeta, rule1, rule2 := recognize_controller.ParseVideoMeta(srcFile.GetName())
+	switch {
+	case rule1 != "" && rule2 != "":
+		logrus.Debugf("解析视频元数据: %s，匹配的自定义规则：%s，应用的自定义媒体规则：%s", srcFile.GetName(), rule1, rule2)
+	case rule1 != "":
+		logrus.Debugf("解析视频元数据: %s，匹配的自定义规则：%s", srcFile.GetName(), rule1)
+	case rule2 != "":
+		logrus.Debugf("解析视频元数据: %s，应用的自定义媒体规则：%s", srcFile.GetName(), rule2)
+	default:
+		logrus.Debugf("解析视频元数据: %s，没有匹配到自定义规则和应用的自定义媒体规则", srcFile.GetName())
+	}
+
+	var msgs []string
+	if mediaType != meta.MediaTypeUnknown {
+		videoMeta.MediaType = mediaType
+		msgs = append(msgs, fmt.Sprintf("媒体类型: %s", mediaType))
+	}
+	if tmdbID != 0 {
+		videoMeta.TMDBID = tmdbID
+		msgs = append(msgs, fmt.Sprintf("TMDB ID: %d", tmdbID))
+	}
+	if season >= -1 {
+		videoMeta.Season = season
+		msgs = append(msgs, fmt.Sprintf("季数: %d", season))
+	}
+
+	if episodeStr != "" {
+		startEpisode, endEpisode, err := parseEpisodeStr(episodeStr)
+		if err != nil {
+			return fmt.Errorf("解析集数失败: %w", err)
+		}
+		videoMeta.Episode = startEpisode
+		videoMeta.EndEpisode = endEpisode
+		if endEpisode != 0 {
+			msgs = append(msgs, fmt.Sprintf("集数范围: %d-%d", startEpisode, endEpisode))
+		} else {
+			msgs = append(msgs, fmt.Sprintf("集数: %d", startEpisode))
+		}
+	} else if episodeOffset != "" { // 当 episodeStr 为空时，才使用 episodeOffset
+		offsetEpisode, err := wordmatch.ParseOffsetExpr(episodeOffset, videoMeta.Episode)
+		if err != nil {
+			return fmt.Errorf("解析集数偏移表达式失败：%w", err)
+		}
+		videoMeta.Episode = offsetEpisode
+		msgs = append(msgs, fmt.Sprintf("集数偏移：%s，计算结果：%d", episodeOffset, offsetEpisode))
+	}
+
+	if part != "" {
+		videoMeta.Part = part
+		msgs = append(msgs, fmt.Sprintf("指定分段: %s", part))
+	}
+	if len(msgs) > 0 {
+		logrus.Infof("更新 %s 媒体元数据：%s", srcFile.GetName(), strings.Join(msgs, ", "))
+	}
+
+	info, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
+	if err != nil {
+		return fmt.Errorf("识别媒体信息失败：%w", err)
+	}
+
+	if organizeByType {
+		dstDir = dstDir.Join(GenMediaTypeFloderName(videoMeta.MediaType))
+	}
+	if organizeByCategory {
+		dstDir = dstDir.Join(GenCategoryFloderName(info))
+	}
+
+	logrus.Infof("开始转移媒体文件：%s，目标目录：%s，转移类型：%s，组织方式：%t，分类方式：%t，刮削：%t",
+		srcFile.String(), dstDir.String(), transferType, organizeByType, organizeByCategory, scrape)
+
+	item, err := schemas.NewMediaItem(videoMeta, info)
+	if err != nil {
+		return fmt.Errorf("创建媒体项失败：%w", err)
+	}
+
+	var dst storage.StoragePath
+	if scrape {
+		dst, err = ArchiveMedia(srcFile, dstDir, transferType, item, info)
+	} else {
+		dst, err = ArchiveMedia(srcFile, dstDir, transferType, item, nil)
+	}
+
+	if err != nil {
+		return fmt.Errorf("转移媒体文件失败：%w", err)
+	}
+	logrus.Infof("媒体文件转移成功：%s -> %s", srcFile.String(), dst.String())
+	return nil
 }
