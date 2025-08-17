@@ -26,7 +26,7 @@ func (s *LocalStorage) GetTransferType() []storage.TransferType {
 }
 
 func (*LocalStorage) GetDetail(path string) (*storage.StorageFileInfo, error) {
-	info, err := os.Stat(filepath.Clean(path))
+	info, err := os.Stat(filepath.FromSlash(path))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, errs.ErrFileNotFound
