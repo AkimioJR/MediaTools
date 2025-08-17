@@ -36,3 +36,17 @@ type RenameRequest struct {
 	Path    string `json:"path" binding:"required"`
 	NewName string `json:"new_name" binding:"required"`
 }
+
+type ArchiveMediaManualRequest struct {
+	SrcFile            FileInfoRequest `json:"src_file" binding:"required"`
+	DstDir             FileInfoRequest `json:"dst_dir" binding:"required"`
+	MediaType          meta.MediaType  `json:"media_type"`
+	TMDBID             int             `json:"tmdb_id"`
+	Season             int             `json:"season"`
+	EpisodeStr         string          `json:"episode_str"`
+	EpisodeOffset      string          `json:"episode_offset"`
+	Part               string          `json:"part"`
+	OrganizeByType     bool            `json:"organize_by_type"`
+	OrganizeByCategory bool            `json:"organize_by_category"`
+	Scrape             bool            `json:"scrape"`
+}
