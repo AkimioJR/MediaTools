@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"MediaTools/utils"
 	pathlib "path"
 	"strings"
 	"time"
@@ -21,7 +22,7 @@ type StoragePath interface {
 func NewStoragePath(storageType StorageType, path string) StoragePath {
 	return &StorageFileInfo{
 		StorageType: storageType,
-		Path:        pathlib.Clean(path),
+		Path:        utils.ToPosixPath(path),
 		Name:        pathlib.Base(path),
 		Ext:         pathlib.Ext(path),
 	}

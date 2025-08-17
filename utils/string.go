@@ -2,6 +2,7 @@ package utils
 
 import (
 	"MediaTools/extensions"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strings"
@@ -212,4 +213,10 @@ func FuzzyMatching(text string, patterns ...string) bool {
 		}
 	}
 	return false
+}
+
+func ToPosixPath(p string) string {
+	p = filepath.Clean(p)
+	p = strings.ReplaceAll(p, "\\", "/")
+	return p
 }
