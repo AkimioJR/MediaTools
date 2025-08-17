@@ -52,30 +52,30 @@ func (sp StreamingPlatform) String() string {
 }
 
 // ParseResourceType 从字符串解析资源类型
-func ParseStreamingPlatform(s string) StreamingPlatform {
+func (sp *StreamingPlatform) ParseString(s string) {
 	switch strings.ToUpper(s) {
 	case "AMAZON", "AMZN":
-		return Amazon
+		*sp = Amazon
 	case "NETFLIX", "NF":
-		return Netflix
+		*sp = Netflix
 	case "APPLE TV+", "ATVP":
-		return AppleTV
+		*sp = AppleTV
 	case "ITUNES", "iT":
-		return ITunes
+		*sp = ITunes
 	case "DISNEY+", "DSNP":
-		return Disney
+		*sp = Disney
 	case "BAHA":
-		return Baha
+		*sp = Baha
 	case "BILIBILI", "BILI":
-		return BiliBili
+		*sp = BiliBili
 	case "B-GLOBAL", "BG":
-		return BiliGlobal
+		*sp = BiliGlobal
 	case "CRUNCHYROLL", "CR":
-		return Crunchyroll
+		*sp = Crunchyroll
 	case "YOUTUBE", "YT":
-		return YouTube
+		*sp = YouTube
 	default:
-		return UnknownStreamingPlatform
+		*sp = UnknownStreamingPlatform
 	}
 }
 
@@ -88,6 +88,6 @@ func (sp *StreamingPlatform) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	*sp = ParseStreamingPlatform(s)
+	sp.ParseString(s)
 	return nil
 }

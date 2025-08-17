@@ -887,7 +887,8 @@ func (meta *VideoMeta) parsePlatform(s *parseState) {
 	nextToken := s.tokens.Peek()
 
 	// 检查当前token是否为流媒体平台
-	p := ParseStreamingPlatform(token)
+	var p StreamingPlatform
+	p.ParseString(token)
 	if p != UnknownStreamingPlatform {
 		platformName = p.String()
 	} else {
@@ -914,7 +915,7 @@ func (meta *VideoMeta) parsePlatform(s *parseState) {
 				} else {
 					combinedToken = adjacent.token + separator + token
 				}
-				p := ParseStreamingPlatform(combinedToken)
+				p.ParseString(combinedToken)
 				if p != UnknownStreamingPlatform {
 					platformName = p.String()
 					queryRange = 2
@@ -961,7 +962,7 @@ func (meta *VideoMeta) parsePlatform(s *parseState) {
 	}
 
 	if hasWebToken {
-		meta.Platform = ParseStreamingPlatform(platformName)
+		meta.Platform.ParseString(platformName)
 		s.lastType = lastTokenTypePlatform
 		s.continueFlag = false
 		s.stopNameFlag = true
