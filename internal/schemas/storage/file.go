@@ -28,19 +28,19 @@ func NewStoragePath(storageType StorageType, path string) StoragePath {
 }
 
 type StorageFileInfo struct {
-	StorageType StorageType `json:"storage_type"`       // 存储系统类型
-	Path        string      `json:"path"`               // 文件路径
-	Name        string      `json:"name"`               // 文件名
-	Ext         string      `json:"ext"`                // 文件扩展名
-	Size        int64       `json:"size,omitempty"`     // 文件大小
-	IsDir       bool        `json:"is_dir,omitempty"`   // 是否为目录
-	ModTime     time.Time   `json:"mod_time,omitempty"` // 文件修改时间
+	StorageType StorageType `json:"storage_type"`        // 存储系统类型
+	Path        string      `json:"path"`                // 文件路径
+	Name        string      `json:"name"`                // 文件名
+	Ext         string      `json:"ext"`                 // 文件扩展名
+	Size        int64       `json:"size,omitempty"`      // 文件大小
+	FileType    FileType    `json:"file_type,omitempty"` // 文件类型
+	ModTime     time.Time   `json:"mod_time,omitempty"`  // 文件修改时间
 }
 
-func NewFileInfo(storageType StorageType, path string, size int64, isDir bool, modTime time.Time) *StorageFileInfo {
+func NewFileInfo(storageType StorageType, path string, size int64, ft FileType, modTime time.Time) *StorageFileInfo {
 	fi := NewStoragePath(storageType, path).(*StorageFileInfo)
 	fi.Size = size
-	fi.IsDir = isDir
+	fi.FileType = ft
 	fi.ModTime = modTime
 	return fi
 }

@@ -7,6 +7,7 @@ import (
 	"iter"
 	"os"
 	pathlib "path"
+	"path/filepath"
 )
 
 type LocalStorage struct {
@@ -32,12 +33,17 @@ func (*LocalStorage) GetDetail(path string) (*storage.StorageFileInfo, error) {
 		}
 		return nil, err
 	}
-
+	var ft storage.FileType
+	if info.IsDir() {
+		ft = storage.FileTypeDirectory
+	} else {
+		ft = storage.FileTypeFile
+	}
 	return storage.NewFileInfo(
 		storage.StorageLocal,
 		path,
 		info.Size(),
-		info.IsDir(),
+		ft,
 		info.ModTime(),
 	), nil
 }

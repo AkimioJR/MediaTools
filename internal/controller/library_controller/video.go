@@ -65,7 +65,7 @@ func ArchiveMedia(
 					logrus.Warningf("获取文件 %s 详情失败，跳过转移字幕/音轨文件：%v", path, err)
 					continue // 跳过获取详情失败的文件
 				}
-				if info.IsDir {
+				if info.FileType == storage.FileTypeDirectory {
 					logrus.Debugf("跳过目录：%s", info.Path)
 					continue // 跳过目录
 				}
@@ -141,7 +141,7 @@ func ArchiveMediaSmart(src *storage.StorageFileInfo) error {
 		return nil
 	}
 
-	if src.IsDir {
+	if src.FileType == storage.FileTypeDirectory {
 		logrus.Info("正在处理目录：", src.Path)
 		iter, err := storage_controller.IterFiles(src)
 		if err != nil {
@@ -152,7 +152,7 @@ func ArchiveMediaSmart(src *storage.StorageFileInfo) error {
 				logrus.Warningf("处理文件 %s 时出错：%v", file.Path, err)
 				continue
 			}
-			if file.IsDir {
+			if file.FileType == storage.FileTypeDirectory {
 				logrus.Debugf("跳过目录：%s", file.Path)
 				continue
 			}
