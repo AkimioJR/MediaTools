@@ -47,7 +47,7 @@ func (sp StreamingPlatform) String() string {
 	case YouTube:
 		return "YouTube"
 	default:
-		return ""
+		return "UnknownStreamingPlatform"
 	}
 }
 
