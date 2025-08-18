@@ -2,6 +2,7 @@ package fanart
 
 import (
 	"MediaTools/pkg/limiter"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"image"
@@ -97,16 +98,30 @@ func (client *FanartClient) DoRequest(method string, path string, query url.Valu
 }
 
 func (client *FanartClient) DownloadImage(url string) (image.Image, error) {
-	resp, err := client.client.Get(url)
+	cacheKey := "image|" + url
+
+	var (
+		data []byte
+		err  error
+	)
+	data, err = client.cache.Get(cacheKey)
 	if err != nil {
-		return nil, NewFanartError(fmt.Sprintf("下载图片「%s」失败", url), err)
+		resp, err := client.client.Get(url)
+		if err != nil {
+			return nil, NewFanartError(fmt.Sprintf("下载图片「%s」失败", url), err)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return nil, NewFanartError(fmt.Sprintf("下载图片「%s」失败，HTTP code: %d", url, resp.StatusCode), nil)
+		}
+		defer resp.Body.Close()
+		data, err = io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, NewFanartError(fmt.Sprintf("读取图片「%s」响应体失败", url), err)
+		}
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return nil, NewFanartError(fmt.Sprintf("下载图片「%s」失败，HTTP code: %d", url, resp.StatusCode), nil)
-	}
-	defer resp.Body.Close()
-	img, _, err := image.Decode(resp.Body)
+
+	img, _, err := image.Decode(bytes.NewReader(data))
 	if err != nil {
 		return nil, NewFanartError(fmt.Sprintf("解码图片「%s」失败", url), err)
 	}
