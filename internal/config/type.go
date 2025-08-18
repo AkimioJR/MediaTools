@@ -59,6 +59,8 @@ type LibraryConfig struct {
 	TransferType       storage.TransferType `json:"transfer_type" yaml:"transfer_type"`               // 传输类型
 	OrganizeByType     bool                 `json:"organize_by_type" yaml:"organize_by_type"`         // 是否按类型分文件夹
 	OrganizeByCategory bool                 `json:"organize_by_category" yaml:"organize_by_category"` // 是否按分类分文件夹
+	Scrape             bool                 `json:"scrape" yaml:"scrape"`                             // 是否刮削
+	Notify             bool                 `json:"notify" yaml:"notify"`                             // 是否通知
 }
 
 type CustomWordConfig struct {
