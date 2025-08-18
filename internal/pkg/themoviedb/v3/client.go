@@ -2,6 +2,7 @@ package themoviedb
 
 import (
 	"MediaTools/pkg/limiter"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"image"
@@ -159,18 +160,37 @@ func (c *Client) GetImageURL(path string) string {
 
 func (c *Client) DownloadImage(path string) (image.Image, error) {
 	url := c.GetImageURL(path)
-	resp, err := c.client.Get(url)
+
+	cacheKey := "IMAGE" + "|" + url
+
+	var (
+		data []byte
+		err  error
+	)
+	data, err = c.cache.Get(cacheKey)
 	if err != nil {
-		return nil, NewTMDBError(err, fmt.Sprintf("下载图片「%s」失败", url))
+		resp, err := c.client.Get(url)
+		if err != nil {
+			return nil, NewTMDBError(err, fmt.Sprintf("下载图片「%s」失败", url))
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return nil, NewTMDBError(nil, fmt.Sprintf("下载图片「%s」失败，HTTP code: %d", url, resp.StatusCode))
+		}
+		data, err = io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, NewTMDBError(err, fmt.Sprintf("读取图片「%s」失败", url))
+		}
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return nil, NewTMDBError(nil, fmt.Sprintf("下载图片「%s」失败，HTTP code: %d", url, resp.StatusCode))
-	}
-	defer resp.Body.Close()
-	img, _, err := image.Decode(resp.Body)
+
+	img, _, err := image.Decode(bytes.NewReader(data))
 	if err != nil {
 		return nil, NewTMDBError(err, fmt.Sprintf("解码图片「%s」失败", url))
 	}
+
+	go func() {
+		c.cache.Set(cacheKey, data)
+	}()
+
 	return img, nil
 }
