@@ -17,9 +17,7 @@ import (
 // @Produce json
 func TMDB(ctx *gin.Context) {
 	var resp schemas.Response[*config.TMDBConfig]
-	resp.Success = true
-	resp.Data = &config.TMDB
-	resp.RespondJSON(ctx, http.StatusOK)
+	resp.RespondSuccessJSON(ctx, &config.TMDB)
 }
 
 // @Router /config/tmdb [post]
