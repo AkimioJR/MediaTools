@@ -2,6 +2,7 @@ package wordmatch
 
 import (
 	"MediaTools/utils"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -18,7 +19,7 @@ func NewWordsMatcher(lines []string) (*WordsMatcher, error) {
 		}
 		cw, err := ParseLine(line)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("解析 %s 内容出错: %w", line, err)
 		}
 		matcher.rules = append(matcher.rules, cw)
 	}
