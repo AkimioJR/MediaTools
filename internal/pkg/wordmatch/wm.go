@@ -29,14 +29,17 @@ func NewWordsMatcher(words []string) (*WordsMatcher, error) {
 func (wm *WordsMatcher) MatchAndProcess(title string) (string, string) {
 	var rule string // 匹配到的规则
 	for _, word := range wm.words {
+		firstMatch := false            // 每次匹配前重置
 		if word.replaceFromRe != nil { // 替换被替换词
 			if word.replaceFromRe.MatchString(title) {
 				rule = word.originalStr
 				title = word.replaceFromRe.ReplaceAllString(title, word.ReplaceTo)
-				break // 替换后直接跳出循环
+				firstMatch = true // 标记为第一次匹配成功
 			}
+		} else {
+			firstMatch = true // 如果没有替换词正则，则直接标记为第一次匹配成功
 		}
-		if word.PrefixWord != "" && word.SuffixWord != "" && word.OffsetExpr != "" { // 前后定位词和偏移量表达式
+		if firstMatch && word.PrefixWord != "" && word.SuffixWord != "" && word.OffsetExpr != "" { // 前后定位词和偏移量表达式
 			prefixIndex := strings.Index(title, word.PrefixWord)
 			suffixIndex := strings.Index(title, word.SuffixWord)
 
