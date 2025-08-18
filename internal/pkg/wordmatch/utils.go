@@ -54,7 +54,7 @@ func ParseEpisodeExpr(expr string) ([3]string, error) {
 	return [3]string{strings.TrimSpace(strs1[0]), strings.TrimSpace(strs2[0]), strings.TrimSpace(strs2[1])}, nil
 }
 
-func ParseLine(s string) (*CustomWord, error) {
+func ParseLine(s string) (*CustomWordRule, error) {
 	var (
 		replceStrs  [2]string
 		episodeStrs [3]string
@@ -114,7 +114,7 @@ func ParseLine(s string) (*CustomWord, error) {
 		replceStrs[0] = trimmed
 	}
 
-	cw := &CustomWord{
+	cw := &CustomWordRule{
 		ReplaceFrom: replceStrs[0],
 		ReplaceTo:   replceStrs[1],
 		PrefixWord:  episodeStrs[0],

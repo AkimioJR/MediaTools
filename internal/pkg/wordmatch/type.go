@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-type CustomWord struct {
+type CustomWordRule struct {
 	ReplaceFrom string `json:"replace_from"` // 被替换词
 	ReplaceTo   string `json:"replace_to"`   // 替换词
 	PrefixWord  string `json:"prefix_word"`  // 前定位词
@@ -16,7 +16,7 @@ type CustomWord struct {
 	originalStr   string         // 原始规则字符串
 }
 
-func (cw *CustomWord) Compile() error {
+func (cw *CustomWordRule) Compile() error {
 	var err error
 	if cw.ReplaceFrom != "" {
 		cw.replaceFromRe, err = regexp.Compile(cw.ReplaceFrom)

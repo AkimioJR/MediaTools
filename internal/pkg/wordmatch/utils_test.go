@@ -37,13 +37,13 @@ func TestParseOffsetExpr(t *testing.T) {
 func TestParseLine(t *testing.T) {
 	tests := []struct {
 		input       string
-		expected    *wordmatch.CustomWord
+		expected    *wordmatch.CustomWordRule
 		shouldError bool
 		description string
 	}{
 		{
 			input: "被驅逐出勇者隊伍的白魔導師，被.S.級冒險者撿到",
-			expected: &wordmatch.CustomWord{
+			expected: &wordmatch.CustomWordRule{
 				ReplaceFrom: "被驅逐出勇者隊伍的白魔導師，被.S.級冒險者撿到",
 				ReplaceTo:   "",
 				PrefixWord:  "",
@@ -55,7 +55,7 @@ func TestParseLine(t *testing.T) {
 		},
 		{
 			input: "被驅逐出勇者隊伍的白魔導師，被.S.級冒險者撿到 => {[tmdbid=284771;type=tv;s=1]}被驅逐出勇者隊伍的白魔導師，被S級冒險者撿到",
-			expected: &wordmatch.CustomWord{
+			expected: &wordmatch.CustomWordRule{
 				ReplaceFrom: "被驅逐出勇者隊伍的白魔導師，被.S.級冒險者撿到",
 				ReplaceTo:   "{[tmdbid=284771;type=tv;s=1]}被驅逐出勇者隊伍的白魔導師，被S級冒險者撿到",
 				PrefixWord:  "",
@@ -67,7 +67,7 @@ func TestParseLine(t *testing.T) {
 		},
 		{
 			input: "前缀 <> 后缀 >> 2*EP",
-			expected: &wordmatch.CustomWord{
+			expected: &wordmatch.CustomWordRule{
 				ReplaceFrom: "",
 				ReplaceTo:   "",
 				PrefixWord:  "前缀",
@@ -79,7 +79,7 @@ func TestParseLine(t *testing.T) {
 		},
 		{
 			input: "我們不可能成為戀人！絕對不行。（※似乎可行？） => {[tmdbid=277513;type=tv;s=1]}我们不可能成为恋人！绝对不行。 (※似乎可行？) && 前缀 <> 后缀 >> 2*EP",
-			expected: &wordmatch.CustomWord{
+			expected: &wordmatch.CustomWordRule{
 				ReplaceFrom: "我們不可能成為戀人！絕對不行。（※似乎可行？）",
 				ReplaceTo:   "{[tmdbid=277513;type=tv;s=1]}我们不可能成为恋人！绝对不行。 (※似乎可行？)",
 				PrefixWord:  "前缀",
@@ -91,7 +91,7 @@ func TestParseLine(t *testing.T) {
 		},
 		{
 			input: "地縛少年花子君.2 => {[tmdbid=95269;type=tv;s=2]}地缚少年花子君 S02 && 前缀 <> 后缀 >> EP-1",
-			expected: &wordmatch.CustomWord{
+			expected: &wordmatch.CustomWordRule{
 				ReplaceFrom: "地縛少年花子君.2",
 				ReplaceTo:   "{[tmdbid=95269;type=tv;s=2]}地缚少年花子君 S02",
 				PrefixWord:  "前缀",
@@ -103,7 +103,7 @@ func TestParseLine(t *testing.T) {
 		},
 		{
 			input: `Lycoris Recoil 莉可麗絲：友誼是時間的竊賊 - => {[tmdbid=154494;type=tv;s=0]}莉可丽丝 S00 E && E <> \[1080P\] >> EP+4`,
-			expected: &wordmatch.CustomWord{
+			expected: &wordmatch.CustomWordRule{
 				ReplaceFrom: "Lycoris Recoil 莉可麗絲：友誼是時間的竊賊 -",
 				ReplaceTo:   "{[tmdbid=154494;type=tv;s=0]}莉可丽丝 S00 E",
 				PrefixWord:  "E",
