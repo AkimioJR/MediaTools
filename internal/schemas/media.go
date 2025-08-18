@@ -91,37 +91,47 @@ func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error
 		TMDBID: info.TMDBID,
 		IMDBID: info.IMDBID,
 		TVDBID: info.TVDBID,
+
+		Season:  -1, // 先强制设置成-1
+		Episode: -1,
 	}
 
 	switch info.MediaType {
 	case meta.MediaTypeMovie:
-		item.Title = info.TMDBInfo.MovieInfo.Title
-		item.OriginalTitle = info.TMDBInfo.MovieInfo.OriginalTitle
-		year, err := strconv.Atoi(info.TMDBInfo.MovieInfo.ReleaseDate[:4])
-		if err == nil {
-			item.Year = year
+		if info.TMDBInfo.MovieInfo != nil {
+			item.Title = info.TMDBInfo.MovieInfo.Title
+			item.OriginalTitle = info.TMDBInfo.MovieInfo.OriginalTitle
+			year, err := strconv.Atoi(info.TMDBInfo.MovieInfo.ReleaseDate[:4])
+			if err == nil {
+				item.Year = year
+			}
 		}
-		// 电影类型数据强制将季集数设置为 -1
-		item.Season = -1
-		item.Episode = -1
 
 	case meta.MediaTypeTV:
-		item.Title = info.TMDBInfo.TVInfo.SerieInfo.Name
-		item.OriginalTitle = info.TMDBInfo.TVInfo.SerieInfo.OriginalName
-		year, err := strconv.Atoi(info.TMDBInfo.TVInfo.SerieInfo.FirstAirDate[:4])
-		if err == nil {
-			item.Year = year
+		if info.TMDBInfo.TVInfo.SerieInfo != nil {
+			item.Title = info.TMDBInfo.TVInfo.SerieInfo.Name
+			item.OriginalTitle = info.TMDBInfo.TVInfo.SerieInfo.OriginalName
+			year, err := strconv.Atoi(info.TMDBInfo.TVInfo.SerieInfo.FirstAirDate[:4])
+			if err == nil {
+				item.Year = year
+			}
 		}
+
 		item.Season = videoMeta.Season
 		item.SeasonStr = videoMeta.GetSeasonStr()
-		year, err = strconv.Atoi(info.TMDBInfo.TVInfo.SeasonInfo.AirDate[:4])
-		if err == nil {
-			item.SeasonYear = year
+		if info.TMDBInfo.TVInfo.SeasonInfo != nil {
+			year, err := strconv.Atoi(info.TMDBInfo.TVInfo.SeasonInfo.AirDate[:4])
+			if err == nil {
+				item.SeasonYear = year
+			}
 		}
 		item.Episode = videoMeta.Episode
 		item.EpisodeStr = videoMeta.GetEpisodeStr()
-		item.EpisodeTitle = info.TMDBInfo.TVInfo.EpisodeInfo.Name
-		item.EpisodeDate = info.TMDBInfo.TVInfo.EpisodeInfo.AirDate
+
+		if info.TMDBInfo.TVInfo.EpisodeInfo != nil {
+			item.EpisodeTitle = info.TMDBInfo.TVInfo.EpisodeInfo.Name
+			item.EpisodeDate = info.TMDBInfo.TVInfo.EpisodeInfo.AirDate
+		}
 
 	default:
 		return nil, fmt.Errorf("不支持的媒体类型: %s", info.MediaType.String())
