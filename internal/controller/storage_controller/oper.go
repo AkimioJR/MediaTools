@@ -94,7 +94,7 @@ func ReadFile(path storage.StoragePath) (io.ReadCloser, error) {
 	return provider.ReadFile(path.GetPath())
 }
 
-func List(dir storage.StoragePath) (iter.Seq2[storage.StoragePath, error], error) {
+func List(dir storage.StoragePath) (iter.Seq2[storage.StorageEntry, error], error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -102,29 +102,28 @@ func List(dir storage.StoragePath) (iter.Seq2[storage.StoragePath, error], error
 	if !exists {
 		return nil, errs.ErrStorageProviderNotFound
 	}
-	paths, err := provider.List(dir.GetPath())
+	entries, err := provider.List(dir.GetPath())
 	if err != nil {
 		logrus.Warningf("列出目录内容失败: %s, 错误: %v", dir.GetPath(), err)
 		return nil, err
 	}
 
-	return func(yield func(storage.StoragePath, error) bool) {
-		for path, err := range paths {
+	return func(yield func(storage.StorageEntry, error) bool) {
+		for entry, err := range entries {
 			if err != nil {
 				if !yield(nil, err) {
 					return // 如果迭代器被中断，则退出
 				}
 				continue
 			}
-			filePath := storage.NewStoragePath(dir.GetStorageType(), path)
-			if !yield(filePath, nil) {
+			if !yield(entry, nil) {
 				return // 如果迭代器被中断，则退出
 			}
 		}
 	}, nil
 }
 
-func ListRoot(storageType storage.StorageType) (iter.Seq2[storage.StoragePath, error], error) {
+func ListRoot(storageType storage.StorageType) (iter.Seq2[storage.StorageEntry, error], error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -132,20 +131,20 @@ func ListRoot(storageType storage.StorageType) (iter.Seq2[storage.StoragePath, e
 	if !exists {
 		return nil, errs.ErrStorageProviderNotFound
 	}
-	paths, err := provider.ListRoot()
+	entries, err := provider.ListRoot()
 	if err != nil {
 		logrus.Warningf("列出根目录内容失败, 错误: %v", err)
 		return nil, err
 	}
-	return func(yield func(storage.StoragePath, error) bool) {
-		for path, err := range paths {
+	return func(yield func(storage.StorageEntry, error) bool) {
+		for entry, err := range entries {
 			if err != nil {
 				if !yield(nil, err) {
 					return // 如果迭代器被中断，则退出
 				}
 				continue
 			}
-			if !yield(storage.NewStoragePath(storageType, path), nil) {
+			if !yield(entry, nil) {
 				return // 如果迭代器被中断，则退出
 			}
 		}
@@ -220,7 +219,7 @@ func SoftLink(srcPath storage.StoragePath, dstPath storage.StoragePath) error {
 	return provider.SoftLink(srcPath.GetPath(), dstPath.GetPath())
 }
 
-func IterFiles(dir storage.StoragePath) (iter.Seq2[*storage.StorageFileInfo, error], error) {
+func IterFiles(dir storage.StoragePath) (iter.Seq2[storage.StorageEntry, error], error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -247,14 +246,14 @@ func IterFiles(dir storage.StoragePath) (iter.Seq2[*storage.StorageFileInfo, err
 		return nil, errs.ErrNotADirectory
 	}
 
-	return func(yield func(*storage.StorageFileInfo, error) bool) {
+	return func(yield func(storage.StorageEntry, error) bool) {
 		iterFilesRecursive(provider, dir.GetPath(), yield)
 	}, nil
 }
 
 // iterFilesRecursive 递归遍历目录中的所有文件
-func iterFilesRecursive(provider storage.StorageProvider, dirPath string, yield func(*storage.StorageFileInfo, error) bool) {
-	paths, err := provider.List(dirPath)
+func iterFilesRecursive(provider storage.StorageProvider, dirPath string, yield func(storage.StorageEntry, error) bool) {
+	entries, err := provider.List(dirPath)
 	if err != nil {
 		if !yield(nil, err) {
 			return
@@ -262,7 +261,7 @@ func iterFilesRecursive(provider storage.StorageProvider, dirPath string, yield 
 		return
 	}
 
-	for path, err := range paths {
+	for entry, err := range entries {
 		if err != nil {
 			if !yield(nil, err) { // 如果迭代器被中断，则退出
 				return
@@ -270,20 +269,10 @@ func iterFilesRecursive(provider storage.StorageProvider, dirPath string, yield 
 			continue
 		}
 
-		info, err := provider.GetDetail(path)
-		if err != nil {
-			if !yield(nil, err) {
-				return
-			}
-			continue
-		}
-
-		if info.Type == storage.FileTypeDirectory {
-			// 如果是目录，递归遍历
-			iterFilesRecursive(provider, info.Path, yield)
-		} else {
-			// 如果是文件，yield 返回
-			if !yield(info, nil) {
+		if entry.GetFileType() == storage.FileTypeDirectory { // 如果是目录，递归遍历
+			iterFilesRecursive(provider, entry.GetPath(), yield)
+		} else { // 如果是文件，yield 返回
+			if !yield(entry, nil) {
 				return
 			}
 		}

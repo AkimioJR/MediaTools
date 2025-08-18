@@ -118,14 +118,14 @@ func StorageList(ctx *gin.Context) {
 	logrus.Debugf("解析请求详细信息字符串: %s, 值为: %v", detailStr, detailFlag)
 
 	var (
-		paths iter.Seq2[storage.StoragePath, error]
-		err   error
+		entries iter.Seq2[storage.StorageEntry, error]
+		err     error
 	)
 	path := ctx.Query("path")
 	if path == "" {
-		paths, err = storage_controller.ListRoot(storageType)
+		entries, err = storage_controller.ListRoot(storageType)
 	} else {
-		paths, err = storage_controller.List(storage.NewStoragePath(storageType, path))
+		entries, err = storage_controller.List(storage.NewStoragePath(storageType, path))
 	}
 	if err != nil {
 		resp.Message = "列出目录内容失败: " + err.Error()
@@ -133,23 +133,23 @@ func StorageList(ctx *gin.Context) {
 		return
 	}
 
-	for sp, itErr := range paths {
+	for entry, itErr := range entries {
 		if itErr != nil {
-			resp.Message = fmt.Sprintf("列出目录内容失败: %s, 错误: %v", sp.String(), itErr)
+			resp.Message = fmt.Sprintf("列出目录内容失败: %s, 错误: %v", entry.String(), itErr)
 			resp.RespondJSON(ctx, http.StatusInternalServerError)
 			return
 		}
 
 		if detailFlag { // 请求详细信息
-			info, err := storage_controller.GetDetail(sp)
+			info, err := storage_controller.GetDetail(entry)
 			if err != nil {
-				logrus.Warningf("获取文件详情失败: %s, 错误: %v", sp.String(), err)
-				resp.Data = append(resp.Data, sp.(*storage.StorageFileInfo))
+				logrus.Warningf("获取文件详情失败: %s, 错误: %v", entry.String(), err)
+				resp.Data = append(resp.Data, entry.(*storage.StorageFileInfo))
 			} else {
 				resp.Data = append(resp.Data, info)
 			}
 		} else { // 不请求详细信息，只返回基本路径信息
-			resp.Data = append(resp.Data, sp.(*storage.StorageFileInfo))
+			resp.Data = append(resp.Data, entry.(*storage.StorageFileInfo))
 		}
 	}
 	resp.RespondJSON(ctx, http.StatusOK)
