@@ -10,14 +10,13 @@ type WordsMatcher struct {
 	rules []*CustomWordRule
 }
 
-func NewWordsMatcher(words []string) (*WordsMatcher, error) {
+func NewWordsMatcher(lines []string) (*WordsMatcher, error) {
 	var matcher WordsMatcher
-	matcher.rules = make([]*CustomWordRule, 0, len(words))
-	for _, w := range words {
-		if strings.HasPrefix(w, "#") || strings.TrimSpace(w) == "" { // 跳过注释和空行
+	for _, line := range lines {
+		if strings.HasPrefix(line, "#") || strings.TrimSpace(line) == "" { // 跳过注释和空行
 			continue
 		}
-		cw, err := ParseLine(w)
+		cw, err := ParseLine(line)
 		if err != nil {
 			return nil, err
 		}
