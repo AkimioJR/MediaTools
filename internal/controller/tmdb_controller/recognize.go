@@ -58,18 +58,22 @@ func RecognizeAndEnrichMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, err
 		if videoMeta.Season != -1 {
 			seasonDetail, err := GetTVSeasonDetail(info.TMDBID, videoMeta.Season)
 			if err != nil {
-				return nil, fmt.Errorf("获取电视剧季信息失败: %v", err)
+				logrus.Warningf("获取电视剧季信息失败: %v", err)
+			} else {
+				logrus.Debugf("获取到电视剧季信息: %+v", seasonDetail)
+				info.TMDBInfo.TVInfo.SeasonInfo = seasonDetail.TMDBInfo.TVInfo.SeasonInfo
 			}
-			logrus.Debugf("获取到电视剧季信息: %+v", seasonDetail)
-			info.TMDBInfo.TVInfo.SeasonInfo = seasonDetail.TMDBInfo.TVInfo.SeasonInfo
+
 		}
 		if videoMeta.Episode != -1 {
 			episodeDetail, err := GetTVEpisodeDetail(info.TMDBID, videoMeta.Season, videoMeta.Episode)
 			if err != nil {
-				return nil, fmt.Errorf("获取电视剧集信息失败: %v", err)
+				logrus.Warningf("获取电视剧集信息失败: %v", err)
+			} else {
+				logrus.Debugf("获取到电视剧集信息: %+v", episodeDetail)
+				info.TMDBInfo.TVInfo.EpisodeInfo = episodeDetail.TMDBInfo.TVInfo.EpisodeInfo
 			}
-			logrus.Debugf("获取到电视剧集信息: %+v", episodeDetail)
-			info.TMDBInfo.TVInfo.EpisodeInfo = episodeDetail.TMDBInfo.TVInfo.EpisodeInfo
+
 		}
 	}
 	logrus.Debugf("识别并补充媒体信息完成: %+v", info)
