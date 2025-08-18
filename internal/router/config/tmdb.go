@@ -66,5 +66,5 @@ func UpdateTMDB(ctx *gin.Context) {
 		return
 	}
 
-	resp.RespondJSON(ctx, http.StatusOK)
+	resp.RespondSuccessJSON(ctx, &config.TMDB)
 }
