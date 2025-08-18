@@ -75,9 +75,10 @@ func (wm *WordsMatcher) MatchAndProcess(title string) (string, string) {
 					continue
 				}
 				title = strings.Replace(title, episodeStr, strconv.Itoa(newEpisode), 1)
+				rule = wordRule.originalStr
+				break
 			}
-			rule = wordRule.originalStr
-			break
+
 		}
 	}
 	return title, rule
