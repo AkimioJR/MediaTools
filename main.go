@@ -3,6 +3,7 @@ package main
 import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/controller"
+	"MediaTools/internal/database"
 	"MediaTools/internal/logging"
 	"MediaTools/internal/router"
 	"flag"
@@ -53,6 +54,10 @@ func main() {
 		panic(fmt.Sprintf("日志初始化失败: %v", err))
 	}
 	logrus.Info("日志初始化完成")
+	err = database.Init()
+	if err != nil {
+		panic(fmt.Sprintf("数据库初始化失败: %v", err))
+	}
 
 	logrus.Info("开始初始化全部工具链...")
 	err = controller.InitAllControllers()
