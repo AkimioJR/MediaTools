@@ -3,4 +3,4 @@
 debug/*
 
 *.log
-config/config.yaml
+config/*
