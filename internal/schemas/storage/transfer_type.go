@@ -57,3 +57,16 @@ func ParseTransferType(s string) TransferType {
 		return TransferUnknown
 	}
 }
+
+func (t TransferType) MarshalYAML() (any, error) {
+	return t.String(), nil
+}
+
+func (t *TransferType) UnmarshalYAML(unmarshal func(any) error) error {
+	var s string
+	if err := unmarshal(&s); err != nil {
+		return err
+	}
+	*t = ParseTransferType(s)
+	return nil
+}
