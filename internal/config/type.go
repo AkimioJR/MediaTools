@@ -1,6 +1,7 @@
 package config
 
 import (
+	"MediaTools/internal/model"
 	"MediaTools/internal/schemas/storage"
 )
 
@@ -22,21 +23,6 @@ type FanartConfig struct {
 	ApiKey    string   `json:"api_key" yaml:"api_key"`
 	ApiURL    string   `json:"api_url" yaml:"api_url"`
 	Languages []string `json:"languages" yaml:"languages"` // 语言顺序
-}
-
-type Configuration struct {
-	// 基础设置
-	Log LogConfig `json:"log" yaml:"log"`
-
-	// 刮削设置
-	TMDB   TMDBConfig   `json:"tmdb" yaml:"tmdb"`
-	Fanart FanartConfig `json:"fanart" yaml:"fanart"`
-
-	// 存储设置
-	Storages []StorageConfig `json:"storages" yaml:"storages"`
-
-	// 媒体库设置
-	Media MediaConfig `json:"media" yaml:"media"`
 }
 
 type MediaConfig struct {
@@ -72,4 +58,26 @@ type CustomWordConfig struct {
 type StorageConfig struct {
 	Type storage.StorageType `json:"type" yaml:"type"`
 	Data map[string]string   `json:"data" yaml:"data"`
+}
+
+type DataBaseConfig struct {
+	Type model.DBType `json:"type" yaml:"type"` // 数据库类型
+	DSN  string       `json:"dsn" yaml:"dsn"`   // 数据库连接字符串
+}
+
+type Configuration struct {
+	DB DataBaseConfig `json:"db" yaml:"db"` // 数据库配置
+
+	// 基础设置
+	Log LogConfig `json:"log" yaml:"log"`
+
+	// 刮削设置
+	TMDB   TMDBConfig   `json:"tmdb" yaml:"tmdb"`
+	Fanart FanartConfig `json:"fanart" yaml:"fanart"`
+
+	// 存储设置
+	Storages []StorageConfig `json:"storages" yaml:"storages"`
+
+	// 媒体库设置
+	Media MediaConfig `json:"media" yaml:"media"`
 }

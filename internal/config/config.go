@@ -9,10 +9,12 @@ import (
 )
 
 const (
-	ConfigFile = "config/config.yaml"
+	ConfigFile   = "config/config.yaml"
+	SQLiteDBFile = "config/data.db"
 )
 
 var (
+	DB       DataBaseConfig
 	Log      LogConfig
 	TMDB     TMDBConfig
 	Fanart   FanartConfig
@@ -46,6 +48,7 @@ func Init() error {
 
 func WriteConfig() error {
 	var c = Configuration{
+		DB:       DB,
 		Log:      Log,
 		TMDB:     TMDB,
 		Fanart:   Fanart,

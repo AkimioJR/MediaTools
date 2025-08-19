@@ -1,9 +1,11 @@
 package config
 
 import (
+	"MediaTools/internal/model"
 	"fmt"
 	"os"
 	pathlib "path"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -31,6 +33,7 @@ func initDefaultConfig() error {
 
 // 应用配置到全局变量
 func (c *Configuration) applyConfig() {
+	DB = c.DB
 	Log = c.Log
 	TMDB = c.TMDB
 	Fanart = c.Fanart
@@ -54,8 +57,18 @@ func (c *Configuration) writeConfig() error {
 	return nil
 }
 
+var dbOnce sync.Once
+
 // 检查配置的完整性
 func (c *Configuration) check() {
+	dbOnce.Do(func() {
+		if c.DB.Type == model.DBTypeUnknown || c.DB.DSN == "" {
+			logrus.Warning("数据库类型或连接字符串未设置，使用默认 SQLite 配置")
+			c.DB.Type = model.DBTypeSQLite
+			c.DB.DSN = SQLiteDBFile
+		}
+	})
+
 	if c.Log.ConsoleLevel == "" {
 		logrus.Warning("日志终端输出级别未设置，使用默认配置")
 		c.Log.ConsoleLevel = defaultConfig.Log.ConsoleLevel
