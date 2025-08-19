@@ -4,6 +4,7 @@ import (
 	"MediaTools/encode"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/pkg/themoviedb/v3"
+	"encoding/json"
 	"fmt"
 	pathlib "path"
 	"strconv"
@@ -138,6 +139,17 @@ func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error
 	}
 
 	return &item, nil
+}
+func (mi *MediaItem) Scan(value any) error {
+	return json.Unmarshal(value.([]byte), mi)
+}
+
+func (mi MediaItem) Value() (any, error) {
+	b, err := json.Marshal(mi)
+	if err != nil {
+		return nil, fmt.Errorf("MediaItem JSON 序列化失败: %w", err)
+	}
+	return b, nil
 }
 
 type RecognizeMediaDetail struct {
