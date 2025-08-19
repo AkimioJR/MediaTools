@@ -1,7 +1,7 @@
 package config
 
 import (
-	"MediaTools/internal/model"
+	"MediaTools/internal/models"
 	"MediaTools/internal/schemas/storage"
 )
 
@@ -61,8 +61,8 @@ type StorageConfig struct {
 }
 
 type DataBaseConfig struct {
-	Type model.DBType `json:"type" yaml:"type"` // 数据库类型
-	DSN  string       `json:"dsn" yaml:"dsn"`   // 数据库连接字符串
+	Type models.DBType `json:"type" yaml:"type"` // 数据库类型
+	DSN  string        `json:"dsn" yaml:"dsn"`   // 数据库连接字符串
 }
 
 type Configuration struct {

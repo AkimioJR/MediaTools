@@ -1,7 +1,7 @@
 package config
 
 import (
-	"MediaTools/internal/model"
+	"MediaTools/internal/models"
 	"fmt"
 	"os"
 	pathlib "path"
@@ -63,9 +63,9 @@ var dbOnce sync.Once
 func (c *Configuration) check() {
 	needSave := false
 	dbOnce.Do(func() {
-		if c.DB.Type == model.DBTypeUnknown || c.DB.DSN == "" {
+		if c.DB.Type == models.DBTypeUnknown || c.DB.DSN == "" {
 			logrus.Warning("数据库类型或连接字符串未设置，使用默认 SQLite 配置")
-			c.DB.Type = model.DBTypeSQLite
+			c.DB.Type = models.DBTypeSQLite
 			c.DB.DSN = SQLiteDBFile
 			needSave = true
 		}
