@@ -71,25 +71,21 @@ func ArchiveMedia(
 				if path.GetPath() == srcDir.GetPath() {
 					continue // 跳过源目录本身
 				}
-				info, err := storage_controller.GetDetail(path)
-				if err != nil {
-					logrus.Warningf("获取文件 %s 详情失败，跳过转移字幕/音轨文件：%v", path, err)
-					continue // 跳过获取详情失败的文件
-				}
-				if info.Type == storage.FileTypeDirectory {
-					logrus.Debugf("跳过目录：%s", info.Path)
+
+				if path.GetFileType() == storage.FileTypeDirectory {
+					logrus.Debugf("跳过目录：%s", path)
 					continue // 跳过目录
 				}
 
-				if slices.Contains(exts, info.LowerExt()) {
-					otherdstPathPath := utils.ChangeExt(dstPath.GetPath(), info.Ext)
+				if slices.Contains(exts, path.LowerExt()) {
+					otherdstPathPath := utils.ChangeExt(dstPath.GetPath(), path.GetExt())
 					otherdstPath, err := storage_controller.GetPath(otherdstPathPath, dstPath.GetStorageType())
 					if err != nil {
 						logrus.Warningf("获取文件 %s:%s 失败: %v", dstPath.GetStorageType(), otherdstPathPath, err)
 						continue
 					}
-					logrus.Debugf("转移字幕/音轨文件：%s -> %s", info.String(), otherdstPath)
-					err = storage_controller.TransferFile(info, otherdstPath, transferType) // 转移字幕或音轨文件
+					logrus.Debugf("转移字幕/音轨文件：%s -> %s", path.String(), otherdstPath)
+					err = storage_controller.TransferFile(path, otherdstPath, transferType) // 转移字幕或音轨文件
 					if err != nil {
 						logrus.Warningf("转移字幕/音轨文件失败：%v", err)
 					}
