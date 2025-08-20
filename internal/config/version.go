@@ -18,9 +18,9 @@ type VersionInfo struct {
 }
 
 func parseBuildTime(s string) string {
-	if t, err := time.Parse(time.RFC3339, s); err != nil {
+	if _, err := time.Parse(time.RFC3339, s); err != nil {
 		return "Unkown"
 	} else {
-		return t.Local().Format(time.RFC822Z)
+		return s
 	}
 }
