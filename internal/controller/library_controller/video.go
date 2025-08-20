@@ -99,7 +99,7 @@ func ArchiveMedia(
 		if err != nil {
 			return nil, fmt.Errorf("获取目标文件路径失败：%w", err)
 		}
-		err = scrape_controller.Scrape(dstFile, info)
+		err = scrape_controller.Scrape(ctx, dstFile, info)
 		if err != nil {
 			logrus.Warningf("刮削数据失败：%v", err)
 		}

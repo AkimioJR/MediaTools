@@ -17,18 +17,26 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Scrape(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) error {
+func Scrape(ctx context.Context, dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) error {
+	var scrapers []func(*storage.StorageFileInfo, *schemas.MediaInfo)
 	switch info.MediaType {
 	case meta.MediaTypeMovie:
-		ScrapeMovieInfo(dstFile, info)
-		ScrapeMovieImage(dstFile, info)
+		scrapers = append(scrapers, ScrapeMovieInfo, ScrapeMovieImage)
 
 	case meta.MediaTypeTV:
-		ScrapeTVInfo(dstFile, info)
-		ScrapeTVImage(dstFile, info)
+		scrapers = append(scrapers, ScrapeTVInfo, ScrapeTVImage)
 
 	default:
 		return fmt.Errorf("不支持的媒体类型: %s", info.MediaType)
+	}
+
+	for _, scraper := range scrapers {
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("刮削任务被取消: %v", ctx.Err())
+		default:
+		}
+		scraper(dstFile, info)
 	}
 
 	return nil
@@ -49,7 +57,7 @@ func RecognizeAndScrape(ctx context.Context, dstFile *storage.StorageFileInfo, m
 	if err != nil {
 		return fmt.Errorf("识别媒体信息失败: %v", err)
 	}
-	return Scrape(dstFile, info)
+	return Scrape(ctx, dstFile, info)
 }
 
 func ScrapeMovieInfo(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) {
