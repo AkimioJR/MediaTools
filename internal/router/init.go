@@ -3,6 +3,7 @@ package router
 import (
 	configuration "MediaTools/internal/config"
 	"MediaTools/internal/router/config"
+	"MediaTools/internal/router/history"
 	"MediaTools/internal/router/library"
 	"MediaTools/internal/router/log"
 	"MediaTools/internal/router/recognize"
@@ -44,6 +45,7 @@ func InitRouter(isDev bool) *gin.Engine {
 	scrape.RegisterScrapeRouter(ginRouter)      // 刮削相关接口
 	library.RegisterLibraryRouter(ginRouter)    // 媒体库相关接口
 	storage.RegisterStorageRouter(ginRouter)    // 存储相关接口
+	history.RegisterHistoryRouter(ginRouter)    // 历史记录相关接口
 
 	logrus.Info("路由初始化完成")
 	return ginRouter
