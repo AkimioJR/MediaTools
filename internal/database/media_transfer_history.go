@@ -3,6 +3,7 @@ package database
 import (
 	"MediaTools/internal/models"
 	"MediaTools/internal/schemas/storage"
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -19,6 +20,15 @@ func UpdateMediaTransferHistory(history *models.MediaTransferHistory) error {
 		return fmt.Errorf("更新媒体转移历史记录失败: %w", result.Error)
 	}
 	return nil
+}
+
+func QueryMediaTransferHistoryBySrc(src storage.StoragePath) (*models.MediaTransferHistory, error) {
+	ctx := context.Background()
+	history, err := gorm.G[models.MediaTransferHistory](DB).Where("src_type = ? AND src_path = ?", src.GetStorageType(), src.GetPath()).First(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("查询媒体转移历史记录失败: %w", err)
+	}
+	return &history, nil
 }
 
 // QueryMediaTransferHistory 查询媒体转移历史记录
