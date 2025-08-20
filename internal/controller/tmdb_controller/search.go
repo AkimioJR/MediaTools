@@ -5,13 +5,14 @@ import (
 	"MediaTools/internal/pkg/themoviedb/v3"
 	"MediaTools/internal/schemas"
 	"MediaTools/utils"
+	"context"
 	"fmt"
 	"iter"
 
 	"github.com/sirupsen/logrus"
 )
 
-func SearchMovie(searchName string) (*schemas.MediaInfo, error) {
+func SearchMovie(ctx context.Context, searchName string) (*schemas.MediaInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -59,6 +60,12 @@ func SearchMovie(searchName string) (*schemas.MediaInfo, error) {
 	}
 
 	for result, err := range results {
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("搜索电影任务被取消: %w", ctx.Err())
+
+		default:
+		}
 		if err != nil {
 			logrus.Warning(err)
 			continue // 如果搜索失败，尝试下一个结果
@@ -78,12 +85,13 @@ func SearchMovie(searchName string) (*schemas.MediaInfo, error) {
 			logrus.Infof("匹配电影「%s」(TMDB ID: %d) 别名", result.Title, result.ID)
 			return GetInfo(result.ID, meta.MediaTypeMovie)
 		}
+
 	}
 	logrus.Warningf("未找到电影「%s」的匹配项，返回第一项: %s", searchName, firstResult.Title)
 	return GetInfo(firstResult.ID, meta.MediaTypeMovie)
 }
 
-func SearchTV(searchName string) (*schemas.MediaInfo, error) {
+func SearchTV(ctx context.Context, searchName string) (*schemas.MediaInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -130,6 +138,12 @@ func SearchTV(searchName string) (*schemas.MediaInfo, error) {
 	}
 
 	for result, err := range results {
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("搜索电视剧任务被取消: %w", ctx.Err())
+
+		default:
+		}
 		if err != nil {
 			logrus.Warning(err)
 			continue // 如果搜索失败，尝试下一个结果
@@ -154,7 +168,7 @@ func SearchTV(searchName string) (*schemas.MediaInfo, error) {
 	return GetInfo(firstResult.ID, meta.MediaTypeTV)
 }
 
-func SearchMulti(searchName string) (*schemas.MediaInfo, error) {
+func SearchMulti(ctx context.Context, searchName string) (*schemas.MediaInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -201,6 +215,12 @@ func SearchMulti(searchName string) (*schemas.MediaInfo, error) {
 	}
 
 	for result, err := range results {
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("综合搜索任务被取消: %w", ctx.Err())
+		default:
+		}
+
 		if err != nil {
 			logrus.Warning(err)
 			continue // 如果搜索失败，尝试下一个结果

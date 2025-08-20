@@ -3,6 +3,7 @@ package tmdb_controller
 import (
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/schemas"
+	"context"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
@@ -11,7 +12,7 @@ import (
 // RecognizeMedia 识别媒体信息
 // videoMeta 识别的元数据
 // 返回识别后的媒体信息
-func RecognizeMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, error) {
+func RecognizeMedia(ctx context.Context, videoMeta *meta.VideoMeta) (*schemas.MediaInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -23,7 +24,7 @@ func RecognizeMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, error) {
 	}
 
 	// 如果没有 TMDB ID，则尝试识别媒体名称
-	var fn func(string) (*schemas.MediaInfo, error)
+	var fn func(context.Context, string) (*schemas.MediaInfo, error)
 	switch videoMeta.MediaType {
 	case meta.MediaTypeMovie:
 		fn = SearchMovie
@@ -33,7 +34,7 @@ func RecognizeMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, error) {
 		fn = SearchMulti
 	}
 	for _, name := range videoMeta.GetTitles() {
-		info, err := fn(name)
+		info, err := fn(ctx, name)
 		if err != nil {
 			logrus.Warningf("识别「%s」媒体信息失败: %v", name, err)
 			continue // 如果搜索失败，尝试下一个名称
@@ -46,8 +47,8 @@ func RecognizeMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, error) {
 // RecognizeAndEnrichMedia 识别媒体信息，如果是电视剧类型，还会补充季和集的详细信息（如果有对应信息）
 // videoMeta 识别的元数据
 // 返回识别后的媒体信息，如果是电视剧类型，还会补充季和集的详细信息
-func RecognizeAndEnrichMedia(videoMeta *meta.VideoMeta) (*schemas.MediaInfo, error) {
-	info, err := RecognizeMedia(videoMeta)
+func RecognizeAndEnrichMedia(ctx context.Context, videoMeta *meta.VideoMeta) (*schemas.MediaInfo, error) {
+	info, err := RecognizeMedia(ctx, videoMeta)
 	if err != nil {
 		return nil, fmt.Errorf("识别媒体信息失败: %v", err)
 	}
