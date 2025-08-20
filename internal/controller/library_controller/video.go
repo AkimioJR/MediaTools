@@ -58,6 +58,12 @@ func ArchiveMedia(
 		} else {
 			exts := append(extensions.SubtitleExtensions, extensions.AudioTrackExtensions...)
 			for path, err := range paths {
+				select {
+				case <-ctx.Done():
+					return nil, fmt.Errorf("转移字幕/音轨文件操作被取消: %v", ctx.Err())
+				default:
+				}
+
 				if err != nil {
 					logrus.Warningf("遍历目录 %s 失败，跳过转移字幕/音轨文件：%v", srcDir, err)
 					continue // 跳过错误的路径
