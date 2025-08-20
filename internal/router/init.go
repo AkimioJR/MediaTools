@@ -1,6 +1,7 @@
 package router
 
 import (
+	configuration "MediaTools/internal/config"
 	"MediaTools/internal/router/config"
 	"MediaTools/internal/router/library"
 	"MediaTools/internal/router/log"
@@ -8,6 +9,7 @@ import (
 	"MediaTools/internal/router/scrape"
 	"MediaTools/internal/router/storage"
 	"MediaTools/internal/router/tmdb"
+	"MediaTools/internal/schemas"
 	"net/http"
 
 	_ "MediaTools/docs"
@@ -29,6 +31,11 @@ func InitRouter(isDev bool) *gin.Engine {
 		logrus.Info("开发者模式已启用，开启 Swagger API 路由")
 		ginRouter.GET("/docs/*any", gs.WrapHandler(swaggerFiles.Handler))
 	}
+
+	ginRouter.GET("/version", func(ctx *gin.Context) {
+		var resp schemas.Response[*configuration.VersionInfo]
+		resp.RespondSuccessJSON(ctx, &configuration.Version)
+	})
 
 	config.RegisterConfigRouter(ginRouter)      // 配置相关路由
 	log.RegisterLogRouter(ginRouter)            // 日志相关路由
