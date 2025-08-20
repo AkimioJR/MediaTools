@@ -252,28 +252,52 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/library/archive": {
-            "post": {
-                "description": "整理一个视频文件及其相关的字幕和音轨文件到指定目录",
-                "consumes": [
-                    "application/json"
-                ],
+        "/history/media/transfer": {
+            "get": {
+                "description": "查询媒体转移历史记录，支持根据 ID、时间范围、源路径、目标路径、转移类型和状态进行过滤",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "媒体库"
+                    "History"
                 ],
-                "summary": "归档媒体文件",
+                "summary": "查询媒体转移历史记录",
                 "parameters": [
                     {
-                        "description": "请求参数",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/schemas.LibraryArchiveMediaRequest"
-                        }
+                        "type": "integer",
+                        "description": "媒体转移历史记录 ID, 如果提供则只查询该 ID 的记录",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "存储类型, 可选值为 'LocalStorage' 等",
+                        "name": "storage_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "路径, 模糊匹配",
+                        "name": "path",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "转移类型, 可选值为 'Copy'、'Move'、'Link'、'SoftLink' 等",
+                        "name": "transfer_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否成功, true 或 false",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "最大返回数量, 默认值为 30",
+                        "name": "count",
+                        "in": "query"
                     }
                 ],
                 "responses": {}
@@ -469,12 +493,20 @@ const docTemplate = `{
                     "description": "媒体库名称",
                     "type": "string"
                 },
+                "notify": {
+                    "description": "是否通知",
+                    "type": "boolean"
+                },
                 "organize_by_category": {
                     "description": "是否按分类分文件夹",
                     "type": "boolean"
                 },
                 "organize_by_type": {
                     "description": "是否按类型分文件夹",
+                    "type": "boolean"
+                },
+                "scrape": {
+                    "description": "是否刮削",
                     "type": "boolean"
                 },
                 "src_path": {
@@ -577,27 +609,6 @@ const docTemplate = `{
                 },
                 "storage_type": {
                     "$ref": "#/definitions/storage.StorageType"
-                }
-            }
-        },
-        "schemas.LibraryArchiveMediaRequest": {
-            "type": "object",
-            "required": [
-                "dst_dir",
-                "src_file"
-            ],
-            "properties": {
-                "dst_dir": {
-                    "$ref": "#/definitions/schemas.FileInfoRequest"
-                },
-                "scrape": {
-                    "type": "boolean"
-                },
-                "src_file": {
-                    "$ref": "#/definitions/schemas.FileInfoRequest"
-                },
-                "transfer_type": {
-                    "$ref": "#/definitions/storage.TransferType"
                 }
             }
         },
