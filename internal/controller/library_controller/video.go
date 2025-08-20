@@ -11,6 +11,7 @@ import (
 	"MediaTools/internal/schemas"
 	"MediaTools/internal/schemas/storage"
 	"MediaTools/utils"
+	"context"
 	"fmt"
 	"slices"
 	"strings"
@@ -26,6 +27,7 @@ import (
 // info: 识别到的媒体信息（为nil代表无需刮削）
 // 返回值: 目标文件信息和可能的错误
 func ArchiveMedia(
+	ctx context.Context,
 	srcFile storage.StoragePath,
 	dstDir storage.StoragePath,
 	transferType storage.TransferType,
@@ -105,7 +107,7 @@ func ArchiveMedia(
 	return dstPath, nil
 }
 
-func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePath,
+func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstDir storage.StoragePath,
 	transferType storage.TransferType, mediaType meta.MediaType,
 	tmdbID int, season int, episodeStr string, episodeOffset string,
 	part string, organizeByType bool, organizeByCategory bool, scrape bool,
@@ -168,7 +170,7 @@ func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePat
 		logrus.Infof("更新 %s 媒体元数据：%s", srcFile.GetName(), strings.Join(msgs, ", "))
 	}
 
-	info, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
+	info, err := tmdb_controller.RecognizeAndEnrichMedia(ctx, videoMeta)
 	if err != nil {
 		return nil, fmt.Errorf("识别媒体信息失败：%w", err)
 	}
@@ -190,9 +192,9 @@ func ArchiveMediaAdvanced(srcFile storage.StoragePath, dstDir storage.StoragePat
 
 	var dstFile storage.StoragePath
 	if scrape {
-		dstFile, err = ArchiveMedia(srcFile, dstDir, transferType, item, info)
+		dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, info)
 	} else {
-		dstFile, err = ArchiveMedia(srcFile, dstDir, transferType, item, nil)
+		dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, nil)
 	}
 
 	if err != nil {

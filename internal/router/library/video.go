@@ -25,7 +25,7 @@ func ArchiveMediaManual(ctx *gin.Context) {
 	srcFile := storage.NewStoragePath(req.SrcFile.StorageType, req.SrcFile.Path)
 	dstDir := storage.NewStoragePath(req.DstDir.StorageType, req.DstDir.Path)
 
-	dstFile, err := library_controller.ArchiveMediaAdvanced(srcFile, dstDir, req.TransferType, req.MediaType,
+	dstFile, err := library_controller.ArchiveMediaAdvanced(ctx, srcFile, dstDir, req.TransferType, req.MediaType,
 		req.TMDBID, req.Season, req.EpisodeStr, req.EpisodeOffset, req.Part,
 		req.OrganizeByType, req.OrganizeByCategory, req.Scrape,
 	)

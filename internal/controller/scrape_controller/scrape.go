@@ -4,6 +4,7 @@ import (
 	"MediaTools/internal/controller/fanart_controller"
 	"MediaTools/internal/controller/recognize_controller"
 	"MediaTools/internal/schemas/storage"
+	"context"
 
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/tmdb_controller"
@@ -35,7 +36,7 @@ func Scrape(dstFile *storage.StorageFileInfo, info *schemas.MediaInfo) error {
 
 // RecognizeAndScrape 识别并刮削媒体信息
 // 识别目标文件的元数据，查询 TMDB 获取媒体信息，并在该文件夹进行刮削
-func RecognizeAndScrape(dstFile *storage.StorageFileInfo, mediaType meta.MediaType, tmdbID int) error {
+func RecognizeAndScrape(ctx context.Context, dstFile *storage.StorageFileInfo, mediaType meta.MediaType, tmdbID int) error {
 	videoMeta, _, _ := recognize_controller.ParseVideoMeta(dstFile.Name)
 	if mediaType != meta.MediaTypeUnknown && videoMeta.MediaType == meta.MediaTypeUnknown {
 		videoMeta.MediaType = mediaType
@@ -44,7 +45,7 @@ func RecognizeAndScrape(dstFile *storage.StorageFileInfo, mediaType meta.MediaTy
 		videoMeta.TMDBID = tmdbID
 	}
 
-	info, err := tmdb_controller.RecognizeAndEnrichMedia(videoMeta)
+	info, err := tmdb_controller.RecognizeAndEnrichMedia(ctx, videoMeta)
 	if err != nil {
 		return fmt.Errorf("识别媒体信息失败: %v", err)
 	}

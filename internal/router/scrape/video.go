@@ -46,7 +46,7 @@ func Video(ctx *gin.Context) {
 		logrus.Infof("开始刮削视频：%s", dstFile.String())
 	}
 
-	err := scrape_controller.RecognizeAndScrape(&dstFile, req.MediaType, req.TMDBID)
+	err := scrape_controller.RecognizeAndScrape(ctx, &dstFile, req.MediaType, req.TMDBID)
 	if err != nil {
 		resp.Message = "刮削失败: " + err.Error()
 		resp.RespondJSON(ctx, http.StatusInternalServerError)
