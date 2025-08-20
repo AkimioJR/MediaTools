@@ -2,6 +2,7 @@ package database
 
 import (
 	"MediaTools/internal/config"
+	"strings"
 
 	"MediaTools/internal/models"
 	"fmt"
@@ -14,12 +15,12 @@ var DB *gorm.DB
 
 func Init() error {
 	var err error
-	switch config.DB.Type {
-	case models.DBTypeSQLite:
+	switch strings.ToLower(config.DB.Type) {
+	case "sqlite":
 		DB, err = gorm.Open(sqlite.Open(config.DB.DSN))
 
 	default:
-		return fmt.Errorf("不支持的数据库类型: %s", config.DB.Type.String())
+		return fmt.Errorf("不支持的数据库类型: %s", config.DB.Type)
 	}
 
 	if err != nil {

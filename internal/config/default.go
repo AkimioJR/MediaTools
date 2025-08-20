@@ -1,14 +1,13 @@
 package config
 
 import (
-	"MediaTools/internal/models"
 	"MediaTools/internal/schemas/storage"
 )
 
 var defaultConfig = Configuration{
 	DB: DataBaseConfig{
-		Type: models.DBTypeSQLite, // 默认使用 SQLite 数据库
-		DSN:  SQLiteDBFile,        // SQLite 数据库文件路径
+		Type: "sqlite",     // 默认使用 SQLite 数据库
+		DSN:  SQLiteDBFile, // SQLite 数据库文件路径
 	},
 	Log: LogConfig{
 		ConsoleLevel: "info",
