@@ -73,6 +73,8 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 		}
 		storageTypeStr := ctx.Query("storage_type")
 		storageType = storage.ParseStorageType(storageTypeStr)
+		path = ctx.Query("path")
+
 		transferTypeStr := ctx.Query("transfer_type")
 		transferType = storage.ParseTransferType(transferTypeStr)
 
