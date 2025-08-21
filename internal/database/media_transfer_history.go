@@ -36,15 +36,15 @@ func QueryMediaTransferHistoryBySrc(src storage.StoragePath) (*models.MediaTrans
 // 如果 ID 不为 nil，则只查询该 ID 的记录
 // 如果 ID 为 nil，则根据其他条件查询
 func QueryMediaTransferHistory(
+	ctx context.Context,
 	id *uint, startTime *time.Time, endTime *time.Time,
 	storageType storage.StorageType, // 存储类型和路径，存储类型为 StorageUnknown 时不进行过滤，否则对 src 和 dst 都进行过滤
 	path string, // 路径，模糊匹配
 	transferType storage.TransferType, // 转移类型为 TransferUnknown 时不进行过滤
 	status *bool, // 是否成功
 	count int, // 最大返回数量
-) ([]*models.MediaTransferHistory, error) {
-	histories := make([]*models.MediaTransferHistory, 0)
-	query := DB.Model(&models.MediaTransferHistory{})
+) ([]models.MediaTransferHistory, error) {
+	var query gorm.ChainInterface[models.MediaTransferHistory] = gorm.G[models.MediaTransferHistory](DB)
 
 	if id != nil { // 如果提供了 ID，则只查询该 ID 的记录
 		query = query.Where("id = ?", *id)
@@ -78,13 +78,13 @@ func QueryMediaTransferHistory(
 		}
 	}
 
-	result := query.Find(&histories)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return histories, nil // 如果没有找到记录，返回空切片
+	results, err := query.Find(ctx)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return results, nil // 如果没有找到记录，返回空切片
 		} else {
-			return nil, fmt.Errorf("查询媒体转移历史记录失败: %w", result.Error)
+			return nil, fmt.Errorf("查询媒体转移历史记录失败: %w", err)
 		}
 	}
-	return histories, nil
+	return results, nil
 }
