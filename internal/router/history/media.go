@@ -27,7 +27,7 @@ import (
 // @Param count query int false "最大返回数量, 默认值为 30"
 func QueryMediaTransferHistory(ctx *gin.Context) {
 	var (
-		resp schemas.Response[[]models.MediaTransferHistory]
+		resp schemas.Response[[]*models.MediaTransferHistory]
 
 		id                 *uint                // ID
 		startTime, endTime *time.Time           // 时间范围
@@ -99,11 +99,19 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 		}
 	}
 
-	histories, err := database.QueryMediaTransferHistory(ctx, id, startTime, endTime, storageType, path, transferType, status, count)
-	if err != nil {
-		resp.Message = "查询媒体转移历史记录失败: " + err.Error()
-		ctx.JSON(http.StatusInternalServerError, resp)
-		return
+	var respHistories []*models.MediaTransferHistory
+	for history, err := range database.QueryMediaTransferHistory(ctx, id, startTime, endTime, storageType, path, transferType, status) {
+		if err != nil {
+			resp.Message = err.Error()
+			resp.RespondJSON(ctx, http.StatusInternalServerError)
+			return
+		}
+
+		if count == 0 {
+			break
+		}
+		count--
+		respHistories = append(respHistories, history)
 	}
-	resp.RespondSuccessJSON(ctx, histories)
+	resp.RespondSuccessJSON(ctx, respHistories)
 }

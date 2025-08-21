@@ -4,8 +4,8 @@ import (
 	"MediaTools/internal/models"
 	"MediaTools/internal/schemas/storage"
 	"context"
-	"errors"
 	"fmt"
+	"iter"
 	"time"
 
 	"gorm.io/gorm"
@@ -42,8 +42,7 @@ func QueryMediaTransferHistory(
 	path string, // 路径，模糊匹配
 	transferType storage.TransferType, // 转移类型为 TransferUnknown 时不进行过滤
 	status *bool, // 是否成功
-	count int, // 最大返回数量
-) ([]models.MediaTransferHistory, error) {
+) iter.Seq2[*models.MediaTransferHistory, error] {
 	var query gorm.ChainInterface[models.MediaTransferHistory] = gorm.G[models.MediaTransferHistory](DB)
 
 	if id != nil { // 如果提供了 ID，则只查询该 ID 的记录
@@ -73,18 +72,33 @@ func QueryMediaTransferHistory(
 		if status != nil {
 			query = query.Where("status = ?", *status)
 		}
-		if count > 0 {
-			query = query.Limit(count)
-		}
 	}
 
-	results, err := query.Find(ctx)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return results, nil // 如果没有找到记录，返回空切片
-		} else {
-			return nil, fmt.Errorf("查询媒体转移历史记录失败: %w", err)
+	return func(yield func(*models.MediaTransferHistory, error) bool) {
+		results, err := query.Rows(ctx)
+		if err != nil {
+			yield(nil, fmt.Errorf("查询媒体转移历史记录失败: %w", err))
+			return
+		}
+		defer results.Close()
+
+		var history *models.MediaTransferHistory
+		for results.Next() {
+			err := results.Scan(&history)
+			if err != nil {
+				if !yield(nil, fmt.Errorf("扫描媒体转移历史记录失败: %w", err)) {
+					return
+				}
+				continue
+			}
+			if !yield(history, nil) {
+				return
+			}
+		}
+
+		// 检查是否有错误发生
+		if err := results.Err(); err != nil {
+			yield(nil, fmt.Errorf("遍历结果集时发生错误: %w", err))
 		}
 	}
-	return results, nil
 }
