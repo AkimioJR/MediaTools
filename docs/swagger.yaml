@@ -123,6 +123,56 @@ definitions:
     - MediaTypeUnknown
     - MediaTypeMovie
     - MediaTypeTV
+  schemas.ArchiveMediaManualRequest:
+    properties:
+      dst_dir:
+        allOf:
+        - $ref: '#/definitions/schemas.FileInfoRequest'
+        description: 目标目录
+      episode_offset:
+        description: 集数偏移（仅为制定集数是生效）
+        type: string
+      episode_str:
+        description: 集数字符串，单集或多集范围
+        type: string
+      media_type:
+        allOf:
+        - $ref: '#/definitions/meta.MediaType'
+        description: 可选字段
+      organize_by_category:
+        description: 是否按分类整理
+        type: boolean
+      organize_by_type:
+        description: 是否按类型整理
+        type: boolean
+      part:
+        description: 指定分段
+        type: string
+      scrape:
+        description: 是否刮削元数据
+        type: boolean
+      season:
+        description: 季编号，-1 表示不设定
+        type: integer
+      src_file:
+        allOf:
+        - $ref: '#/definitions/schemas.FileInfoRequest'
+        description: 源文件
+      tmdb_id:
+        description: TMDB ID
+        type: integer
+      transfer_type:
+        allOf:
+        - $ref: '#/definitions/storage.TransferType'
+        description: 转移方法
+    required:
+    - dst_dir
+    - organize_by_category
+    - organize_by_type
+    - scrape
+    - src_file
+    - transfer_type
+    type: object
   schemas.FileInfoRequest:
     properties:
       path:
@@ -390,6 +440,24 @@ paths:
       summary: 查询媒体转移历史记录
       tags:
       - History
+  /library/archive:
+    post:
+      consumes:
+      - application/json
+      description: 手动归档媒体文件
+      parameters:
+      - description: 请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ArchiveMediaManualRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: 手动归档媒体文件
+      tags:
+      - 媒体库管理
   /log/recent:
     get:
       description: 获取最近日志

@@ -303,6 +303,33 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/library/archive": {
+            "post": {
+                "description": "手动归档媒体文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "媒体库管理"
+                ],
+                "summary": "手动归档媒体文件",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ArchiveMediaManualRequest"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/log/recent": {
             "get": {
                 "description": "获取最近日志",
@@ -642,6 +669,83 @@ const docTemplate = `{
                 "MediaTypeMovie",
                 "MediaTypeTV"
             ]
+        },
+        "schemas.ArchiveMediaManualRequest": {
+            "type": "object",
+            "required": [
+                "dst_dir",
+                "organize_by_category",
+                "organize_by_type",
+                "scrape",
+                "src_file",
+                "transfer_type"
+            ],
+            "properties": {
+                "dst_dir": {
+                    "description": "目标目录",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.FileInfoRequest"
+                        }
+                    ]
+                },
+                "episode_offset": {
+                    "description": "集数偏移（仅为制定集数是生效）",
+                    "type": "string"
+                },
+                "episode_str": {
+                    "description": "集数字符串，单集或多集范围",
+                    "type": "string"
+                },
+                "media_type": {
+                    "description": "可选字段",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/meta.MediaType"
+                        }
+                    ]
+                },
+                "organize_by_category": {
+                    "description": "是否按分类整理",
+                    "type": "boolean"
+                },
+                "organize_by_type": {
+                    "description": "是否按类型整理",
+                    "type": "boolean"
+                },
+                "part": {
+                    "description": "指定分段",
+                    "type": "string"
+                },
+                "scrape": {
+                    "description": "是否刮削元数据",
+                    "type": "boolean"
+                },
+                "season": {
+                    "description": "季编号，-1 表示不设定",
+                    "type": "integer"
+                },
+                "src_file": {
+                    "description": "源文件",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.FileInfoRequest"
+                        }
+                    ]
+                },
+                "tmdb_id": {
+                    "description": "TMDB ID",
+                    "type": "integer"
+                },
+                "transfer_type": {
+                    "description": "转移方法",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/storage.TransferType"
+                        }
+                    ]
+                }
+            }
         },
         "schemas.FileInfoRequest": {
             "type": "object",

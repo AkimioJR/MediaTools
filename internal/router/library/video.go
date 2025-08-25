@@ -11,6 +11,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @Router /library/archive [post]
+// @Summary 手动归档媒体文件
+// @Description 手动归档媒体文件
+// @Tags 媒体库管理
+// @Accept json
+// @Produce json
+// @Param data body schemas.ArchiveMediaManualRequest true "请求参数"
 func ArchiveMediaManual(ctx *gin.Context) {
 	var (
 		req  schemas.ArchiveMediaManualRequest
