@@ -5,8 +5,10 @@ import (
 	"MediaTools/internal/controller/recognize_controller"
 	"MediaTools/internal/controller/scrape_controller"
 	"MediaTools/internal/controller/storage_controller"
+	"MediaTools/internal/controller/task_controller"
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/pkg/meta"
+	"MediaTools/internal/pkg/task"
 	"MediaTools/internal/pkg/wordmatch"
 	"MediaTools/internal/schemas"
 	"MediaTools/internal/schemas/storage"
@@ -113,7 +115,7 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 	transferType storage.TransferType, mediaType meta.MediaType,
 	tmdbID int, season int, episodeStr string, episodeOffset string,
 	part string, organizeByType bool, organizeByCategory bool, scrape bool,
-) (storage.StoragePath, error) {
+) (*task.Task, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -192,16 +194,26 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 		return nil, fmt.Errorf("创建媒体项失败：%w", err)
 	}
 
-	var dstFile storage.StoragePath
-	if scrape {
-		dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, info)
+	var taskName string
+	if item.MediaType == meta.MediaTypeMovie {
+		taskName = fmt.Sprintf("%s (%d)", item.Title, item.Year)
 	} else {
-		dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, nil)
+		taskName = fmt.Sprintf("%s S%02dE%02d", item.Title, item.Season, item.Episode)
 	}
 
-	if err != nil {
-		return nil, fmt.Errorf("转移媒体文件失败：%w", err)
-	}
-	logrus.Infof("媒体文件转移成功：%s -> %s", srcFile.String(), dstFile.String())
-	return dstFile, nil
+	task := task_controller.SubmitTransferTask(taskName, func(ctx context.Context) {
+		var dstFile storage.StoragePath
+		if scrape {
+			dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, info)
+		} else {
+			dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, nil)
+		}
+		if err != nil {
+			logrus.Warning("转移媒体文件失败：%w", err)
+		} else {
+			logrus.Infof("媒体文件转移成功：%s -> %s", srcFile.String(), dstFile.String())
+		}
+	})
+
+	return task, nil
 }

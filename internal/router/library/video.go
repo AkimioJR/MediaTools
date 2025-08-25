@@ -2,6 +2,7 @@ package library
 
 import (
 	"MediaTools/internal/controller/library_controller"
+	"MediaTools/internal/pkg/task"
 	"MediaTools/internal/schemas"
 	"MediaTools/internal/schemas/storage"
 	"net/http"
@@ -13,7 +14,7 @@ import (
 func ArchiveMediaManual(ctx *gin.Context) {
 	var (
 		req  schemas.ArchiveMediaManualRequest
-		resp schemas.Response[*storage.StorageFileInfo]
+		resp schemas.Response[*task.Task]
 	)
 
 	req.Season = -1 // 默认值为 -1，表示不设定季编号
@@ -25,7 +26,7 @@ func ArchiveMediaManual(ctx *gin.Context) {
 	srcFile := storage.NewStoragePath(req.SrcFile.StorageType, req.SrcFile.Path)
 	dstDir := storage.NewStoragePath(req.DstDir.StorageType, req.DstDir.Path)
 
-	dstFile, err := library_controller.ArchiveMediaAdvanced(ctx, srcFile, dstDir, req.TransferType, req.MediaType,
+	task, err := library_controller.ArchiveMediaAdvanced(ctx, srcFile, dstDir, req.TransferType, req.MediaType,
 		req.TMDBID, req.Season, req.EpisodeStr, req.EpisodeOffset, req.Part,
 		req.OrganizeByType, req.OrganizeByCategory, req.Scrape,
 	)
@@ -35,6 +36,6 @@ func ArchiveMediaManual(ctx *gin.Context) {
 		return
 	}
 
-	logrus.Info("手动整理媒体文件整理成功：", dstFile.String())
-	resp.RespondSuccessJSON(ctx, dstFile.(*storage.StorageFileInfo))
+	logrus.Debugf("已提交媒体文件整理任务: %+v", task)
+	resp.RespondSuccessJSON(ctx, task)
 }
