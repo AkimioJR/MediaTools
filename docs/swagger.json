@@ -409,6 +409,52 @@
                 ],
                 "responses": {}
             }
+        },
+        "/task/transfer": {
+            "get": {
+                "description": "查询转移任务列表",
+                "tags": [
+                    "任务管理"
+                ],
+                "summary": "查询转移任务列表",
+                "responses": {}
+            }
+        },
+        "/task/transfer/{id}": {
+            "get": {
+                "description": "获取转移任务状态",
+                "tags": [
+                    "任务管理"
+                ],
+                "summary": "获取转移任务状态",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "任务 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "description": "取消转移任务",
+                "tags": [
+                    "任务管理"
+                ],
+                "summary": "取消转移任务",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "任务 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
         }
     },
     "definitions": {

@@ -467,6 +467,38 @@ paths:
       summary: 刮削视频
       tags:
       - 刮削
+  /task/transfer:
+    get:
+      description: 查询转移任务列表
+      responses: {}
+      summary: 查询转移任务列表
+      tags:
+      - 任务管理
+  /task/transfer/{id}:
+    delete:
+      description: 取消转移任务
+      parameters:
+      - description: 任务 ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: 取消转移任务
+      tags:
+      - 任务管理
+    get:
+      description: 获取转移任务状态
+      parameters:
+      - description: 任务 ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: 获取转移任务状态
+      tags:
+      - 任务管理
 schemes:
 - HTTP
 swagger: "2.0"
