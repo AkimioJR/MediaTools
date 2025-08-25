@@ -88,14 +88,22 @@ func (tq *TaskQueue) SubmitTask(name string, fn TaskFunc) *Task {
 	return task
 }
 
-// 取消任务
-func (tq *TaskQueue) CancelTask(id string) (*Task, error) {
+// 获取任务
+func (tq *TaskQueue) GetTask(id string) (*Task, error) {
 	value, ok := tq.taskMap.Load(id)
 	if !ok {
 		return nil, errs.ErrTaskNotFound
 	}
+	return value.(*Task), nil
+}
 
-	task := value.(*Task)
+// 取消任务
+func (tq *TaskQueue) CancelTask(id string) (*Task, error) {
+	task, err := tq.GetTask(id)
+	if err != nil {
+		return nil, err
+	}
+
 	task.State = TaskStateCanceling
 	defer func() {
 		task.cancel()
