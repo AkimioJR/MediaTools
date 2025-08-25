@@ -89,14 +89,17 @@ func (tq *TaskQueue) SubmitTask(name string, fn TaskFunc) *Task {
 }
 
 // 取消任务
-func (tq *TaskQueue) CancelTask(id string) error {
+func (tq *TaskQueue) CancelTask(id string) (*Task, error) {
 	value, ok := tq.taskMap.Load(id)
 	if !ok {
-		return errs.ErrTaskNotFound
+		return nil, errs.ErrTaskNotFound
 	}
 
 	task := value.(*Task)
-	task.cancel()
-	tq.taskMap.Delete(id)
-	return nil
+	task.State = TaskStateCanceling
+	defer func() {
+		task.cancel()
+		tq.taskMap.Delete(id)
+	}()
+	return task, nil
 }
