@@ -64,7 +64,7 @@ func (tq *TaskQueue) Close() {
 
 // 生产者函数
 // 向任务队列中添加任务
-func (tq *TaskQueue) SubmitTask(name string, fn TaskFunc) {
+func (tq *TaskQueue) SubmitTask(name string, fn TaskFunc) *Task {
 	var (
 		id string
 		ok bool
@@ -85,6 +85,7 @@ func (tq *TaskQueue) SubmitTask(name string, fn TaskFunc) {
 	}
 	tq.taskMap.Store(id, task)
 	tq.taskChan <- task
+	return task
 }
 
 // 取消任务
