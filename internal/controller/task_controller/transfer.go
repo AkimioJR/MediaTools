@@ -6,6 +6,6 @@ func SubmitTransferTask(name string, fn task.TaskFunc) *task.Task {
 	return transferTaskQueue.SubmitTask(name, fn)
 }
 
-func CancelTransferTask(id string) error {
+func CancelTransferTask(id string) (*task.Task, error) {
 	return transferTaskQueue.CancelTask(id)
 }
