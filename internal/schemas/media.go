@@ -8,6 +8,9 @@ import (
 	"fmt"
 	pathlib "path"
 	"strconv"
+
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 type TMDBTVInfo struct {
@@ -150,6 +153,19 @@ func (mi MediaItem) Value() (any, error) {
 		return nil, fmt.Errorf("MediaItem JSON 序列化失败: %w", err)
 	}
 	return b, nil
+}
+func (MediaItem) GormDBDataType(db *gorm.DB, field *schema.Field) string {
+	// 使用 field.Tag、field.TagSettings 获取字段的 tag
+	// 查看 https://github.com/go-gorm/gorm/blob/master/schema/field.go 获取全部的选项
+
+	// 根据不同的数据库驱动返回不同的数据类型
+	switch db.Dialector.Name() {
+	case "mysql", "sqlite":
+		return "JSON"
+	case "postgres":
+		return "JSONB"
+	}
+	return ""
 }
 
 type RecognizeMediaDetail struct {
