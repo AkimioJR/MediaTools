@@ -9,6 +9,7 @@ import (
 	"MediaTools/internal/router/recognize"
 	"MediaTools/internal/router/scrape"
 	"MediaTools/internal/router/storage"
+	"MediaTools/internal/router/task"
 	"MediaTools/internal/router/tmdb"
 	"MediaTools/internal/schemas"
 	"net/http"
@@ -46,6 +47,7 @@ func InitRouter(isDev bool) *gin.Engine {
 	library.RegisterLibraryRouter(ginRouter.Group("/library"))      // 媒体库相关接口
 	storage.RegisterStorageRouter(ginRouter.Group("/storage"))      // 存储相关接口
 	history.RegisterHistoryRouter(ginRouter.Group("/history"))      // 历史记录相关接口
+	task.RegisterTaskRouter(ginRouter.Group("/task"))               // 任务相关接口
 
 	logrus.Info("路由初始化完成")
 	return ginRouter
