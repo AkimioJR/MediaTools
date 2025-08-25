@@ -38,14 +38,14 @@ func InitRouter(isDev bool) *gin.Engine {
 		resp.RespondSuccessJSON(ctx, &configuration.Version)
 	})
 
-	config.RegisterConfigRouter(ginRouter)      // 配置相关路由
-	log.RegisterLogRouter(ginRouter)            // 日志相关路由
-	tmdb.RegisterTMDBRouter(ginRouter)          // TMDB 相关接口
-	recognize.RegisteRecognizeRouter(ginRouter) // 识别相关接口
-	scrape.RegisterScrapeRouter(ginRouter)      // 刮削相关接口
-	library.RegisterLibraryRouter(ginRouter)    // 媒体库相关接口
-	storage.RegisterStorageRouter(ginRouter)    // 存储相关接口
-	history.RegisterHistoryRouter(ginRouter)    // 历史记录相关接口
+	config.RegisterConfigRouter(ginRouter.Group("/config"))         // 配置相关路由
+	log.RegisterLogRouter(ginRouter.Group("/log"))                  // 日志相关路由
+	tmdb.RegisterTMDBRouter(ginRouter.Group("/tmdb"))               // TMDB 相关接口
+	recognize.RegisteRecognizeRouter(ginRouter.Group("/recognize")) // 识别相关接口
+	scrape.RegisterScrapeRouter(ginRouter.Group("/scrape"))         // 刮削相关接口
+	library.RegisterLibraryRouter(ginRouter.Group("/library"))      // 媒体库相关接口
+	storage.RegisterStorageRouter(ginRouter.Group("/storage"))      // 存储相关接口
+	history.RegisterHistoryRouter(ginRouter.Group("/history"))      // 历史记录相关接口
 
 	logrus.Info("路由初始化完成")
 	return ginRouter
