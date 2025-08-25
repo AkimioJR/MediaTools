@@ -103,3 +103,14 @@ func (tq *TaskQueue) CancelTask(id string) (*Task, error) {
 	}()
 	return task, nil
 }
+
+func (tq *TaskQueue) IterTasks(yield func(task *Task) bool) {
+	tq.taskMap.Range(func(key, value any) bool {
+		task := value.(*Task)
+		if !yield(task) {
+			return false
+		} else {
+			return true
+		}
+	})
+}
