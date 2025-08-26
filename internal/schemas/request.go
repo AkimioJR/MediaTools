@@ -50,6 +50,7 @@ type ArchiveMediaManualRequest struct {
 	TMDBID        int            `json:"tmdb_id"`        // TMDB ID
 	Season        int            `json:"season"`         // 季编号，-1 表示不设定
 	EpisodeStr    string         `json:"episode_str"`    // 集数字符串，单集或多集范围
+	EpisodeFormat string         `json:"episode_format"` // 集数格式（用于集数定位）
 	EpisodeOffset string         `json:"episode_offset"` // 集数偏移（仅为制定集数是生效）
 	Part          string         `json:"part"`           // 指定分段
 }
