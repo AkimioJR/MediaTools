@@ -160,13 +160,12 @@ func ParseEpisodeOffset(episode int, expr string) (int, error) {
 // 例如：(BD)十二国記 第45話「東の海神 西の滄海 五章」(1440x1080 x264-10bpp flac).mkv、(BD)十二国記 第32話「風の万里 黎明の空　九章」(1440x1080 x264-10bpp flac).mkv 共3个文件需要批量整理
 // 此处可以填(BD)十二国記 第{ep}話{a}(1440x1080 x264-10bpp flac).mkv， {ep}表示集，{a} 表示通配符
 func ParseEpisodeFormat(name string, format string) (int, error) {
-	// 将模式转换为正则表达式
+
 	// 转义模式中的特殊字符
 	format = regexp.QuoteMeta(format)
-	format = strings.ReplaceAll(format, "{a}", ".+")
-	format = strings.ReplaceAll(format, "{ep}", "(.+)")
+	format = strings.ReplaceAll(format, `\{ep\}`, "(.+?)")
+	format = strings.ReplaceAll(format, `\{a\}`, ".+?")
 
-	// 编译正则表达式
 	re, err := regexp.Compile(format)
 	if err != nil {
 		return -1, fmt.Errorf("无效的格式: %v", err)
