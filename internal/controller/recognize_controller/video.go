@@ -2,7 +2,9 @@ package recognize_controller
 
 import (
 	"MediaTools/internal/pkg/meta"
+	"MediaTools/internal/pkg/wordmatch"
 	"MediaTools/internal/schemas"
+	"MediaTools/utils"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -143,4 +145,40 @@ func ApplyMediaMetaRule(vm *meta.VideoMeta) string {
 		logrus.Warningf("标题「%s」匹配到多个设置规则：%+v，跳过解析", vm.OrginalTitle, matches)
 		return ""
 	}
+}
+
+// ParseEpisodeOffset 解析集偏移
+// episode: 原集数
+// expr: 偏移字符串
+// 返回: 偏移后的集数，错误
+func ParseEpisodeOffset(episode int, expr string) (int, error) {
+	return wordmatch.ParseOffsetExpr(expr, episode)
+}
+
+// ParseEpisodeFormat 解析集数格式使用表达式来确定集数的位置
+// {ep}占位符代表集数
+// 例如：(BD)十二国記 第45話「東の海神 西の滄海 五章」(1440x1080 x264-10bpp flac).mkv、(BD)十二国記 第32話「風の万里 黎明の空　九章」(1440x1080 x264-10bpp flac).mkv 共3个文件需要批量整理
+// 此处可以填(BD)十二国記 第{ep}話{a}(1440x1080 x264-10bpp flac).mkv， {ep}表示集，{a} 表示通配符
+func ParseEpisodeFormat(name string, format string) (int, error) {
+	// 将模式转换为正则表达式
+	// 转义模式中的特殊字符
+	format = regexp.QuoteMeta(format)
+	format = strings.ReplaceAll(format, "{a}", ".+")
+	format = strings.ReplaceAll(format, "{ep}", "(.+)")
+
+	// 编译正则表达式
+	re, err := regexp.Compile(format)
+	if err != nil {
+		return -1, fmt.Errorf("无效的格式: %v", err)
+	}
+	matches := re.FindStringSubmatch(name)
+	if len(matches) < 2 {
+		return -1, fmt.Errorf("无法从 「%s」 中根据格式 「%s」 提取集数", name, format)
+	}
+	epStr := strings.TrimSpace(matches[1])
+	ep, err := utils.String2Int(epStr)
+	if err != nil {
+		return -1, fmt.Errorf("解析 「%s」 集数格式失败: %v", name, err)
+	}
+	return ep, nil
 }
