@@ -2,9 +2,11 @@ package utils
 
 import (
 	"MediaTools/extensions"
+
 	"path/filepath"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 
 	"errors"
@@ -181,6 +183,31 @@ func ChineseToInt(chinese string) (int, error) {
 	}
 
 	return result, nil
+}
+
+var ErrUnsupportedNumberString = errors.New("unsupport number string")
+
+func String2Int(s string) (num int, err error) {
+	switch {
+	case IsDigits(s):
+		num, err = strconv.Atoi(s)
+		if err != nil {
+			return -1, err
+		}
+	case IsAllChinese(s):
+		num, err = ChineseToInt(s)
+		if err != nil {
+			return -1, err
+		}
+	case IsRomanNumeral(s):
+		num, err = RomanToInt(s)
+		if err != nil {
+			return -1, err
+		}
+	default:
+		return -1, ErrUnsupportedNumberString
+	}
+	return num, nil
 }
 
 var (

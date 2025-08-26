@@ -48,25 +48,8 @@ func (wm *WordsMatcher) MatchAndProcess(title string) (string, string) {
 			}
 
 			episodeStr := strings.TrimSpace(title[prefixIndex+len(wordRule.PrefixWord) : suffixIndex])
-			var episode int
-			var err error
-			switch {
-			case utils.IsDigits(episodeStr):
-				episode, err = strconv.Atoi(episodeStr)
-				if err != nil {
-					continue
-				}
-			case utils.IsAllChinese(episodeStr):
-				episode, err = utils.ChineseToInt(episodeStr)
-				if err != nil {
-					continue
-				}
-			case utils.IsRomanNumeral(episodeStr):
-				episode, err = utils.RomanToInt(episodeStr)
-				if err != nil {
-					continue
-				}
-			default:
+			episode, err := utils.String2Int(episodeStr)
+			if err != nil {
 				continue
 			}
 			if episode > 0 {
