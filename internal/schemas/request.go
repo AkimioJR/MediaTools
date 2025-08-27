@@ -38,12 +38,12 @@ type RenameRequest struct {
 }
 
 type ArchiveMediaManualRequest struct {
-	SrcFile            FileInfoRequest      `json:"src_file" binding:"required"`             // 源文件
-	DstDir             FileInfoRequest      `json:"dst_dir" binding:"required"`              // 目标目录
-	TransferType       storage.TransferType `json:"transfer_type" binding:"required"`        // 转移方法
-	OrganizeByType     bool                 `json:"organize_by_type" binding:"required"`     // 是否按类型整理
-	OrganizeByCategory bool                 `json:"organize_by_category" binding:"required"` // 是否按分类整理
-	Scrape             bool                 `json:"scrape" binding:"required"`               // 是否刮削元数据
+	SrcFile            FileInfoRequest      `json:"src_file" binding:"required"`      // 源文件
+	DstDir             FileInfoRequest      `json:"dst_dir" binding:"required"`       // 目标目录
+	TransferType       storage.TransferType `json:"transfer_type" binding:"required"` // 转移方法
+	OrganizeByType     bool                 `json:"organize_by_type"`                 // 是否按类型整理
+	OrganizeByCategory bool                 `json:"organize_by_category"`             // 是否按分类整理
+	Scrape             bool                 `json:"scrape"`                           // 是否刮削元数据
 
 	// 可选字段
 	MediaType     meta.MediaType `json:"media_type"`     // 媒体类型
