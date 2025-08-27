@@ -26,6 +26,9 @@ func QueryMediaTransferHistoryBySrc(src storage.StoragePath) (*models.MediaTrans
 	ctx := context.Background()
 	history, err := gorm.G[models.MediaTransferHistory](DB).Where("src_type = ? AND src_path = ?", src.GetStorageType(), src.GetPath()).First(ctx)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil // 没有找到记录，返回 nil
+		}
 		return nil, fmt.Errorf("查询媒体转移历史记录失败: %w", err)
 	}
 	return &history, nil
