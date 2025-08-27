@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 // @Router /history/media/transfer [get]
@@ -24,7 +25,8 @@ import (
 // @Param path query string false "路径, 模糊匹配"
 // @Param transfer_type query string false "转移类型, 可选值为 'Copy'、'Move'、'Link'、'SoftLink' 等"
 // @Param status query bool false "是否成功, true 或 false"
-// @Param count query int false "最大返回数量, 默认值为 30"
+// @Param count query int false "最大返回数量, 默认值为 50"
+// @Param page query int false "页码, 从 1 开始, 默认值为 1"
 func QueryMediaTransferHistory(ctx *gin.Context) {
 	var (
 		resp schemas.Response[[]*models.MediaTransferHistory]
@@ -35,7 +37,8 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 		path               string               // 路径，模糊匹配
 		transferType       storage.TransferType // 转移类型
 		status             *bool                // 是否成功
-		count              = 30                 // 默认返回数量
+		count              = 50                 // 默认返回数量
+		page               = 1                  // 默认页码
 	)
 
 	// 解析 ID
@@ -98,10 +101,24 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 			}
 			count = c
 		}
+		pageStr := ctx.Query("page")
+		if pageStr != "" {
+			p, err := strconv.Atoi(pageStr)
+			if err != nil {
+				resp.Message = "解析页码参数失败: " + err.Error()
+				ctx.JSON(http.StatusBadRequest, resp)
+				return
+			}
+			if p < 1 {
+				logrus.Warningf("页码参数无效，重置为 1: %d", p)
+				p = 1
+			}
+			page = p
+		}
 	}
-
+	offset := (page - 1) * count
 	var respHistories []*models.MediaTransferHistory
-	for history, err := range database.QueryMediaTransferHistory(ctx, id, startTime, endTime, storageType, path, transferType, status) {
+	for history, err := range database.QueryMediaTransferHistory(ctx, id, startTime, endTime, storageType, path, transferType, status, offset) {
 		if err != nil {
 			resp.Message = err.Error()
 			resp.RespondJSON(ctx, http.StatusInternalServerError)
