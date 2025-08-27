@@ -7,6 +7,7 @@ import (
 	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/controller/task_controller"
 	"MediaTools/internal/controller/tmdb_controller"
+	"MediaTools/internal/database"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/pkg/task"
 	"MediaTools/internal/schemas"
@@ -133,6 +134,16 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 	lock.RLock()
 	defer lock.RUnlock()
 
+	history, err := database.QueryMediaTransferHistoryBySrc(srcFile)
+	if err != nil {
+		logrus.Warningf("查询媒体转移历史失败：%v", err)
+	} else if history != nil {
+		return nil, fmt.Errorf("媒体文件 %s 已经转移过，跳过转移", srcFile)
+	}
+	history.TransferType = transferType
+	history.SrcPath = srcFile.GetPath()
+	history.SrcType = srcFile.GetStorageType()
+
 	videoMeta, rule1, rule2 := recognize_controller.ParseVideoMeta(srcFile.GetName())
 	switch {
 	case rule1 != "" && rule2 != "":
@@ -216,6 +227,7 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 	if err != nil {
 		return nil, fmt.Errorf("创建媒体项失败：%w", err)
 	}
+	history.Item = item
 
 	var taskName string
 	if item.MediaType == meta.MediaTypeMovie {
@@ -225,7 +237,6 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 	}
 
 	task := task_controller.SubmitTransferTask(taskName, func(ctx context.Context) {
-
 		var dstFile storage.StoragePath
 		if scrape {
 			dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, info)
@@ -234,8 +245,20 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 		}
 		if err != nil {
 			logrus.Warning("转移媒体文件失败：%w", err)
+			history.Status = false
+			history.Message = err.Error()
 		} else {
 			logrus.Infof("媒体文件转移成功：%s -> %s", srcFile.String(), dstFile.String())
+			history.Status = true
+			history.DstPath = dstFile.GetPath()
+			history.DstType = dstFile.GetStorageType()
+
+			err = database.UpdateMediaTransferHistory(history)
+			if err != nil {
+				logrus.Errorf("更新媒体转移记录失败: %v", err)
+			} else {
+				logrus.Debugf("更新媒体转移记录成功: %+v", history)
+			}
 		}
 	})
 
