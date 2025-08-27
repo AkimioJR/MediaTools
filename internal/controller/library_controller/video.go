@@ -9,7 +9,6 @@ import (
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/pkg/task"
-	"MediaTools/internal/pkg/wordmatch"
 	"MediaTools/internal/schemas"
 	"MediaTools/internal/schemas/storage"
 	"MediaTools/utils"
@@ -111,9 +110,24 @@ func ArchiveMedia(
 	return dstPath, nil
 }
 
+// 高级整理媒体文件，支持更多选项
+// srcFile: 源文件路径
+// dstDir: 目标目录路径
+// transferType: 传输类型
+// mediaType: 媒体类型（电影、电视剧等）
+// tmdbID: TMDB ID（可选）
+// season: 季编号（可选，-1表示不设定季编号）
+// episodeStr: 集数字符串（可选，支持范围，如 "1-3"）
+// episodeFormat: 集数格式（用于集数定位）
+// episodeOffset: 集数偏移表达式（可选，如 "EP+1"）
+// part: 分段信息（可选）
+// organizeByType: 是否按媒体类型整理目录
+// organizeByCategory: 是否按分类整理目录
+// scrape: 是否刮削元数据
+// 返回值: 提交的任务和可能的错误
 func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstDir storage.StoragePath,
 	transferType storage.TransferType, mediaType meta.MediaType,
-	tmdbID int, season int, episodeStr string, episodeOffset string,
+	tmdbID int, season int, episodeStr string, episodeFormat string, episodeOffset string,
 	part string, organizeByType bool, organizeByCategory bool, scrape bool,
 ) (*task.Task, error) {
 	lock.RLock()
@@ -157,13 +171,22 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 		} else {
 			msgs = append(msgs, fmt.Sprintf("集数: %d", startEpisode))
 		}
-	} else if episodeOffset != "" { // 当 episodeStr 为空时，才使用 episodeOffset
-		offsetEpisode, err := wordmatch.ParseOffsetExpr(episodeOffset, videoMeta.Episode)
-		if err != nil {
-			return nil, fmt.Errorf("解析集数偏移表达式失败：%w", err)
+	} else {
+		if episodeFormat != "" {
+			ep, err := recognize_controller.ParseEpisodeFormat(videoMeta.OrginalTitle, episodeFormat)
+			if err != nil {
+				return nil, fmt.Errorf("解析集数格式失败：%w", err)
+			}
+			videoMeta.Episode = ep
 		}
-		videoMeta.Episode = offsetEpisode
-		msgs = append(msgs, fmt.Sprintf("集数偏移：%s, 计算结果: %d", episodeOffset, offsetEpisode))
+		if episodeOffset != "" { // 当 episodeStr 为空时，才使用 episodeOffset
+			offsetEpisode, err := recognize_controller.ParseEpisodeOffset(videoMeta.Episode, episodeOffset)
+			if err != nil {
+				return nil, fmt.Errorf("解析集数偏移表达式失败：%w", err)
+			}
+			videoMeta.Episode = offsetEpisode
+			msgs = append(msgs, fmt.Sprintf("集数偏移：%s, 计算结果: %d", episodeOffset, offsetEpisode))
+		}
 	}
 
 	if part != "" {
