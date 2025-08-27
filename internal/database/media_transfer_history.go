@@ -17,7 +17,7 @@ import (
 func UpdateMediaTransferHistory(history *models.MediaTransferHistory) error {
 	result := DB.Save(history)
 	if result.Error != nil {
-		return fmt.Errorf("更新媒体转移历史记录失败: %w", result.Error)
+		return fmt.Errorf("更新数据库失败: %w", result.Error)
 	}
 	return nil
 }
