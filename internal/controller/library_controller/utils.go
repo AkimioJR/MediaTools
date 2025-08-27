@@ -178,10 +178,10 @@ func GenFloder(libConfig *config.LibraryConfig, info *schemas.MediaInfo) []strin
 
 // 支持解析集数或范围，
 // 例如 1 ---> 第1集
-// 例如 1,3 ---> 第1集到第3集
+// 例如 1-3 ---> 第1集到第3集
 func parseEpisodeStr(episodeStr string) (int, int, error) {
-	if strings.Contains(episodeStr, ",") { // 多集或范围
-		parts := strings.Split(episodeStr, ",")
+	if strings.Contains(episodeStr, "-") { // 多集或范围
+		parts := strings.Split(episodeStr, "-")
 		if len(parts) != 2 {
 			return 0, 0, fmt.Errorf("集数格式错误，应该是单集或两集范围，输入字符串: %s", episodeStr)
 		}
