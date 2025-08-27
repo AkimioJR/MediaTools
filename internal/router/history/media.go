@@ -17,7 +17,7 @@ import (
 // @Description 查询媒体转移历史记录，支持根据 ID、时间范围、源路径、目标路径、转移类型和状态进行过滤
 // @Tags History
 // @Produce json
-// @Param id query uint false "媒体转移历史记录 ID, 如果提供则只查询该 ID 的记录"
+// @Param id query uint64 false "媒体转移历史记录 ID, 如果提供则只查询该 ID 的记录"
 // @Param start_time query time.Time false "开始时间, 格式为 RFC3339"
 // @Param end_time query time.Time false "结束时间, 格式为 RFC3339"
 // @Param storage_type query string false "存储类型, 可选值为 'LocalStorage' 等"
@@ -29,7 +29,7 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 	var (
 		resp schemas.Response[[]*models.MediaTransferHistory]
 
-		id                 *uint                // ID
+		id                 *uint64              // ID
 		startTime, endTime *time.Time           // 时间范围
 		storageType        storage.StorageType  // 存储类型
 		path               string               // 路径，模糊匹配
@@ -47,8 +47,8 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, resp)
 			return
 		}
-		idUint := uint(idp) // 先转换为 uint
-		id = &idUint        // 然后取地址赋给指针
+		idUint := uint64(idp) // 先转换为 uint
+		id = &idUint          // 然后取地址赋给指针
 	} else { // 如果没有提供 ID，则根据其他条件查询
 		startTimeStr := ctx.Query("start_time")
 		endTimeStr := ctx.Query("end_time")
