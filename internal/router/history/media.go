@@ -29,7 +29,7 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 	var (
 		resp schemas.Response[[]*models.MediaTransferHistory]
 
-		id                 *uint64              // ID
+		id                 = new(uint64)        // ID
 		startTime, endTime *time.Time           // 时间范围
 		storageType        storage.StorageType  // 存储类型
 		path               string               // 路径，模糊匹配
@@ -47,8 +47,7 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, resp)
 			return
 		}
-		idUint := uint64(idp) // 先转换为 uint
-		id = &idUint          // 然后取地址赋给指针
+		*id = uint64(idp)
 	} else { // 如果没有提供 ID，则根据其他条件查询
 		startTimeStr := ctx.Query("start_time")
 		endTimeStr := ctx.Query("end_time")
