@@ -46,6 +46,7 @@ func QueryMediaTransferHistory(
 	path string, // 路径，模糊匹配
 	transferType storage.TransferType, // 转移类型为 TransferUnknown 时不进行过滤
 	status *bool, // 是否成功
+	offset int, // 偏移量
 ) iter.Seq2[*models.MediaTransferHistory, error] {
 	var query gorm.ChainInterface[models.MediaTransferHistory] = gorm.G[models.MediaTransferHistory](DB)
 
@@ -75,6 +76,10 @@ func QueryMediaTransferHistory(
 
 		if status != nil {
 			query = query.Where("status = ?", *status)
+		}
+
+		if offset > 0 {
+			query = query.Offset(offset)
 		}
 	}
 
