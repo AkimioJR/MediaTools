@@ -3,9 +3,12 @@ package library_controller
 import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/pkg/meta"
+	"MediaTools/internal/pkg/wordmatch"
 	"MediaTools/internal/schemas"
 	"MediaTools/internal/schemas/storage"
+	"MediaTools/utils"
 	"fmt"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -179,7 +182,7 @@ func GenFloder(libConfig *config.LibraryConfig, info *schemas.MediaInfo) []strin
 // 支持解析集数或范围，
 // 例如 1 ---> 第1集
 // 例如 1-3 ---> 第1集到第3集
-func parseEpisodeStr(episodeStr string) (int, int, error) {
+func ParseEpisodeStr(episodeStr string) (int, int, error) {
 	if strings.Contains(episodeStr, "-") { // 多集或范围
 		parts := strings.Split(episodeStr, "-")
 		if len(parts) != 2 {
@@ -201,4 +204,39 @@ func parseEpisodeStr(episodeStr string) (int, int, error) {
 		}
 		return episode, 0, nil
 	}
+}
+
+// ParseEpisodeFormat 解析集数格式使用表达式来确定集数的位置
+// {ep}占位符代表集数
+// 例如：(BD)十二国記 第45話「東の海神 西の滄海 五章」(1440x1080 x264-10bpp flac).mkv、(BD)十二国記 第32話「風の万里 黎明の空　九章」(1440x1080 x264-10bpp flac).mkv 共3个文件需要批量整理
+// 此处可以填(BD)十二国記 第{ep}話{a}(1440x1080 x264-10bpp flac).mkv， {ep}表示集，{a} 表示通配符
+func ParseEpisodeFormat(name string, format string) (int, error) {
+
+	// 转义模式中的特殊字符
+	format = regexp.QuoteMeta(format)
+	format = strings.ReplaceAll(format, `\{ep\}`, "(.+?)")
+	format = strings.ReplaceAll(format, `\{a\}`, ".+?")
+
+	re, err := regexp.Compile(format)
+	if err != nil {
+		return -1, fmt.Errorf("无效的格式: %v", err)
+	}
+	matches := re.FindStringSubmatch(name)
+	if len(matches) < 2 {
+		return -1, fmt.Errorf("无法从 「%s」 中根据格式 「%s」 提取集数", name, format)
+	}
+	epStr := strings.TrimSpace(matches[1])
+	ep, err := utils.String2Int(epStr)
+	if err != nil {
+		return -1, fmt.Errorf("解析 「%s」 集数格式失败: %v", name, err)
+	}
+	return ep, nil
+}
+
+// ParseEpisodeOffset 解析集偏移
+// episode: 原集数
+// expr: 偏移字符串
+// 返回: 偏移后的集数，错误
+func ParseEpisodeOffset(episode int, expr string) (int, error) {
+	return wordmatch.ParseOffsetExpr(expr, episode)
 }

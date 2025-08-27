@@ -160,7 +160,7 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 	}
 
 	if episodeStr != "" {
-		startEpisode, endEpisode, err := parseEpisodeStr(episodeStr)
+		startEpisode, endEpisode, err := ParseEpisodeStr(episodeStr)
 		if err != nil {
 			return nil, fmt.Errorf("解析集数失败: %w", err)
 		}
@@ -173,14 +173,14 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 		}
 	} else {
 		if episodeFormat != "" {
-			ep, err := recognize_controller.ParseEpisodeFormat(videoMeta.OrginalTitle, episodeFormat)
+			ep, err := ParseEpisodeFormat(videoMeta.OrginalTitle, episodeFormat)
 			if err != nil {
 				return nil, fmt.Errorf("解析集数格式失败：%w", err)
 			}
 			videoMeta.Episode = ep
 		}
 		if episodeOffset != "" { // 当 episodeStr 为空时，才使用 episodeOffset
-			offsetEpisode, err := recognize_controller.ParseEpisodeOffset(videoMeta.Episode, episodeOffset)
+			offsetEpisode, err := ParseEpisodeOffset(videoMeta.Episode, episodeOffset)
 			if err != nil {
 				return nil, fmt.Errorf("解析集数偏移表达式失败：%w", err)
 			}
@@ -225,6 +225,7 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 	}
 
 	task := task_controller.SubmitTransferTask(taskName, func(ctx context.Context) {
+
 		var dstFile storage.StoragePath
 		if scrape {
 			dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, info)
