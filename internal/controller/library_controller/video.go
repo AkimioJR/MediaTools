@@ -8,6 +8,7 @@ import (
 	"MediaTools/internal/controller/task_controller"
 	"MediaTools/internal/controller/tmdb_controller"
 	"MediaTools/internal/database"
+	"MediaTools/internal/models"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/pkg/task"
 	"MediaTools/internal/schemas"
@@ -140,6 +141,8 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 	} else if history != nil {
 		return nil, fmt.Errorf("媒体文件 %s 已经转移过，跳过转移", srcFile)
 	}
+
+	history = new(models.MediaTransferHistory)
 	history.TransferType = transferType
 	history.SrcPath = srcFile.GetPath()
 	history.SrcType = srcFile.GetStorageType()
