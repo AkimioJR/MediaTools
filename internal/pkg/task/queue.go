@@ -67,7 +67,7 @@ func (tq *TaskQueue) Close() {
 func (tq *TaskQueue) SubmitTask(name string, fn TaskFunc) *Task {
 	var (
 		id string
-		ok bool
+		ok bool = true
 	)
 
 	for ok {
