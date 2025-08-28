@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func SearchMovie(ctx context.Context, searchName string) (*schemas.MediaInfo, error) {
+func MatchMovie(ctx context.Context, searchName string) (*schemas.MediaInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -91,7 +91,7 @@ func SearchMovie(ctx context.Context, searchName string) (*schemas.MediaInfo, er
 	return GetInfo(firstResult.ID, meta.MediaTypeMovie)
 }
 
-func SearchTV(ctx context.Context, searchName string) (*schemas.MediaInfo, error) {
+func MatchTV(ctx context.Context, searchName string) (*schemas.MediaInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 
@@ -168,7 +168,7 @@ func SearchTV(ctx context.Context, searchName string) (*schemas.MediaInfo, error
 	return GetInfo(firstResult.ID, meta.MediaTypeTV)
 }
 
-func SearchMulti(ctx context.Context, searchName string) (*schemas.MediaInfo, error) {
+func MatchMulti(ctx context.Context, searchName string) (*schemas.MediaInfo, error) {
 	lock.RLock()
 	defer lock.RUnlock()
 

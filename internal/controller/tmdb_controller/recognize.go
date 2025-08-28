@@ -27,11 +27,11 @@ func RecognizeMedia(ctx context.Context, videoMeta *meta.VideoMeta) (*schemas.Me
 	var fn func(context.Context, string) (*schemas.MediaInfo, error)
 	switch videoMeta.MediaType {
 	case meta.MediaTypeMovie:
-		fn = SearchMovie
+		fn = MatchMovie
 	case meta.MediaTypeTV:
-		fn = SearchTV
+		fn = MatchTV
 	case meta.MediaTypeUnknown:
-		fn = SearchMulti
+		fn = MatchMulti
 	}
 	for _, name := range videoMeta.GetTitles() {
 		info, err := fn(ctx, name)
