@@ -19,7 +19,7 @@ func GetAllTransferTasks(ctx *gin.Context) {
 
 	tasks := make([]*task.Task, 0)
 	for task := range task_controller.IterTransferTasks {
-		resp.Data = append(resp.Data, task)
+		tasks = append(tasks, task)
 	}
 	resp.RespondSuccessJSON(ctx, tasks)
 }
