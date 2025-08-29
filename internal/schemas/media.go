@@ -4,13 +4,9 @@ import (
 	"MediaTools/encode"
 	"MediaTools/internal/pkg/meta"
 	"MediaTools/internal/pkg/themoviedb/v3"
-	"encoding/json"
 	"fmt"
 	pathlib "path"
 	"strconv"
-
-	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
 type TMDBTVInfo struct {
@@ -143,30 +139,31 @@ func NewMediaItem(videoMeta *meta.VideoMeta, info *MediaInfo) (*MediaItem, error
 
 	return &item, nil
 }
-func (mi *MediaItem) Scan(value any) error {
-	return json.Unmarshal(value.([]byte), mi)
-}
 
-func (mi MediaItem) Value() (any, error) {
-	b, err := json.Marshal(mi)
-	if err != nil {
-		return nil, fmt.Errorf("MediaItem JSON 序列化失败: %w", err)
-	}
-	return b, nil
-}
-func (MediaItem) GormDBDataType(db *gorm.DB, field *schema.Field) string {
-	// 使用 field.Tag、field.TagSettings 获取字段的 tag
-	// 查看 https://github.com/go-gorm/gorm/blob/master/schema/field.go 获取全部的选项
+// func (mi *MediaItem) Scan(value any) error {
+// 	return json.Unmarshal(value.([]byte), mi)
+// }
 
-	// 根据不同的数据库驱动返回不同的数据类型
-	switch db.Dialector.Name() {
-	case "mysql", "sqlite":
-		return "JSON"
-	case "postgres":
-		return "JSONB"
-	}
-	return ""
-}
+// func (mi MediaItem) Value() (any, error) {
+// 	b, err := json.Marshal(mi)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("MediaItem JSON 序列化失败: %w", err)
+// 	}
+// 	return b, nil
+// }
+// func (MediaItem) GormDBDataType(db *gorm.DB, field *schema.Field) string {
+// 	// 使用 field.Tag、field.TagSettings 获取字段的 tag
+// 	// 查看 https://github.com/go-gorm/gorm/blob/master/schema/field.go 获取全部的选项
+
+// 	// 根据不同的数据库驱动返回不同的数据类型
+// 	switch db.Dialector.Name() {
+// 	case "mysql", "sqlite":
+// 		return "JSON"
+// 	case "postgres":
+// 		return "JSONB"
+// 	}
+// 	return ""
+// }
 
 type RecognizeMediaDetail struct {
 	Item       *MediaItem `json:"item"`        // 识别到的媒体项
