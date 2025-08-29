@@ -7,7 +7,6 @@ import (
 	"MediaTools/utils"
 	"context"
 	"fmt"
-	"iter"
 
 	"github.com/sirupsen/logrus"
 )
@@ -16,59 +15,26 @@ func MatchMovie(ctx context.Context, searchName string) (*schemas.MediaInfo, err
 	lock.RLock()
 	defer lock.RUnlock()
 
-	logrus.Infof("正在搜索「%s」...", searchName)
-
 	var firstResult *themoviedb.SearchMovieResponse
-	var results iter.Seq2[*themoviedb.SearchMovieResponse, error] = func(yield func(*themoviedb.SearchMovieResponse, error) bool) {
-		var page uint32 = 1
-		var params = themoviedb.SearchMovieParams{
-			Query: searchName,
-			Page:  &page,
-		}
-		resp, err := client.SearchMovie(params)
-		if err != nil {
-			yield(nil, fmt.Errorf("搜索电影「%s」失败: %v", searchName, err))
-			return
-		}
-		if resp.TotalResults == 0 {
-			yield(nil, fmt.Errorf("未找到电影「%s」", searchName))
-			return
-		}
-		for _, result := range resp.Result {
-			if firstResult == nil {
-				firstResult = &result // 保存第一条结果
-			}
-			if !yield(&result, nil) {
-				return
-			}
-		}
-		if resp.TotalPages > 1 {
-			for page = 2; page <= uint32(resp.TotalPages); page++ {
-				resp, err = client.SearchMovie(params)
-				if err != nil {
-					if !yield(nil, fmt.Errorf("搜索电影「%s」第 %d 页失败: %v", searchName, page, err)) {
-						return
-					}
-				}
-				for _, result := range resp.Result {
-					if !yield(&result, nil) {
-						return
-					}
-				}
-			}
-		}
+	results, err := SearchMovie(searchName)
+	if err != nil {
+		return nil, fmt.Errorf("搜索电影「%s」失败: %v", searchName, err)
 	}
 
 	for result, err := range results {
 		select {
 		case <-ctx.Done():
-			return nil, fmt.Errorf("搜索电影任务被取消: %w", ctx.Err())
+			return nil, fmt.Errorf("匹配电影任务被取消: %w", ctx.Err())
 
 		default:
 		}
 		if err != nil {
 			logrus.Warning(err)
 			continue // 如果搜索失败，尝试下一个结果
+		}
+
+		if firstResult == nil {
+			firstResult = result
 		}
 
 		if utils.FuzzyMatching(searchName, result.Title, result.OriginalTitle) {
@@ -95,46 +61,10 @@ func MatchTV(ctx context.Context, searchName string) (*schemas.MediaInfo, error)
 	lock.RLock()
 	defer lock.RUnlock()
 
-	logrus.Infof("正在搜索「%s」...", searchName)
 	var firstResult *themoviedb.SearchTVResponse
-	var results iter.Seq2[*themoviedb.SearchTVResponse, error] = func(yield func(*themoviedb.SearchTVResponse, error) bool) {
-		var page uint32 = 1
-		var params = themoviedb.SearchTVSParams{
-			Query: searchName,
-			Page:  &page,
-		}
-		resp, err := client.SearchTV(params)
-		if err != nil {
-			yield(nil, fmt.Errorf("搜索电视剧「%s」失败: %v", searchName, err))
-			return
-		}
-		if resp.TotalResults == 0 {
-			yield(nil, fmt.Errorf("未找到电视剧「%s」", searchName))
-			return
-		}
-		for _, result := range resp.Result {
-			if firstResult == nil {
-				firstResult = &result // 保存第一条结果
-			}
-			if !yield(&result, nil) {
-				return
-			}
-		}
-		if resp.TotalPages > 1 {
-			for page = 2; page <= uint32(resp.TotalPages); page++ {
-				resp, err = client.SearchTV(params)
-				if err != nil {
-					if !yield(nil, fmt.Errorf("搜索电视剧「%s」第 %d 页失败: %v", searchName, page, err)) {
-						return
-					}
-				}
-				for _, result := range resp.Result {
-					if !yield(&result, nil) {
-						return
-					}
-				}
-			}
-		}
+	results, err := SearchTV(searchName)
+	if err != nil {
+		return nil, fmt.Errorf("搜索电视剧「%s」失败: %v", searchName, err)
 	}
 
 	for result, err := range results {
@@ -147,6 +77,10 @@ func MatchTV(ctx context.Context, searchName string) (*schemas.MediaInfo, error)
 		if err != nil {
 			logrus.Warning(err)
 			continue // 如果搜索失败，尝试下一个结果
+		}
+
+		if firstResult == nil {
+			firstResult = result
 		}
 
 		if utils.FuzzyMatching(searchName, result.Name, result.OriginalName) {
@@ -174,56 +108,26 @@ func MatchMulti(ctx context.Context, searchName string) (*schemas.MediaInfo, err
 
 	logrus.Infof("正在综合搜索「%s」...", searchName)
 	var firstResult *themoviedb.SearchMultiResponse
-	var results iter.Seq2[*themoviedb.SearchMultiResponse, error] = func(yield func(*themoviedb.SearchMultiResponse, error) bool) {
-		var page uint32 = 1
-		var params = themoviedb.SearchMultiParams{
-			Query: searchName,
-			Page:  &page,
-		}
-		resp, err := client.SearchMulti(params)
-		if err != nil {
-			yield(nil, fmt.Errorf("综合搜索「%s」失败: %v", searchName, err))
-			return
-		}
-		if resp.TotalResults == 0 {
-			yield(nil, fmt.Errorf("未找到综合搜索结果「%s」", searchName))
-			return
-		}
-		for _, res := range resp.Result {
-			if firstResult == nil {
-				firstResult = &res // 保存第一条结果
-			}
-			if !yield(&res, nil) {
-				return
-			}
-		}
-		if resp.TotalPages > 1 {
-			for page = 2; page <= uint32(resp.TotalPages); page++ {
-				resp, err = client.SearchMulti(params)
-				if err != nil {
-					if !yield(nil, fmt.Errorf("综合搜索「%s」第 %d 页失败: %v", searchName, page, err)) {
-						return
-					}
-				}
-				for _, res := range resp.Result {
-					if !yield(&res, nil) {
-						return
-					}
-				}
-			}
-		}
+	results, err := SearchMulti(searchName)
+	if err != nil {
+		return nil, fmt.Errorf("综合搜索「%s」失败: %v", searchName, err)
 	}
 
 	for result, err := range results {
 		select {
 		case <-ctx.Done():
 			return nil, fmt.Errorf("综合搜索任务被取消: %w", ctx.Err())
+
 		default:
 		}
 
 		if err != nil {
 			logrus.Warning(err)
 			continue // 如果搜索失败，尝试下一个结果
+		}
+
+		if firstResult == nil {
+			firstResult = result
 		}
 
 		mediaType := parseType(result.MediaType)
