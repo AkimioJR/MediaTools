@@ -52,6 +52,7 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 		}
 		*id = uint64(idp)
 	} else { // 如果没有提供 ID，则根据其他条件查询
+		id = nil
 		startTimeStr := ctx.Query("start_time")
 		endTimeStr := ctx.Query("end_time")
 
