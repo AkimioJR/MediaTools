@@ -17,7 +17,7 @@ func (r *Response[T]) RespondJSON(ctx *gin.Context, code int) {
 	if code == http.StatusOK {
 		r.Success = true
 		r.Message = "success"
-		logrus.Debugf("响应成功: %+v", r.Data)
+		// logrus.Debugf("响应成功: %+v", r.Data)
 	} else {
 		logrus.Warning(r.Message)
 	}
