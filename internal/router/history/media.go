@@ -118,7 +118,7 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 		}
 	}
 	offset := (page - 1) * count
-	var respHistories []*models.MediaTransferHistory
+	respHistories := make([]*models.MediaTransferHistory, 0, count)
 	for history, err := range database.QueryMediaTransferHistory(id, startTime, endTime, storageType, path, transferType, status, offset) {
 		select {
 		case <-ctx.Done():
