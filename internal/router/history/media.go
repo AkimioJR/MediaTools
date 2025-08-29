@@ -119,18 +119,26 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 	}
 	offset := (page - 1) * count
 	var respHistories []*models.MediaTransferHistory
-	for history, err := range database.QueryMediaTransferHistory(ctx, id, startTime, endTime, storageType, path, transferType, status, offset) {
-		if err != nil {
-			resp.Message = err.Error()
-			resp.RespondJSON(ctx, http.StatusInternalServerError)
+	for history, err := range database.QueryMediaTransferHistory(id, startTime, endTime, storageType, path, transferType, status, offset) {
+		select {
+		case <-ctx.Done():
+			resp.Message = "请求已取消，停止查询媒体转移历史记录: " + ctx.Err().Error()
+			resp.RespondJSON(ctx, http.StatusRequestTimeout)
 			return
-		}
 
-		if count == 0 {
-			break
+		default:
+			if err != nil {
+				resp.Message = err.Error()
+				resp.RespondJSON(ctx, http.StatusInternalServerError)
+				return
+			}
+
+			if count == 0 {
+				break
+			}
+			count--
+			respHistories = append(respHistories, history)
 		}
-		count--
-		respHistories = append(respHistories, history)
 	}
 	resp.RespondSuccessJSON(ctx, respHistories)
 }

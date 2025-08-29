@@ -40,7 +40,6 @@ func QueryMediaTransferHistoryBySrc(src storage.StoragePath) (*models.MediaTrans
 // 如果 ID 不为 nil，则只查询该 ID 的记录
 // 如果 ID 为 nil，则根据其他条件查询
 func QueryMediaTransferHistory(
-	ctx context.Context,
 	id *uint64, startTime *time.Time, endTime *time.Time,
 	storageType storage.StorageType, // 存储类型和路径，存储类型为 StorageUnknown 时不进行过滤，否则对 src 和 dst 都进行过滤
 	path string, // 路径，模糊匹配
@@ -48,7 +47,7 @@ func QueryMediaTransferHistory(
 	status *bool, // 是否成功
 	offset int, // 偏移量
 ) iter.Seq2[*models.MediaTransferHistory, error] {
-	var query gorm.ChainInterface[models.MediaTransferHistory] = gorm.G[models.MediaTransferHistory](DB)
+	query := DB.Model(&models.MediaTransferHistory{})
 
 	if id != nil { // 如果提供了 ID，则只查询该 ID 的记录
 		query = query.Where("id = ?", *id)
@@ -84,7 +83,7 @@ func QueryMediaTransferHistory(
 	}
 
 	return func(yield func(*models.MediaTransferHistory, error) bool) {
-		results, err := query.Rows(ctx)
+		results, err := query.Rows()
 		if err != nil {
 			yield(nil, fmt.Errorf("查询媒体转移历史记录失败: %w", err))
 			return
