@@ -168,7 +168,7 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 		videoMeta.TMDBID = tmdbID
 		msgs = append(msgs, fmt.Sprintf("TMDB ID: %d", tmdbID))
 	}
-	if season >= -1 {
+	if season > -1 {
 		videoMeta.Season = season
 		msgs = append(msgs, fmt.Sprintf("季数: %d", season))
 	}
