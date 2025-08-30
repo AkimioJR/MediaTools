@@ -255,13 +255,13 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 			history.Status = true
 			history.DstPath = dstFile.GetPath()
 			history.DstType = dstFile.GetStorageType()
+		}
 
-			err = database.UpdateMediaTransferHistory(history)
-			if err != nil {
-				logrus.Errorf("更新媒体转移记录失败: %v", err)
-			} else {
-				logrus.Debugf("更新媒体转移记录成功: %+v", history)
-			}
+		err = database.UpdateMediaTransferHistory(history)
+		if err != nil {
+			logrus.Errorf("更新媒体转移记录失败: %v", err)
+		} else {
+			logrus.Debugf("更新媒体转移记录成功: %+v", history)
 		}
 	})
 
