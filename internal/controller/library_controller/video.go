@@ -136,10 +136,8 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 	defer lock.RUnlock()
 
 	history, err := database.QueryMediaTransferHistoryBySrc(srcFile)
-	if err != nil {
-		logrus.Warningf("查询媒体转移历史失败：%v", err)
-	} else if history != nil {
-		return nil, fmt.Errorf("媒体文件 %s 已经转移过，跳过转移", srcFile)
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("查询媒体转移历史失败：%v", err)
 	}
 
 	history = new(models.MediaTransferHistory)
