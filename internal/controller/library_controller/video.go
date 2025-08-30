@@ -15,11 +15,13 @@ import (
 	"MediaTools/internal/schemas/storage"
 	"MediaTools/utils"
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
 
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 // 整理一个视频文件及其相关的字幕和音轨文件到指定目录
