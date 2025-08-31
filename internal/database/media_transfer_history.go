@@ -36,14 +36,15 @@ func QueryMediaTransferHistoryBySrc(src storage.StoragePath) (*models.MediaTrans
 // 如果 ID 不为 nil，则只查询该 ID 的记录
 // 如果 ID 为 nil，则根据其他条件查询
 func QueryMediaTransferHistory(
+	ctx context.Context,
 	id *uint64, startTime *time.Time, endTime *time.Time,
 	storageType storage.StorageType, // 存储类型和路径，存储类型为 StorageUnknown 时不进行过滤，否则对 src 和 dst 都进行过滤
 	path string, // 路径，模糊匹配
 	transferType storage.TransferType, // 转移类型为 TransferUnknown 时不进行过滤
 	status *bool, // 是否成功
 	offset int, // 偏移量
-) iter.Seq2[*models.MediaTransferHistory, error] {
-	query := DB.Model(&models.MediaTransferHistory{})
+) (iter.Seq2[*models.MediaTransferHistory, error], error) {
+	query := DB.Model(&models.MediaTransferHistory{}).WithContext(ctx)
 
 	if id != nil { // 如果提供了 ID，则只查询该 ID 的记录
 		query = query.Where("id = ?", *id)
@@ -77,32 +78,30 @@ func QueryMediaTransferHistory(
 			query = query.Offset(offset)
 		}
 	}
-
+	rows, err := query.Rows()
+	if err != nil {
+		return nil, fmt.Errorf("查询媒体转移历史记录失败: %w", err)
+	}
 	return func(yield func(*models.MediaTransferHistory, error) bool) {
-		results, err := query.Rows()
-		if err != nil {
-			yield(nil, fmt.Errorf("查询媒体转移历史记录失败: %w", err))
-			return
-		}
-		defer results.Close()
+		defer rows.Close()
 
-		var history *models.MediaTransferHistory
-		for results.Next() {
-			err := results.Scan(&history)
+		var history models.MediaTransferHistory
+		for rows.Next() {
+			err := DB.ScanRows(rows, &history)
 			if err != nil {
 				if !yield(nil, fmt.Errorf("扫描媒体转移历史记录失败: %w", err)) {
 					return
 				}
 				continue
 			}
-			if !yield(history, nil) {
+			if !yield(&history, nil) {
 				return
 			}
 		}
 
 		// 检查是否有错误发生
-		if err := results.Err(); err != nil {
+		if err := rows.Err(); err != nil {
 			yield(nil, fmt.Errorf("遍历结果集时发生错误: %w", err))
 		}
-	}
+	}, nil
 }
