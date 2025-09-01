@@ -11,13 +11,13 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+var db *gorm.DB
 
 func Init() error {
 	var err error
 	switch strings.ToLower(config.DB.Type) {
 	case "sqlite":
-		DB, err = gorm.Open(sqlite.Open(config.DB.DSN))
+		db, err = gorm.Open(sqlite.Open(config.DB.DSN))
 
 	default:
 		return fmt.Errorf("不支持的数据库类型: %s", config.DB.Type)
@@ -31,7 +31,7 @@ func Init() error {
 }
 
 func AutoMigrate() error {
-	return DB.AutoMigrate(
+	return db.AutoMigrate(
 		&models.MediaTransferHistory{},
 	)
 }

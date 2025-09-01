@@ -15,7 +15,7 @@ import (
 // 如果 ID 不存在则创建新的转移历史记录
 // 如果 ID 存在则更新现有的转移历史记录
 func UpdateMediaTransferHistory(history *models.MediaTransferHistory) error {
-	result := DB.Save(history)
+	result := db.Save(history)
 	if result.Error != nil {
 		return fmt.Errorf("更新数据库失败: %w", result.Error)
 	}
@@ -24,7 +24,7 @@ func UpdateMediaTransferHistory(history *models.MediaTransferHistory) error {
 
 func QueryMediaTransferHistoryBySrc(src storage.StoragePath) (*models.MediaTransferHistory, error) {
 	ctx := context.Background()
-	history, err := gorm.G[models.MediaTransferHistory](DB).Where("src_type = ? AND src_path = ?", src.GetStorageType(), src.GetPath()).First(ctx)
+	history, err := gorm.G[models.MediaTransferHistory](db).Where("src_type = ? AND src_path = ?", src.GetStorageType(), src.GetPath()).First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func QueryMediaTransferHistory(
 	status *bool, // 是否成功
 	offset int, // 偏移量
 ) (iter.Seq2[*models.MediaTransferHistory, error], error) {
-	query := DB.Model(&models.MediaTransferHistory{}).WithContext(ctx)
+	query := db.Model(&models.MediaTransferHistory{}).WithContext(ctx)
 
 	if id != nil { // 如果提供了 ID，则只查询该 ID 的记录
 		query = query.Where("id = ?", *id)
@@ -87,7 +87,7 @@ func QueryMediaTransferHistory(
 
 		var history models.MediaTransferHistory
 		for rows.Next() {
-			err := DB.ScanRows(rows, &history)
+			err := db.ScanRows(rows, &history)
 			if err != nil {
 				if !yield(nil, fmt.Errorf("扫描媒体转移历史记录失败: %w", err)) {
 					return
@@ -107,7 +107,7 @@ func QueryMediaTransferHistory(
 }
 
 func DeleteMediaTransferHistory(ctx context.Context, id uint64) error {
-	rowsAffected, err := gorm.G[models.MediaTransferHistory](DB).Where("id = ?", id).Delete(ctx)
+	rowsAffected, err := gorm.G[models.MediaTransferHistory](db).Where("id = ?", id).Delete(ctx)
 	if err != nil {
 		return fmt.Errorf("删除媒体转移历史记录失败: %w", err)
 	}
