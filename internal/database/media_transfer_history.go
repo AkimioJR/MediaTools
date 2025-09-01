@@ -105,3 +105,14 @@ func QueryMediaTransferHistory(
 		}
 	}, nil
 }
+
+func DeleteMediaTransferHistory(ctx context.Context, id uint64) error {
+	rowsAffected, err := gorm.G[models.MediaTransferHistory](DB).Where("id = ?", id).Delete(ctx)
+	if err != nil {
+		return fmt.Errorf("删除媒体转移历史记录失败: %w", err)
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("未找到媒体转移历史记录: %d", id)
+	}
+	return nil
+}
