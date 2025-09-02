@@ -16,7 +16,7 @@ import (
 // @Router /history/media/transfer [get]
 // @Summary 查询媒体转移历史记录
 // @Description 查询媒体转移历史记录，支持根据 ID、时间范围、源路径、目标路径、转移类型和状态进行过滤
-// @Tags History
+// @Tags 历史记录
 // @Produce json
 // @Param start_time query time.Time false "开始时间, 格式为 RFC3339"
 // @Param end_time query time.Time false "结束时间, 格式为 RFC3339"
