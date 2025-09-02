@@ -13,7 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @Router /history/media/transfer [get]
+// @Router /history/media [get]
 // @Summary 查询媒体转移历史记录
 // @Description 查询媒体转移历史记录，支持根据 ID、时间范围、源路径、目标路径、转移类型和状态进行过滤
 // @Tags 历史记录
@@ -128,7 +128,7 @@ func QueryMediaTransferHistory(ctx *gin.Context) {
 	resp.RespondSuccessJSON(ctx, respHistories)
 }
 
-// @Router /media/{id} [get]
+// @Router /history/media/{id} [get]
 // @Summary 查询媒体转移历史记录 by ID
 // @Description 根据 ID 查询媒体转移历史记录
 // @Tag 历史记录
