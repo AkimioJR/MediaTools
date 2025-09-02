@@ -37,7 +37,7 @@ func QueryMediaTransferHistoryBySrc(src storage.StoragePath) (*models.MediaTrans
 // 如果 ID 为 nil，则根据其他条件查询
 func QueryMediaTransferHistory(
 	ctx context.Context,
-	id *uint64, startTime *time.Time, endTime *time.Time,
+	startTime *time.Time, endTime *time.Time,
 	storageType storage.StorageType, // 存储类型和路径，存储类型为 StorageUnknown 时不进行过滤，否则对 src 和 dst 都进行过滤
 	path string, // 路径，模糊匹配
 	transferType storage.TransferType, // 转移类型为 TransferUnknown 时不进行过滤
@@ -46,38 +46,34 @@ func QueryMediaTransferHistory(
 ) (iter.Seq2[*models.MediaTransferHistory, error], error) {
 	query := db.Model(&models.MediaTransferHistory{}).WithContext(ctx)
 
-	if id != nil { // 如果提供了 ID，则只查询该 ID 的记录
-		query = query.Where("id = ?", *id)
-	} else { // 如果没有提供 ID，则根据其他条件查询
-
-		switch {
-		case startTime != nil && endTime != nil: // 如果同时提供了开始和结束时间
-			query = query.Where("created_at BETWEEN ? AND ?", *startTime, *endTime)
-		case startTime != nil: // 如果只提供了开始时间
-			query = query.Where("created_at >= ?", *startTime)
-		case endTime != nil: // 如果只提供了结束时间
-			query = query.Where("created_at <= ?", *endTime)
-		}
-
-		if storageType != storage.StorageUnknown {
-			query = query.Where("src_type = ? OR dst_type = ?", storageType, storageType)
-		}
-		if path != "" {
-			query = query.Where("src_path LIKE ? OR dst_path LIKE ?", "%"+path+"%", "%"+path+"%")
-		}
-
-		if transferType != storage.TransferUnknown {
-			query = query.Where("transfer_type = ?", transferType)
-		}
-
-		if status != nil {
-			query = query.Where("status = ?", *status)
-		}
-
-		if offset > 0 {
-			query = query.Offset(offset)
-		}
+	switch {
+	case startTime != nil && endTime != nil: // 如果同时提供了开始和结束时间
+		query = query.Where("created_at BETWEEN ? AND ?", *startTime, *endTime)
+	case startTime != nil: // 如果只提供了开始时间
+		query = query.Where("created_at >= ?", *startTime)
+	case endTime != nil: // 如果只提供了结束时间
+		query = query.Where("created_at <= ?", *endTime)
 	}
+
+	if storageType != storage.StorageUnknown {
+		query = query.Where("src_type = ? OR dst_type = ?", storageType, storageType)
+	}
+	if path != "" {
+		query = query.Where("src_path LIKE ? OR dst_path LIKE ?", "%"+path+"%", "%"+path+"%")
+	}
+
+	if transferType != storage.TransferUnknown {
+		query = query.Where("transfer_type = ?", transferType)
+	}
+
+	if status != nil {
+		query = query.Where("status = ?", *status)
+	}
+
+	if offset > 0 {
+		query = query.Offset(offset)
+	}
+
 	rows, err := query.Rows()
 	if err != nil {
 		return nil, fmt.Errorf("查询媒体转移历史记录失败: %w", err)
