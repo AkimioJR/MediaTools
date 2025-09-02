@@ -31,6 +31,14 @@ func QueryMediaTransferHistoryBySrc(src storage.StoragePath) (*models.MediaTrans
 	return &history, nil
 }
 
+func QueryMediaTransferHistoryByID(ctx context.Context, id uint64) (*models.MediaTransferHistory, error) {
+	history, err := gorm.G[models.MediaTransferHistory](db).Where("id = ?", id).First(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &history, nil
+}
+
 // QueryMediaTransferHistory 查询媒体转移历史记录
 // 支持根据 ID、时间范围、源路径、目标路径、转移类型和状态进行过滤
 // 如果 ID 不为 nil，则只查询该 ID 的记录
