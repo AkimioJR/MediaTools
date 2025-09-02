@@ -252,23 +252,17 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/history/media/transfer": {
+        "/history/media": {
             "get": {
                 "description": "查询媒体转移历史记录，支持根据 ID、时间范围、源路径、目标路径、转移类型和状态进行过滤",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "History"
+                    "历史记录"
                 ],
                 "summary": "查询媒体转移历史记录",
                 "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "媒体转移历史记录 ID, 如果提供则只查询该 ID 的记录",
-                        "name": "id",
-                        "in": "query"
-                    },
                     {
                         "type": "string",
                         "description": "存储类型, 可选值为 'LocalStorage' 等",
@@ -295,9 +289,50 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "最大返回数量, 默认值为 30",
+                        "description": "最大返回数量, 默认值为 50",
                         "name": "count",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码, 从 1 开始, 默认值为 1",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/history/media/{id}": {
+            "get": {
+                "description": "根据 ID 查询媒体转移历史记录",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "查询媒体转移历史记录 by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "媒体转移历史记录 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "description": "根据 ID 删除媒体转移历史记录",
+                "summary": "删除媒体转移历史记录",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "媒体转移历史记录 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -674,9 +709,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "dst_dir",
-                "organize_by_category",
-                "organize_by_type",
-                "scrape",
                 "src_file",
                 "transfer_type"
             ],
@@ -688,6 +720,10 @@ const docTemplate = `{
                             "$ref": "#/definitions/schemas.FileInfoRequest"
                         }
                     ]
+                },
+                "episode_format": {
+                    "description": "集数格式（用于集数定位）",
+                    "type": "string"
                 },
                 "episode_offset": {
                     "description": "集数偏移（仅为制定集数是生效）",
