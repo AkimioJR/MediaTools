@@ -153,3 +153,29 @@ func QueryMediaTransferHistoryByID(ctx *gin.Context) {
 
 	resp.RespondSuccessJSON(ctx, history)
 }
+
+// @Router /history/media/{id} [delete]
+// @Summary 删除媒体转移历史记录
+// @Description 根据 ID 删除媒体转移历史记录
+// @Tag 历史记录
+// @Param id path uint64 true "媒体转移历史记录 ID"
+func DeleteMediaTransferHistory(ctx *gin.Context) {
+	var resp schemas.Response[any]
+
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		resp.Message = "无效的 ID 参数: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusBadRequest)
+		return
+	}
+
+	err = database.DeleteMediaTransferHistory(ctx, id)
+	if err != nil {
+		resp.Message = "删除媒体转移历史记录失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		return
+	}
+
+	resp.RespondSuccessJSON(ctx, nil)
+}

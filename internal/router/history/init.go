@@ -8,5 +8,6 @@ func RegisterHistoryRouter(historyRouter *gin.RouterGroup) {
 	{
 		mediaHistoryRouter.GET("", QueryMediaTransferHistory)         // 查询媒体转移历史记录
 		mediaHistoryRouter.GET("/:id", QueryMediaTransferHistoryByID) // 查询媒体转移历史记录 by ID
+		mediaHistoryRouter.DELETE("/:id", DeleteMediaTransferHistory) // 删除媒体转移历史记录
 	}
 }
