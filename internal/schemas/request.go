@@ -54,3 +54,8 @@ type ArchiveMediaManualRequest struct {
 	EpisodeOffset string         `json:"episode_offset"` // 集数偏移（仅为制定集数是生效）
 	Part          string         `json:"part"`           // 指定分段
 }
+
+type DeleteMediaTransferHistoryRequest struct {
+	DeleteSrc bool `json:"delete_src"` // 删除源文件
+	DeleteDst bool `json:"delete_dst"` // 删除目标文件
+}

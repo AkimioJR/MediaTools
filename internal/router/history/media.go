@@ -1,6 +1,7 @@
 package history
 
 import (
+	"MediaTools/internal/controller/storage_controller"
 	"MediaTools/internal/database"
 	"MediaTools/internal/models"
 	"MediaTools/internal/schemas"
@@ -159,8 +160,14 @@ func QueryMediaTransferHistoryByID(ctx *gin.Context) {
 // @Description 根据 ID 删除媒体转移历史记录
 // @Tag 历史记录
 // @Param id path uint64 true "媒体转移历史记录 ID"
+// @Param data body schemas.DeleteMediaTransferHistoryRequest true "请求参数"
+// @Accept json
+// @Produce json
 func DeleteMediaTransferHistory(ctx *gin.Context) {
-	var resp schemas.Response[any]
+	var (
+		req  schemas.DeleteMediaTransferHistoryRequest
+		resp schemas.Response[any]
+	)
 
 	idStr := ctx.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
@@ -168,6 +175,36 @@ func DeleteMediaTransferHistory(ctx *gin.Context) {
 		resp.Message = "无效的 ID 参数: " + err.Error()
 		resp.RespondJSON(ctx, http.StatusBadRequest)
 		return
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		resp.Message = "解析请求体失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusBadRequest)
+		return
+	}
+
+	history, err := database.QueryMediaTransferHistoryByID(ctx, id)
+	if err != nil {
+		resp.Message = "查询媒体转移历史记录失败: " + err.Error()
+		resp.RespondJSON(ctx, http.StatusInternalServerError)
+		return
+	}
+
+	if req.DeleteSrc { // 删除源文件
+		err = storage_controller.Delete(storage.NewStoragePath(history.SrcType, history.SrcPath))
+		if err != nil {
+			resp.Message = "删除源文件失败: " + err.Error()
+			resp.RespondJSON(ctx, http.StatusInternalServerError)
+			return
+		}
+	}
+	if req.DeleteDst { // 删除目标文件
+		err = storage_controller.Delete(storage.NewStoragePath(history.DstType, history.DstPath))
+		if err != nil {
+			resp.Message = "删除目标文件失败: " + err.Error()
+			resp.RespondJSON(ctx, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	err = database.DeleteMediaTransferHistory(ctx, id)
