@@ -141,6 +141,9 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf("查询媒体转移历史失败：%v", err)
 	}
+	if history != nil && history.Status {
+		return nil, fmt.Errorf("媒体文件 %s 已经转移到 %s，不能重复转移", srcFile, history.DstPath)
+	}
 
 	history = new(models.MediaTransferHistory)
 	history.TransferType = transferType
