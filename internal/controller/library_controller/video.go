@@ -145,7 +145,6 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 		return nil, fmt.Errorf("媒体文件 %s 已经转移到 %s，不能重复转移", srcFile, history.DstPath)
 	}
 
-	history = new(models.MediaTransferHistory)
 	history.TransferType = transferType
 	history.SrcPath = srcFile.GetPath()
 	history.SrcType = srcFile.GetStorageType()
@@ -214,43 +213,45 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 		logrus.Infof("更新 %s 媒体元数据：%s", srcFile.GetName(), strings.Join(msgs, ", "))
 	}
 
-	info, err := tmdb_controller.RecognizeAndEnrichMedia(ctx, videoMeta)
-	if err != nil {
-		return nil, fmt.Errorf("识别媒体信息失败：%w", err)
-	}
+	history = new(models.MediaTransferHistory)
+	task := task_controller.SubmitTransferTask(srcFile.GetName(), func(ctx context.Context) {
 
-	if organizeByType {
-		dstDir = dstDir.Join(GenMediaTypeFloderName(videoMeta.MediaType))
-	}
-	if organizeByCategory {
-		dstDir = dstDir.Join(GenCategoryFloderName(info))
-	}
+		dstFile, err := func() (storage.StoragePath, error) {
+			info, err := tmdb_controller.RecognizeAndEnrichMedia(ctx, videoMeta)
+			if err != nil {
+				return nil, fmt.Errorf("识别媒体信息失败：%w", err)
+			}
 
-	logrus.Infof("开始转移媒体文件：%s, 目标目录: %s, 转移方式: %s, 是否按照类型分类整理: %t, 是否按照分类整理: %t, 是否刮削: %t",
-		srcFile.String(), dstDir.String(), transferType, organizeByType, organizeByCategory, scrape)
+			if organizeByType {
+				dstDir = dstDir.Join(GenMediaTypeFloderName(videoMeta.MediaType))
+			}
+			if organizeByCategory {
+				dstDir = dstDir.Join(GenCategoryFloderName(info))
+			}
 
-	item, err := schemas.NewMediaItem(videoMeta, info)
-	if err != nil {
-		return nil, fmt.Errorf("创建媒体项失败：%w", err)
-	}
-	history.Item = item
+			logrus.Infof("开始转移媒体文件：%s, 目标目录: %s, 转移方式: %s, 是否按照类型分类整理: %t, 是否按照分类整理: %t, 是否刮削: %t",
+				srcFile.String(), dstDir.String(), transferType, organizeByType, organizeByCategory, scrape)
 
-	var taskName string
-	if item.MediaType == meta.MediaTypeMovie {
-		taskName = fmt.Sprintf("%s (%d)", item.Title, item.Year)
-	} else {
-		taskName = fmt.Sprintf("%s S%02dE%02d", item.Title, item.Season, item.Episode)
-	}
+			item, err := schemas.NewMediaItem(videoMeta, info)
+			if err != nil {
+				return nil, fmt.Errorf("创建媒体项失败：%w", err)
+			}
+			history.Item = item
 
-	task := task_controller.SubmitTransferTask(taskName, func(ctx context.Context) {
-		var dstFile storage.StoragePath
-		if scrape {
-			dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, info)
-		} else {
-			dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, nil)
-		}
+			var dstFile storage.StoragePath
+			if scrape {
+				dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, info)
+			} else {
+				dstFile, err = ArchiveMedia(ctx, srcFile, dstDir, transferType, item, nil)
+			}
+			if err != nil {
+				return nil, fmt.Errorf("转移媒体文件失败：%v", err)
+			}
+			return dstFile, nil
+		}()
+
 		if err != nil {
-			logrus.Warning("转移媒体文件失败：%w", err)
+			logrus.Warning(err)
 			history.Status = false
 			history.Message = err.Error()
 		} else {
