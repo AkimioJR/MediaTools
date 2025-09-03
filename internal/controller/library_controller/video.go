@@ -47,6 +47,14 @@ func ArchiveMedia(
 		return nil, err
 	}
 	dstPath := dstDir.Join(targetName)
+	exist, err := storage_controller.Exist(dstPath)
+	if err != nil {
+		return nil, fmt.Errorf("检查目标文件是否存在失败：%v", err)
+	}
+	if exist {
+		return nil, fmt.Errorf("目标文件 %s 已存在，跳过转移", dstPath)
+	}
+
 	logrus.Infof("开始转移媒体文件：%s -> %s，转移类型类型：%s", srcFile, dstPath, transferType)
 
 	err = storage_controller.TransferFile(srcFile, dstPath, transferType)
