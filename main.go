@@ -6,6 +6,7 @@ import (
 	"MediaTools/internal/database"
 	"MediaTools/internal/logging"
 	"MediaTools/internal/router"
+	"embed"
 	"flag"
 	"fmt"
 	"strings"
@@ -13,6 +14,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
+
+//go:embed web/dist
+var webDist embed.FS
 
 const LOGO = `
 ███╗   ███╗███████╗██████╗ ██╗ █████╗ ████████╗ ██████╗  ██████╗ ██╗     ███████╗
@@ -66,7 +70,8 @@ func main() {
 	}
 	logrus.Info("全部工具链初始化完成")
 
-	ginR := router.InitRouter(isDev)
+	ginR := router.InitRouter(isDev, &webDist)
+
 	err = ginR.Run(":8080")
 	if err != nil {
 		panic(fmt.Sprintf("启动服务器失败: %v", err))
