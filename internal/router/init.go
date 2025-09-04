@@ -12,6 +12,7 @@ import (
 	"MediaTools/internal/router/task"
 	"MediaTools/internal/router/tmdb"
 	"MediaTools/internal/schemas"
+	"embed"
 	"net/http"
 
 	_ "MediaTools/docs"
@@ -22,7 +23,7 @@ import (
 	gs "github.com/swaggo/gin-swagger"
 )
 
-func InitRouter(isDev bool) *gin.Engine {
+func InitRouter(isDev bool, source *embed.FS) *gin.Engine {
 	logrus.Info("开始初始化路由...")
 	ginRouter := gin.Default()
 	apiRouter := ginRouter.Group("/api")
@@ -49,6 +50,7 @@ func InitRouter(isDev bool) *gin.Engine {
 	storage.RegisterStorageRouter(apiRouter.Group("/storage"))      // 存储相关接口
 	history.RegisterHistoryRouter(apiRouter.Group("/history"))      // 历史记录相关接口
 	task.RegisterTaskRouter(apiRouter.Group("/task"))               // 任务相关接口
+	ginRouter.NoRoute(HandlerWebRouter(source))
 
 	logrus.Info("路由初始化完成")
 	return ginRouter
