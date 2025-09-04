@@ -25,6 +25,7 @@ import (
 func InitRouter(isDev bool) *gin.Engine {
 	logrus.Info("开始初始化路由...")
 	ginRouter := gin.Default()
+	apiRouter := ginRouter.Group("/api")
 
 	if isDev {
 		ginRouter.GET("/docs", func(ctx *gin.Context) {
@@ -34,20 +35,20 @@ func InitRouter(isDev bool) *gin.Engine {
 		ginRouter.GET("/docs/*any", gs.WrapHandler(swaggerFiles.Handler))
 	}
 
-	ginRouter.GET("/version", func(ctx *gin.Context) {
+	apiRouter.GET("/version", func(ctx *gin.Context) {
 		var resp schemas.Response[*configuration.VersionInfo]
 		resp.RespondSuccessJSON(ctx, &configuration.Version)
 	})
 
-	config.RegisterConfigRouter(ginRouter.Group("/config"))         // 配置相关路由
-	log.RegisterLogRouter(ginRouter.Group("/log"))                  // 日志相关路由
-	tmdb.RegisterTMDBRouter(ginRouter.Group("/tmdb"))               // TMDB 相关接口
-	recognize.RegisteRecognizeRouter(ginRouter.Group("/recognize")) // 识别相关接口
-	scrape.RegisterScrapeRouter(ginRouter.Group("/scrape"))         // 刮削相关接口
-	library.RegisterLibraryRouter(ginRouter.Group("/library"))      // 媒体库相关接口
-	storage.RegisterStorageRouter(ginRouter.Group("/storage"))      // 存储相关接口
-	history.RegisterHistoryRouter(ginRouter.Group("/history"))      // 历史记录相关接口
-	task.RegisterTaskRouter(ginRouter.Group("/task"))               // 任务相关接口
+	config.RegisterConfigRouter(apiRouter.Group("/config"))         // 配置相关路由
+	log.RegisterLogRouter(apiRouter.Group("/log"))                  // 日志相关路由
+	tmdb.RegisterTMDBRouter(apiRouter.Group("/tmdb"))               // TMDB 相关接口
+	recognize.RegisteRecognizeRouter(apiRouter.Group("/recognize")) // 识别相关接口
+	scrape.RegisterScrapeRouter(apiRouter.Group("/scrape"))         // 刮削相关接口
+	library.RegisterLibraryRouter(apiRouter.Group("/library"))      // 媒体库相关接口
+	storage.RegisterStorageRouter(apiRouter.Group("/storage"))      // 存储相关接口
+	history.RegisterHistoryRouter(apiRouter.Group("/history"))      // 历史记录相关接口
+	task.RegisterTaskRouter(apiRouter.Group("/task"))               // 任务相关接口
 
 	logrus.Info("路由初始化完成")
 	return ginRouter
