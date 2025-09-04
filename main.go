@@ -9,9 +9,13 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"math/rand"
+	"net"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/polevpn/webview"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,17 +31,32 @@ const LOGO = `
 ╚═╝     ╚═╝╚══════╝╚═════╝ ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚══════╝`
 
 var (
-	isDev bool
+	isDev    bool
+	isServer bool
 )
 
 func init() {
 	flag.BoolVar(&isDev, "dev", false, "是否启用开发者模式\nEnable developer mode")
+	flag.BoolVar(&isServer, "server", false, "是否启用 Web 服务器模式（固定端口8080）\nEnable web server mode (fixed port 8080)")
 	flag.Parse()
 
 	fmt.Print("\033[2J") // 清屏
 	fmt.Println(LOGO)
 	fmt.Println(strings.Repeat("=", 31) + fmt.Sprintf(" MediaWarp %s ", config.Version.AppVersion) + strings.Repeat("=", 32))
 	gin.SetMode(gin.ReleaseMode)
+}
+
+// findAvailablePort 查找一个可用的高位端口
+func findAvailablePort() int {
+	for {
+		port := rand.Intn(65535-20000) + 20000
+		addr := fmt.Sprintf("localhost:%d", port)
+		listener, err := net.Listen("tcp", addr)
+		if err == nil {
+			listener.Close()
+			return port
+		}
+	}
 }
 
 // @title MediaTools API 文档
@@ -72,9 +91,39 @@ func main() {
 
 	ginR := router.InitRouter(isDev, &webDist)
 
-	err = ginR.Run(":8080")
-	if err != nil {
-		panic(fmt.Sprintf("启动服务器失败: %v", err))
+	if isServer { // 启动服务器模式
+		err = ginR.Run(":8080")
+		if err != nil {
+			panic(fmt.Sprintf("启动服务器失败: %v", err))
+		}
+		logrus.Info("服务器启动成功，监听端口: 8080")
+	} else { // 启动桌面模式
+		// 查找可用端口
+		port := findAvailablePort()
+		logrus.Infof("桌面模式启动中，端口: %d", port)
+
+		// 创建 HTTP 服务器
+		srv := &http.Server{
+			Addr:    fmt.Sprintf("localhost:%d", port),
+			Handler: ginR,
+		}
+
+		// 在后台启动服务器
+		go func() {
+			logrus.Infof("服务器启动在端口: %d", port)
+			if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				logrus.Errorf("服务器启动失败: %v", err)
+			}
+		}()
+
+		w := webview.New(800, 600, false, true)
+		defer w.Destroy()
+		w.SetSize(800, 600, webview.HintNone)
+		w.SetTitle("MediaTools")
+		w.Navigate(fmt.Sprintf("http://localhost:%d", port))
+		w.Run()
+
+		logrus.Info("应用程序已退出")
 	}
-	logrus.Info("服务器启动成功，监听端口: 8080")
+
 }
