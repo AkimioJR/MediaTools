@@ -1,6 +1,9 @@
 .DS_Store
 
-debug/*
-
 *.log
-config/*
+data/*
+.vscode/settings.json
+
+
+MediaTools
+MediaTools.exe
