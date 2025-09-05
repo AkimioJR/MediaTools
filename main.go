@@ -12,6 +12,7 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -33,11 +34,13 @@ const LOGO = `
 var (
 	isDev    bool
 	isServer bool
+	port     uint
 )
 
 func init() {
 	flag.BoolVar(&isDev, "dev", false, "是否启用开发者模式\nEnable developer mode")
-	flag.BoolVar(&isServer, "server", false, "是否启用 Web 服务器模式（固定端口8080）\nEnable web server mode (fixed port 8080)")
+	flag.BoolVar(&isServer, "server", false, "是否启用 Web 服务器模式\nEnable web server mode")
+	flag.UintVar(&port, "port", 8080, "Web 服务器端口（默认 8080）\nWeb server port")
 	flag.Parse()
 
 	fmt.Print("\033[2J") // 清屏
@@ -92,11 +95,11 @@ func main() {
 	ginR := router.InitRouter(isDev, &webDist)
 
 	if isServer { // 启动服务器模式
-		err = ginR.Run(":8080")
+		err = ginR.Run(":" + strconv.Itoa(int(port)))
 		if err != nil {
 			panic(fmt.Sprintf("启动服务器失败: %v", err))
 		}
-		logrus.Info("服务器启动成功，监听端口: 8080")
+		logrus.Infof("服务器启动成功，监听端口: %d", port)
 	} else { // 启动桌面模式
 		// 查找可用端口
 		port := findAvailablePort()
