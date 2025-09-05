@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/polevpn/webview"
 	"github.com/sirupsen/logrus"
+	webview "github.com/webview/webview_go"
 )
 
 var (
@@ -76,7 +76,7 @@ func Run() {
 			logrus.Infof("服务器启动成功，监听端口: %d", port)
 		}()
 
-		w := webview.New(800, 600, true, false)
+		w := webview.New(false)
 		defer w.Destroy()
 		w.SetSize(800, 600, webview.HintNone)
 		w.SetTitle("MediaTools")
