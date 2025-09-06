@@ -3,14 +3,16 @@ package config
 import (
 	"fmt"
 	"os"
+
 	"runtime"
 
 	"github.com/sirupsen/logrus"
 )
 
 const (
-	ConfigFile   = "config/config.yaml"
-	SQLiteDBFile = "config/data.db"
+	RootDir      = "data"
+	ConfigFile   = RootDir + "/" + "config.yaml"
+	SQLiteDBFile = RootDir + "/" + "data.db"
 )
 
 var (
