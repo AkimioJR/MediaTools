@@ -18,7 +18,13 @@ import (
 func MediaLibrary(ctx *gin.Context) {
 	var resp schemas.Response[[]config.LibraryConfig]
 	resp.Success = true
-	resp.Data = config.Media.Libraries
+
+	if config.Media.Libraries == nil {
+		resp.Data = []config.LibraryConfig{}
+	} else {
+		resp.Data = config.Media.Libraries
+	}
+
 	resp.RespondJSON(ctx, http.StatusOK)
 }
 
