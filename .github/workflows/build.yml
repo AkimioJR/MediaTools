@@ -1,0 +1,64 @@
+name: build
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+        target:
+          - linux-amd64
+          - linux-arm64
+          - darwin-amd64
+          - darwin-arm64
+          - windows-amd64
+          - windows-arm64
+
+    name: Build
+    runs-on: ${{ matrix.platform }}
+    env:
+      GOPROXY: https://proxy.golang.org,direct
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: benjlevesque/short-sha@v3.0
+        id: short-sha
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.1"
+
+      - name: Setup web
+        run: |
+          cd web
+          pnpm install
+          pnpm run build
+          cd ..
+
+      - name: Build
+        uses: go-cross/cgo-actions@v1
+        with:
+          targets: ${{ matrix.target }}
+          musl-target-format: $os-$musl-$arch
+          out-dir: build
+          x-flags: |
+            MediaTools/internal/app/app.appVersion=$tag
+            MediaTools/internal/app/app.commitHash=$git_commit
+            MediaTools/internal/app/app.buildTime=$built_at
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MediaTools_${{ env.SHA }}_${{ matrix.target }}
+          path: build/*
