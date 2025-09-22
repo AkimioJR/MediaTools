@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/glebarez/sqlite"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -26,7 +27,7 @@ func Init() error {
 	if err != nil {
 		return fmt.Errorf("数据库连接失败: %w", err)
 	}
-
+	logrus.Debug("数据库连接成功，正在进行自动迁移...")
 	return AutoMigrate()
 }
 
