@@ -6,7 +6,6 @@ import (
 	"embed"
 	"flag"
 	"fmt"
-	"math/rand"
 	"net"
 	"strings"
 
@@ -45,15 +44,18 @@ func init() {
 
 // findAvailablePort 查找一个可用的高位端口
 func findAvailablePort() int {
-	for {
-		port := rand.Intn(65535-20000) + 20000
-		addr := fmt.Sprintf("localhost:%d", port)
-		listener, err := net.Listen("tcp", addr)
-		if err == nil {
-			listener.Close()
-			return port
-		}
+	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
+	if err != nil {
+		panic(err)
 	}
+
+	l, err := net.ListenTCP("tcp", addr)
+	if err != nil {
+		panic(err)
+	}
+
+	defer l.Close()
+	return l.Addr().(*net.TCPAddr).Port
 }
 
 // @title MediaTools API 文档
