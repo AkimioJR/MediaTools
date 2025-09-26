@@ -37,7 +37,8 @@ runs:
       shell: bash
       run: |
         git_commit=$(git rev-parse HEAD)
-        tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-${git_commit:0:8}")
+        git_commit_short=$(git rev-parse --short HEAD)
+        tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-${git_commit_short}")
         built_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
         filename="${{ inputs.project-name }}-${{ inputs.goos }}-${{ inputs.goarch }}${{ inputs.extension }}"
 
