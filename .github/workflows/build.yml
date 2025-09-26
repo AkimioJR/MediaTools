@@ -18,33 +18,27 @@ jobs:
           - platform: ubuntu-latest
             goos: linux
             goarch: amd64
-            suffix: linux-amd64
           - platform: ubuntu-24.04-arm
             goos: linux
             goarch: arm64
-            suffix: linux-arm64
 
           - platform: macos-13
             goos: darwin
             goarch: amd64
-            suffix: darwin-amd64
           - platform: macos-latest
             goos: darwin
             goarch: arm64
-            suffix: darwin-arm64
 
           - platform: windows-latest
             goos: windows
             goarch: amd64
-            suffix: windows-amd64
             extension: .exe
           - platform: windows-11-arm
             goos: windows
             goarch: arm64
-            suffix: windows-arm64
             extension: .exe
 
-    name: Build binary for ${{ matrix.suffix }}
+    name: Build binary for ${{ matrix.goos }}${{ matrix.goarch }}
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -80,7 +74,7 @@ jobs:
           git_commit=$(git rev-parse HEAD)
           tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-$git_commit")
           built_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          filename="MediaTools-${{ matrix.suffix }}${{ matrix.extension }}"
+          filename="MediaTools-${{ matrix.goos }}${{ matrix.goarch }}${{ matrix.extension }}"
 
           go build -o "build/${filename}" \
             -ldflags="-X MediaTools/internal/config.appVersion=$tag \
@@ -90,5 +84,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MediaTools-${{ matrix.suffix }}${{ matrix.extension }}
-          path: build/MediaTools-${{ matrix.suffix }}${{ matrix.extension }}
+          name: MediaTools-${{ matrix.goos }}${{ matrix.goarch }}${{ matrix.extension }}
+          path: build/MediaTools-${{ matrix.goos }}${{ matrix.goarch }}${{ matrix.extension }}
