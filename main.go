@@ -4,6 +4,7 @@ import (
 	"MediaTools/internal/app"
 	"MediaTools/internal/config"
 	"embed"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"net"
@@ -25,12 +26,14 @@ const LOGO = `
 ╚═╝     ╚═╝╚══════╝╚═════╝ ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚══════╝`
 
 var (
-	isDev    bool
-	isServer bool
-	port     uint
+	isDev       bool
+	isServer    bool
+	port        uint
+	showVersion bool
 )
 
 func init() {
+	flag.BoolVar(&showVersion, "version", false, "显示版本信息\nShow version information")
 	flag.BoolVar(&isDev, "dev", false, "是否启用开发者模式\nEnable developer mode")
 	flag.BoolVar(&isServer, "server", false, "是否启用 Web 服务器模式\nEnable web server mode")
 	flag.UintVar(&port, "port", 8080, "Web 服务器端口（默认 8080）\nWeb server port")
@@ -63,6 +66,14 @@ func findAvailablePort() int {
 // @description 下一代媒体刮削&整理工具
 // @Schemes HTTP
 func main() {
+	if showVersion {
+		str, err := json.MarshalIndent(config.Version, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(str))
+		return
+	}
 	if !isServer {
 		port = uint(findAvailablePort())
 	}
