@@ -14,19 +14,39 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [ubuntu-latest]
-        target:
-          - linux-amd64
-          - linux-arm64
-          - darwin-amd64
-          - darwin-arm64
-          - windows-amd64
-          - windows-arm64
+        include:
+          - platform: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            suffix: linux-amd64
+          - platform: ubuntu-24.04-arm
+            goos: linux
+            goarch: arm64
+            suffix: linux-arm64
 
-    name: Build
+          - platform: macos-13
+            goos: darwin
+            goarch: amd64
+            suffix: darwin-amd64
+          - platform: macos-latest
+            goos: darwin
+            goarch: arm64
+            suffix: darwin-arm64
+
+          - platform: windows-latest
+            goos: windows
+            goarch: amd64
+            suffix: windows-amd64
+            extension: .exe
+          - platform: windows-11-arm
+            goos: windows
+            goarch: arm64
+            suffix: windows-arm64
+            extension: .exe
+
+    name: Build binary for ${{ matrix.suffix }}
     runs-on: ${{ matrix.platform }}
-    env:
-      GOPROXY: https://proxy.golang.org,direct
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,7 +59,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24.1"
+          go-version: 1.24.1
 
       - uses: pnpm/action-setup@v4
         with:
@@ -53,18 +73,21 @@ jobs:
           cd ..
 
       - name: Build
-        uses: go-cross/cgo-actions@v1
-        with:
-          targets: ${{ matrix.target }}
-          musl-target-format: $os-$musl-$arch
-          out-dir: build
-          x-flags: |
-            MediaTools/internal/app/app.appVersion=$tag
-            MediaTools/internal/app/app.commitHash=$git_commit
-            MediaTools/internal/app/app.buildTime=$built_at
+        run: |
+          mkdir -p build
+          git_commit=$(git rev-parse HEAD)
+          tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-$git_commit")
+          built_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          filename="MediaTools-${{ matrix.suffix }}${{ matrix.extension }}"
+
+          go build -o "build/${filename}" \
+            -ldflags="-X MediaTools/internal/config.appVersion=$tag \
+                      -X MediaTools/internal/config.commitHash=$git_commit \
+                      -X MediaTools/internal/config.buildTime=$built_at" \
+            .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MediaTools_${{ env.SHA }}_${{ matrix.target }}
-          path: build/*
+          name: MediaTools-${{ matrix.suffix }}${{ matrix.extension }}
+          path: build/MediaTools-${{ matrix.suffix }}${{ matrix.extension }}
