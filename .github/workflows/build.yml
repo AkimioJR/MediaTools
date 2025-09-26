@@ -38,7 +38,7 @@ jobs:
             goarch: arm64
             extension: .exe
 
-    name: Build binary for ${{ matrix.goos }}${{ matrix.goarch }}
+    name: Build for ${{ matrix.goos }}-${{ matrix.goarch }}
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -74,7 +74,7 @@ jobs:
           git_commit=$(git rev-parse HEAD)
           tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-$git_commit")
           built_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          filename="MediaTools-${{ matrix.goos }}${{ matrix.goarch }}${{ matrix.extension }}"
+          filename="MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.extension }}"
 
           go build -o "build/${filename}" \
             -ldflags="-X MediaTools/internal/config.appVersion=$tag \
@@ -84,5 +84,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MediaTools-${{ matrix.goos }}${{ matrix.goarch }}${{ matrix.extension }}
-          path: build/MediaTools-${{ matrix.goos }}${{ matrix.goarch }}${{ matrix.extension }}
+          name: MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.extension }}
+          path: build/MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.extension }}
