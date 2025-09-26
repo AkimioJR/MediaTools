@@ -69,6 +69,7 @@ jobs:
           cd ..
 
       - name: Build
+        shell: bash
         run: |
           mkdir -p build
           git_commit=$(git rev-parse HEAD)
