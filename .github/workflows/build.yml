@@ -33,10 +33,10 @@ jobs:
             goos: windows
             goarch: amd64
             extension: .exe
-          - platform: windows-11-arm
-            goos: windows
-            goarch: arm64
-            extension: .exe
+          # - platform: windows-11-arm
+          #   goos: windows
+          #   goarch: arm64
+          #   extension: .exe
 
     name: Build for ${{ matrix.goos }}-${{ matrix.goarch }}
     runs-on: ${{ matrix.platform }}
