@@ -3,7 +3,7 @@
 *.log
 data/*
 .vscode/settings.json
-
+build/*
 
 MediaTools
 MediaTools.exe
