@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"strconv"
 
-	webview "github.com/jchv/go-webview-selector"
 	"github.com/sirupsen/logrus"
+	webview "github.com/webview/webview_go"
 )
 
 var (
