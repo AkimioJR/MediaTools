@@ -78,9 +78,11 @@ jobs:
           filename="MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.extension }}"
 
           go build -o "build/${filename}" \
+            -s -w \
             -ldflags="-X MediaTools/internal/config.appVersion=$tag \
                       -X MediaTools/internal/config.commitHash=$git_commit \
-                      -X MediaTools/internal/config.buildTime=$built_at"
+                      -X MediaTools/internal/config.buildTime=$built_at" \
+            .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
