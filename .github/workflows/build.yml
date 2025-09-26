@@ -68,6 +68,14 @@ jobs:
           pnpm run build
           cd ..
 
+      - name: Get build information
+        id: build-info
+        uses: ./.github/actions/build-info
+        with:
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          extension: ${{ matrix.extension }}
+
       - name: Build
         shell: bash
         env:
@@ -76,20 +84,16 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
         run: |
           mkdir -p build
-          git_commit=$(git rev-parse HEAD)
-          tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-$git_commit")
-          built_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          filename="MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.extension }}"
 
-          go build -o "build/${filename}" \
+          go build -o "build/${{ steps.build-info.outputs.filename }}" \
             -ldflags="-s -w \
-                      -X MediaTools/internal/config.appVersion=$tag \
-                      -X MediaTools/internal/config.commitHash=$git_commit \
-                      -X MediaTools/internal/config.buildTime=$built_at" \
+                      -X MediaTools/internal/config.appVersion=${{ steps.build-info.outputs.tag }} \
+                      -X MediaTools/internal/config.commitHash=${{ steps.build-info.outputs.git-commit }} \
+                      -X MediaTools/internal/config.buildTime=${{ steps.build-info.outputs.built-at }}" \
             .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.extension }}
-          path: build/MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.extension }}
+          name: ${{ steps.build-info.outputs.filename }}
+          path: build/${{ steps.build-info.outputs.filename }}

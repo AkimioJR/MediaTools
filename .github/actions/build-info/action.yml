@@ -1,0 +1,53 @@
+name: "Get Build Info"
+description: "Extract git commit, tag, build time and generate filename for builds"
+inputs:
+  goos:
+    description: "Target operating system"
+    required: true
+  goarch:
+    description: "Target architecture"
+    required: true
+  extension:
+    description: "File extension for the binary"
+    required: false
+    default: ""
+  project-name:
+    description: "Project name for the binary filename"
+    required: false
+    default: "MediaTools"
+outputs:
+  git-commit:
+    description: "Git commit hash"
+    value: ${{ steps.build-info.outputs.git-commit }}
+  tag:
+    description: "Git tag or dev version"
+    value: ${{ steps.build-info.outputs.tag }}
+  built-at:
+    description: "Build timestamp"
+    value: ${{ steps.build-info.outputs.built-at }}
+  filename:
+    description: "Generated filename for the binary"
+    value: ${{ steps.build-info.outputs.filename }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Extract build information
+      id: build-info
+      shell: bash
+      run: |
+        git_commit=$(git rev-parse HEAD)
+        tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-${git_commit:0:8}")
+        built_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        filename="${{ inputs.project-name }}-${{ inputs.goos }}-${{ inputs.goarch }}${{ inputs.extension }}"
+
+        echo "git-commit=$git_commit" >> $GITHUB_OUTPUT
+        echo "tag=$tag" >> $GITHUB_OUTPUT
+        echo "built-at=$built_at" >> $GITHUB_OUTPUT
+        echo "filename=$filename" >> $GITHUB_OUTPUT
+
+        echo "🔍 Build Information:"
+        echo "  Git Commit: $git_commit"
+        echo "  Tag: $tag"
+        echo "  Built At: $built_at"
+        echo "  Filename: $filename"
