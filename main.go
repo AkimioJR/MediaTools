@@ -46,7 +46,7 @@ func init() {
 	flag.BoolVar(&showVersion, "version", false, "显示版本信息\nShow version information")
 	flag.BoolVar(&isDev, "dev", false, "是否启用开发者模式\nEnable developer mode")
 	flag.BoolVar(&isServer, "server", false, "是否启用 Web 服务器模式\nEnable web server mode")
-	flag.UintVar(&port, "port", 8080, "Web 服务器端口（默认 8080）\nWeb server port")
+	flag.UintVar(&port, "port", 5000, "Web 服务器端口（默认 5000）\nWeb server port (default 5000)")
 	flag.Parse()
 
 	fmt.Print("\033[2J") // 清屏
