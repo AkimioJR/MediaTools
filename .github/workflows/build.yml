@@ -22,7 +22,7 @@ jobs:
             goos: linux
             goarch: arm64
 
-          - platform: macos-13
+          - platform: macos-latest
             goos: darwin
             goarch: amd64
           - platform: macos-latest
@@ -70,6 +70,10 @@ jobs:
 
       - name: Build
         shell: bash
+        env:
+          CGO_ENABLED: 1
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
         run: |
           mkdir -p build
           git_commit=$(git rev-parse HEAD)
