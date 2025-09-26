@@ -15,10 +15,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - platform: ubuntu-latest
+          - platform: ubuntu-22.04
             goos: linux
             goarch: amd64
-          - platform: ubuntu-24.04-arm
+          - platform: ubuntu-22.04-arm
             goos: linux
             goarch: arm64
 
