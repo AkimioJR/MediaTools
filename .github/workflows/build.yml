@@ -53,6 +53,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup Dependency
+        if: matrix.goos == 'linux'
+        run: |
+          sudo bash scripts/linux.sh
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
