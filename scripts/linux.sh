@@ -8,5 +8,5 @@ apt-get update
 echo "正在安装必要的开发库..."
 apt-get install -y \
     libgtk-3-dev \
-    libwebkit2gtk-4.1-dev \
+    libwebkit2gtk-4.0-dev \
     pkg-config
