@@ -45,7 +45,11 @@ func center(s string, width int, fill string) string {
 func init() {
 	flag.BoolVar(&showVersion, "version", false, "显示版本信息\nShow version information")
 	flag.BoolVar(&isDev, "dev", false, "是否启用开发者模式\nEnable developer mode")
-	flag.BoolVar(&isServer, "server", false, "是否启用 Web 服务器模式\nEnable web server mode")
+	if app.SupportDesktopMode { // 桌面模式下允许切换服务器模式
+		flag.BoolVar(&isServer, "server", false, "是否启用 Web 服务器模式\nEnable web server mode")
+	} else { // 服务器模式下强制启用服务器模式
+		isServer = true
+	}
 	flag.UintVar(&port, "port", 5000, "Web 服务器端口（默认 5000）\nWeb server port (default 5000)")
 	flag.Parse()
 
