@@ -1,0 +1,12 @@
+# data
+data/*
+# logs
+logs/*
+
+# web
+web/node_modules
+web/dist
+
+# other
+./github/*
+./vscode/*
