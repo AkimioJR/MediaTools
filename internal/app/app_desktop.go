@@ -34,18 +34,33 @@ func hideWindow() {
 }
 
 func onReady() {
+	const (
+		showTitle = "显示窗口"
+		showTip   = "显示应用程序窗口"
+		hideTitle = "隐藏窗口"
+		hideTip   = "隐藏应用程序窗口"
+	)
 	systray.SetTitle(AppName)
 	systray.SetTooltip(AppName + " - 工具栏")
+	switchWindowStatusItem := systray.AddMenuItem(hideTitle, hideTip)
 	quitItem := systray.AddMenuItem("退出", "退出应用程序")
-	showWindowsItem := systray.AddMenuItem("显示窗口", "显示应用程序窗口")
-	hideWindowsItem := systray.AddMenuItem("隐藏窗口", "隐藏应用程序窗口")
+
 	go func() {
+		showWindows := true
 		for {
 			select {
-			case <-showWindowsItem.ClickedCh:
-				showWindow()
-			case <-hideWindowsItem.ClickedCh:
-				hideWindow()
+			case <-switchWindowStatusItem.ClickedCh:
+				if showWindows {
+					hideWindow()
+					switchWindowStatusItem.SetTitle(showTitle)
+					switchWindowStatusItem.SetTooltip(showTip)
+				} else {
+					showWindow()
+					switchWindowStatusItem.SetTitle(hideTitle)
+					switchWindowStatusItem.SetTooltip(hideTip)
+				}
+				showWindows = !showWindows
+
 			case <-quitItem.ClickedCh:
 				systray.Quit()
 			}
