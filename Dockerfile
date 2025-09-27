@@ -2,8 +2,8 @@
 FROM --platform=linux/amd64 node:24-alpine AS web-builder
 WORKDIR /web
 COPY web/package.json web/pnpm-lock.yaml ./
-RUN npm install -g pnpm && \
-    pnpm install --frozen-lockfile
+RUN npm install -g pnpm
+RUN pnpm install --frozen-lockfile
 COPY web/ ./
 RUN pnpm run build
 
