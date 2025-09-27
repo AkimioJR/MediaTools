@@ -16,8 +16,8 @@ var (
 	SupportDesktopMode = true
 	globalView         webview.WebView
 	isWindowVisible    = false
-	showWindowChan     = make(chan bool, 1)
-	updateTrayMenuChan = make(chan bool, 1) // 新增：用于更新托盘菜单状态
+	showWindowChan     = make(chan struct{}, 1)
+	updateTrayMenuChan = make(chan struct{}, 1) // 新增：用于更新托盘菜单状态
 	quitFlag           = false
 )
 
@@ -46,16 +46,10 @@ func showWindow() {
 
 		// 通知等待线程窗口已显示
 		select {
-		case showWindowChan <- true:
+		case showWindowChan <- struct{}{}:
 		default:
 		}
 	}
-}
-
-func waitForWindowShow() {
-	logrus.Debug("等待窗口显示信号...")
-	<-showWindowChan
-	logrus.Debug("收到窗口显示信号")
 }
 
 func onReady() {
@@ -150,17 +144,15 @@ func runDesktop() {
 
 			// 确保托盘菜单状态正确
 			select {
-			case updateTrayMenuChan <- true:
+			case updateTrayMenuChan <- struct{}{}:
 			default:
 			}
 		} else {
-			// 等待用户通过系统托盘请求显示窗口
 			logrus.Debug("等待用户通过系统托盘重新打开窗口")
-			waitForWindowShow()
+			<-showWindowChan // 等待用户通过系统托盘请求显示窗口
 
 			if !quitFlag {
-				// 创建新的 webview 实例
-				createWebView()
+				createWebView() // 创建新的 webview 实例
 				defer globalView.Destroy()
 				// showWindow() 已经在托盘处理中被调用
 			}
@@ -177,7 +169,7 @@ func runDesktop() {
 
 			// 通知系统托盘更新菜单状态
 			select {
-			case updateTrayMenuChan <- true:
+			case updateTrayMenuChan <- struct{}{}:
 			default:
 			}
 		}
