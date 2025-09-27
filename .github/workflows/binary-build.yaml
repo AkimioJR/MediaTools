@@ -1,4 +1,4 @@
-name: build
+name: Binary Builder
 
 on:
   push:
@@ -6,9 +6,9 @@ on:
   pull_request:
     branches: ["main"]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+#   cancel-in-progress: true
 
 jobs:
   build:
@@ -87,7 +87,7 @@ jobs:
 
           go build -o "build/${{ steps.build-info.outputs.filename }}" \
             -ldflags="-s -w \
-                      -X MediaTools/internal/config.appVersion=${{ steps.build-info.outputs.tag }} \
+                      -X MediaTools/internal/config.appVersion=${{ steps.build-info.outputs.version }} \
                       -X MediaTools/internal/config.commitHash=${{ steps.build-info.outputs.git-commit }} \
                       -X MediaTools/internal/config.buildTime=${{ steps.build-info.outputs.built-at }}" \
             .
