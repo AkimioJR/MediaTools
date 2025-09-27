@@ -28,7 +28,7 @@ on:
 
 jobs:
   build-web:
-    if: ${{ inputs.NEED_BUILD_WEB == true }}
+    if: ${{ inputs.NEED_BUILD_WEB == true || github.event_name == 'push' || github.event_name == 'pull_request' }}
     name: Build Web Frontend
     uses: ./.github/workflows/web-builder.yaml
 
