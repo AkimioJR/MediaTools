@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e  # 如果任何命令失败就退出
 
