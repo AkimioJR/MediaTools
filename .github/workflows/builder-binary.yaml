@@ -1,4 +1,4 @@
-name: Binary Builder
+name: Builder for Binary
 
 on:
   push:
