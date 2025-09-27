@@ -133,7 +133,6 @@ func runDesktop() {
 			defer globalView.Destroy()
 			showWindow()
 			firstLaunch = false
-			updateTrayMenuChan <- struct{}{} // 确保托盘菜单状态正确
 		} else {
 			logrus.Debug("等待用户通过系统托盘重新打开窗口")
 			<-showWindowChan // 等待用户通过系统托盘请求显示窗口
