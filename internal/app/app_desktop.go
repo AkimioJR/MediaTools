@@ -3,38 +3,51 @@
 package app
 
 import (
-	"MediaTools/internal/router"
 	"fmt"
-	"strconv"
 
 	"github.com/sirupsen/logrus"
 	webview "github.com/webview/webview_go"
 )
 
+const AppName = "MediaTools"
+
 var SupportDesktopMode = true
 
-func Run() {
-	ginR := router.InitRouter(isDev, webDist)
-
-	if isServer { // 启动服务器模式
-		runServer()
-	} else { // 启动桌面模式
-		logrus.Infof("桌面模式启动中，端口: %d", port)
-
-		// 在后台启动服务器
-		go func() {
-			err := ginR.Run("localhost:" + strconv.Itoa(int(port)))
-			if err != nil {
-				panic(fmt.Sprintf("启动服务器失败: %v", err))
-			}
-			logrus.Infof("服务器启动成功，监听端口: %d", port)
-		}()
-
+func openWindows(port uint) <-chan struct{} {
+	doneCh := make(chan struct{})
+	go func() {
 		w := webview.New(false)
 		defer w.Destroy()
 		w.SetSize(800, 600, webview.HintNone)
-		w.SetTitle("MediaTools")
+		w.SetTitle(AppName)
 		w.Navigate(fmt.Sprintf("http://localhost:%d", port))
 		w.Run()
+		close(doneCh)
+	}()
+	return doneCh
+}
+
+func runDesktop() <-chan error {
+	logrus.Infof("桌面模式启动中，端口: %d", port)
+	serverChan := runServer() // 在后台启动服务器
+	windowsCh := openWindows(port)
+	errCh := make(chan error)
+	go func() {
+		select {
+		case err := <-serverChan:
+			errCh <- fmt.Errorf("服务器运行中发生错误: %v", err)
+		case <-windowsCh:
+			errCh <- nil
+		}
+		close(errCh)
+	}()
+	return errCh
+}
+
+func Run() <-chan error {
+	if isServer { // 启动服务器模式
+		return runServer()
+	} else { // 启动桌面模式
+		return runDesktop()
 	}
 }
