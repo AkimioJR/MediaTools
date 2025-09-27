@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       IS_LATEST:
-        description: "是否发布为Docker镜像最新版本"
+        description: "是否发布为 Docker 镜像最新版本"
         default: false
         required: true
         type: boolean
