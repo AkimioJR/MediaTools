@@ -29,24 +29,6 @@ jobs:
           name: web-dist
           path: web/dist/
 
-      - name: Debug - Check web/dist structure
-        run: |
-          echo "=== Checking web/dist structure ==="
-          if [ -d "web/dist" ]; then
-            echo "web/dist directory exists"
-            ls -la web/dist/
-            echo "=== Checking if index.html exists ==="
-            if [ -f "web/dist/index.html" ]; then
-              echo "✓ web/dist/index.html exists"
-            else
-              echo "✗ web/dist/index.html does not exist"
-            fi
-          else
-            echo "✗ web/dist directory does not exist"
-            echo "=== Current directory structure ==="
-            find . -name "*.html" -o -name "dist" -type d 2>/dev/null || true
-          fi
-
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
 
