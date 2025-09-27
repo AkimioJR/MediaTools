@@ -14,7 +14,7 @@ on:
         type: boolean
 
 env:
-  NEED_BUILD_WEB: ${{ github.event.inputs.NEED_BUILD_WEB }}
+  NEED_BUILD_WEB: ${{ inputs.NEED_BUILD_WEB }}
 
 # concurrency:
 #   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
