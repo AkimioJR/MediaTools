@@ -6,7 +6,7 @@ on:
 
 jobs:
   web-build-core:
-    name: Build Web Frontend
+    name: Build Web Frontend Core
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

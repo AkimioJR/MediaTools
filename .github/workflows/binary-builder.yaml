@@ -23,9 +23,9 @@ jobs:
   build-web:
     if: ${{ inputs.NEED_BUILD_WEB == true || github.event_name == 'push' || github.event_name == 'pull_request' }}
     name: Build Web Frontend
-    uses: ./.github/workflows/web-builder-core.yaml
+    uses: ./.github/workflows/core/web.yaml
 
   build-binary:
     needs: build-web
     name: Build Binary
-    uses: ./.github/workflows/binary-builder-core.yaml
+    uses: ./.github/workflows/core/binary.yaml

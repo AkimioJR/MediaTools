@@ -21,12 +21,12 @@ jobs:
   build-web:
     if: ${{ inputs.NEED_BUILD_WEB == true }}
     name: Build Web Frontend
-    uses: ./.github/workflows/web-builder-core.yaml
+    uses: ./.github/workflows/core/web.yaml
 
   build-docker:
     needs: build-web
     name: Build Docker Image
-    uses: ./.github/workflows/docker-builder-core.yaml
+    uses: ./.github/workflows/core/docker.yaml
     with:
       IS_LATEST: ${{ inputs.IS_LATEST }}
     secrets:

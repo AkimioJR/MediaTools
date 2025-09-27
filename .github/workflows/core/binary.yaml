@@ -35,7 +35,7 @@ jobs:
           #   goarch: arm64
           #   extension: .exe
 
-    name: Build for ${{ matrix.goos }}-${{ matrix.goarch }}
+    name: Build ${{ matrix.goos }}(${{ matrix.goarch }}) Binary Core
     runs-on: ${{ matrix.platform }}
 
     steps:
