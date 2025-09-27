@@ -5,6 +5,13 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+  workflow_call:
+    inputs:
+      NEED_BUILD_WEB:
+        description: "是否需要构建前端"
+        default: true
+        required: true
+        type: boolean
   workflow_dispatch:
     inputs:
       NEED_BUILD_WEB:
