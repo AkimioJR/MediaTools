@@ -8,10 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"net"
-	"os"
-	"os/signal"
 	"strings"
-	"syscall"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -100,19 +97,6 @@ func main() {
 	}
 	logrus.Infof("启动参数: 开发者模式=%v, 服务器模式=%v, 端口=%d", isDev, isServer, port)
 	app.InitApp(isDev, isServer, port, &webDist)
-	errCh := app.Run()
-
-	sysSignCh := make(chan os.Signal, 1)
-	signal.Notify(sysSignCh, syscall.SIGINT, syscall.SIGTERM)
-
-	select {
-	case err := <-errCh:
-		if err != nil {
-			logrus.Errorf("应用程序运行中发生错误: %v", err)
-		}
-	case sig := <-sysSignCh:
-		logrus.Infof("收到系统信号: %v, 退出应用程序", sig)
-	}
-
-	logrus.Info("应用程序已退出")
+	defer logrus.Info("应用程序已退出")
+	app.Run()
 }

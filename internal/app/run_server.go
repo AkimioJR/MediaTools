@@ -3,21 +3,36 @@ package app
 import (
 	"MediaTools/internal/router"
 	"fmt"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 
 	"github.com/sirupsen/logrus"
 )
 
-func runServer() <-chan error {
+func waitSysSign() <-chan os.Signal {
+	sysSignCh := make(chan os.Signal, 1)
+	signal.Notify(sysSignCh, syscall.SIGINT, syscall.SIGTERM)
+	return sysSignCh
+}
+
+func runServer() {
 	ginR := router.InitRouter(isDev, webDist)
+	sysCh := waitSysSign()
 	errCh := make(chan error, 1)
-	// 在服务器构建中总是启动服务器模式
 	go func() {
 		err := ginR.Run(":" + strconv.Itoa(int(port)))
 		if err != nil {
 			errCh <- fmt.Errorf("启动服务器失败: %v", err)
 		}
 	}()
-	logrus.Infof("服务器启动成功，监听端口: %d", port)
-	return errCh
+	select {
+	case err := <-errCh:
+		if err != nil {
+			logrus.Errorf("应用程序运行中发生错误: %v", err)
+		}
+	case sig := <-sysCh:
+		logrus.Infof("收到系统信号: %v, 退出应用程序", sig)
+	}
 }
