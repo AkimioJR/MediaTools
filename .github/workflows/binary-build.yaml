@@ -21,13 +21,13 @@ env:
 #   cancel-in-progress: true
 
 jobs:
-  web-build:
+  build-web:
     if: ${{ env.NEED_BUILD_WEB == 'true' }}
     name: Build Web Frontend
     uses: ./.github/workflows/web-builder.yaml
 
-  build:
-    needs: web-build
+  build-binary:
+    needs: build-web
     strategy:
       matrix:
         include:
