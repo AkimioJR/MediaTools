@@ -17,7 +17,7 @@ var (
 	globalView         webview.WebView
 	isWindowVisible    = false
 	showWindowChan     = make(chan struct{}, 1)
-	updateTrayMenuChan = make(chan struct{}, 1) // 新增：用于更新托盘菜单状态
+	updateTrayMenuChan = make(chan struct{}, 5) // 新增：用于更新托盘菜单状态
 	quitFlag           = false
 )
 
@@ -71,8 +71,6 @@ func onReady() {
 				if isWindowVisible {
 					logrus.Debug("用户从托盘隐藏窗口")
 					isWindowVisible = false
-					switchWindowStatusItem.SetTitle(showTitle)
-					switchWindowStatusItem.SetTooltip(showTip)
 					// 安全地终止当前 webview
 					if globalView != nil {
 						globalView.Dispatch(func() {
@@ -82,9 +80,8 @@ func onReady() {
 				} else {
 					logrus.Debug("用户从托盘显示窗口")
 					showWindow()
-					switchWindowStatusItem.SetTitle(hideTitle)
-					switchWindowStatusItem.SetTooltip(hideTip)
 				}
+				updateTrayMenuChan <- struct{}{}
 
 			case <-updateTrayMenuChan:
 				// 根据当前窗口状态更新托盘菜单
