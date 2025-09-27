@@ -1,0 +1,103 @@
+name: Docker Builder Core
+
+on:
+  workflow_call:
+    inputs:
+      IS_LATEST:
+        description: "是否发布为Docker镜像最新版本"
+        required: true
+        type: boolean
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+env:
+  IS_LATEST: ${{ inputs.IS_LATEST }}
+
+jobs:
+  build-docker-core:
+    needs: build-web
+    runs-on: ubuntu-latest
+    name: Build Docker Image
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v4
+
+      - name: Download Web Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: web/dist/
+
+      - name: Debug - Check web/dist structure
+        run: |
+          echo "=== Checking web/dist structure ==="
+          if [ -d "web/dist" ]; then
+            echo "web/dist directory exists"
+            ls -la web/dist/
+            echo "=== Checking if index.html exists ==="
+            if [ -f "web/dist/index.html" ]; then
+              echo "✓ web/dist/index.html exists"
+            else
+              echo "✗ web/dist/index.html does not exist"
+            fi
+          else
+            echo "✗ web/dist directory does not exist"
+            echo "=== Current directory structure ==="
+            find . -name "*.html" -o -name "dist" -type d 2>/dev/null || true
+          fi
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get Build Information
+        id: build-info
+        uses: ./.github/actions/build-info
+        with:
+          goos: linux
+          goarch: ""
+
+      - name: Docker Meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/mediatools
+          tags: |
+            type=raw,value=latest,enable=${{ env.IS_LATEST }}
+            type=raw,value=${{ steps.build-info.outputs.version }},enable=true
+
+      - name: Show Information
+        run: |
+          echo "Docker镜像版本的标签号：${{ steps.build-info.outputs.version }}"
+          echo "Git提交版本号：${{ steps.build-info.outputs.git-commit }}"
+          echo "构建时间：${{ steps.build-info.outputs.built-at }}"
+          echo "是否发布为Docker镜像最新版本：${{ env.IS_LATEST }}"
+
+      - name: Build and Push Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile.ci
+          platforms: |
+            linux/amd64
+            linux/arm64/v8
+            linux/s390x
+          push: true
+          build-args: |
+            APP_VERSION=${{ steps.build-info.outputs.version }}
+            APP_GIT_COMMIT=${{ steps.build-info.outputs.git-commit }}
+            APP_BUILT_AT=${{ steps.build-info.outputs.built-at }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha, scope=${{ github.workflow }}-docker
+          cache-to: type=gha, scope=${{ github.workflow }}-docker

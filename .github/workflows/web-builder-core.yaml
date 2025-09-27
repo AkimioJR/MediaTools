@@ -1,11 +1,11 @@
-name: Web Builder
+name: Web Builder Core
 
 on:
   workflow_call:
   workflow_dispatch:
 
 jobs:
-  web-build:
+  web-build-core:
     name: Build Web Frontend
     runs-on: ubuntu-latest
     steps:
