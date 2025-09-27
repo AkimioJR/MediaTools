@@ -1,0 +1,31 @@
+name: Web Builder
+
+on:
+  workflow_dispatch:
+
+jobs:
+  web-build:
+    name: Build Web Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup web and build
+        run: |
+          cd web
+          pnpm install
+          pnpm run build
+
+      - name: Upload web build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: web/dist/
+          retention-days: 1
