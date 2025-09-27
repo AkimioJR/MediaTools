@@ -7,6 +7,11 @@ on:
         description: "是否发布为Docker镜像最新版本"
         required: true
         type: boolean
+      NEED_BUILD_WEB:
+        description: "是否需要构建前端"
+        default: true
+        required: true
+        type: boolean
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -19,19 +24,35 @@ on:
         default: false
         required: true
         type: boolean
+      NEED_BUILD_WEB:
+        description: "是否需要构建前端"
+        default: true
+        required: true
+        type: boolean
 
 env:
   IS_LATEST: ${{ inputs.IS_LATEST }}
+  NEED_BUILD_WEB: ${{ inputs.NEED_BUILD_WEB }}
 
 jobs:
-  Docker-build:
+  build-web:
+    if: ${{ env.NEED_BUILD_WEB == 'true' }}
+    name: Build Web Frontend
+    uses: ./.github/workflows/web-builder.yaml
+
+  build-docker:
+    needs: build-web
     runs-on: ubuntu-latest
     name: Build Docker Image
     steps:
       - name: Clone Repository
         uses: actions/checkout@v4
+
+      - name: Download Web Build Artifacts
+        uses: actions/download-artifact@v4
         with:
-          submodules: recursive
+          name: web-dist
+          path: web/dist/
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
@@ -45,7 +66,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Get build information
+      - name: Get Build Information
         id: build-info
         uses: ./.github/actions/build-info
         with:
@@ -72,7 +93,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./docker/Dockerfile.ci
           platforms: |
             linux/amd64
             linux/arm64/v8
