@@ -87,9 +87,9 @@ jobs:
 
           go build -o "build/${{ steps.build-info.outputs.filename }}" \
             -ldflags="-s -w \
-                      -X MediaTools/internal/config.appVersion=${{ steps.build-info.outputs.version }} \
-                      -X MediaTools/internal/config.commitHash=${{ steps.build-info.outputs.git-commit }} \
-                      -X MediaTools/internal/config.buildTime=${{ steps.build-info.outputs.built-at }}" \
+                      -X MediaTools/internal/version.appVersion=${{ steps.build-info.outputs.version }} \
+                      -X MediaTools/internal/version.commitHash=${{ steps.build-info.outputs.git-commit }} \
+                      -X MediaTools/internal/version.buildTime=${{ steps.build-info.outputs.built-at }}" \
             .
 
       - name: Upload artifact
