@@ -13,16 +13,13 @@ on:
         required: true
         type: boolean
 
-env:
-  NEED_BUILD_WEB: ${{ inputs.NEED_BUILD_WEB }}
-
 # concurrency:
 #   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 #   cancel-in-progress: true
 
 jobs:
   build-web:
-    if: ${{ env.NEED_BUILD_WEB == 'true' }}
+    if: ${{ inputs.NEED_BUILD_WEB == true }}
     name: Build Web Frontend
     uses: ./.github/workflows/web-builder.yaml
 

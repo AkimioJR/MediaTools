@@ -32,11 +32,10 @@ on:
 
 env:
   IS_LATEST: ${{ inputs.IS_LATEST }}
-  NEED_BUILD_WEB: ${{ inputs.NEED_BUILD_WEB }}
 
 jobs:
   build-web:
-    if: ${{ env.NEED_BUILD_WEB == 'true' }}
+    if: ${{ inputs.NEED_BUILD_WEB == true }}
     name: Build Web Frontend
     uses: ./.github/workflows/web-builder.yaml
 
