@@ -13,7 +13,7 @@ var (
 
 var Version = VersionInfo{
 	AppVersion:         appVersion,
-	SupportDesktopMode: supportDesktopMode,
+	SupportDesktopMode: true,
 	CommitHash:         commitHash,
 	BuildTime:          parseBuildTime(buildTime),
 	GoVersion:          runtime.Version(),

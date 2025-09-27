@@ -5,11 +5,16 @@ import (
 	"MediaTools/internal/controller"
 	"MediaTools/internal/database"
 	"MediaTools/internal/logging"
+	"MediaTools/internal/version"
 	"embed"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
 )
+
+func init() {
+	version.Version.SupportDesktopMode = SupportDesktopMode
+}
 
 var (
 	isDev    bool // 是否启用开发者模式
