@@ -54,8 +54,6 @@ jobs:
 
       - name: Setup Go
         uses: actions/setup-go@v5
-        with:
-          go-version: 1.24.1
 
       - uses: pnpm/action-setup@v4
         with:
@@ -79,6 +77,7 @@ jobs:
       - name: Build
         shell: bash
         env:
+          GOTOOLCHAIN: auto
           CGO_ENABLED: 1
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
