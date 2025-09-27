@@ -5,13 +5,29 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      NEED_BUILD_WEB:
+        description: "是否需要构建前端"
+        default: true
+        required: true
+        type: boolean
+
+env:
+  NEED_BUILD_WEB: ${{ github.event.inputs.NEED_BUILD_WEB }}
 
 # concurrency:
 #   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 #   cancel-in-progress: true
 
 jobs:
+  web-build:
+    if: ${{ env.NEED_BUILD_WEB == 'true' }}
+    name: Build Web Frontend
+    uses: ./.github/workflows/web-builder.yaml
+
   build:
+    needs: web-build
     strategy:
       matrix:
         include:
@@ -44,29 +60,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Setup Dependency
         if: matrix.goos == 'linux'
         run: |
           sudo bash scripts/linux.sh
 
+      - name: Download web build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: web/dist/
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: 1.23 # 使用低版本通过 GOTOOLCHAIN 自动下载更高版本
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Setup web
-        run: |
-          cd web
-          pnpm install
-          pnpm run build
-          cd ..
 
       - name: Get build information
         id: build-info
