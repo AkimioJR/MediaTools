@@ -2,7 +2,7 @@ package main
 
 import (
 	"MediaTools/internal/app"
-	"MediaTools/internal/config"
+	"MediaTools/internal/version"
 	"embed"
 	"encoding/json"
 	"flag"
@@ -56,7 +56,7 @@ func init() {
 	fmt.Print("\033[2J") // 清屏
 	fmt.Println(LOGO)
 	fmt.Println(center(
-		fmt.Sprintf(" MediaWarp %s ", config.Version.AppVersion),
+		fmt.Sprintf(" MediaWarp %s ", version.Version.AppVersion),
 		81,
 		"=",
 	))
@@ -85,7 +85,7 @@ func findAvailablePort() int {
 // @Schemes HTTP
 func main() {
 	if showVersion {
-		str, err := json.MarshalIndent(config.Version, "", "  ")
+		str, err := json.MarshalIndent(version.Version, "", "  ")
 		if err != nil {
 			panic(err)
 		}

@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"runtime"
-
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,14 +20,6 @@ var (
 	Fanart   FanartConfig
 	Storages []StorageConfig
 	Media    MediaConfig
-	Version  = VersionInfo{
-		AppVersion: appVersion,
-		CommitHash: commitHash,
-		BuildTime:  parseBuildTime(buildTime),
-		GoVersion:  runtime.Version(),
-		OS:         runtime.GOOS,
-		Arch:       runtime.GOARCH,
-	}
 )
 
 func Init() error {
