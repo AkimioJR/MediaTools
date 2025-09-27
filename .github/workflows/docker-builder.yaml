@@ -8,18 +8,12 @@ on:
         default: false
         required: true
         type: boolean
-      NEED_BUILD_WEB:
-        description: "是否需要构建前端"
-        default: true
-        required: true
-        type: boolean
 
 env:
   IS_LATEST: ${{ inputs.IS_LATEST }}
 
 jobs:
   build-web:
-    if: ${{ inputs.NEED_BUILD_WEB == true }}
     name: Build Web Frontend
     uses: ./.github/workflows/core/web.yaml
 

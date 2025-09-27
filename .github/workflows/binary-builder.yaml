@@ -8,12 +8,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      NEED_BUILD_WEB:
-        description: "是否需要构建前端"
-        default: true
-        required: true
-        type: boolean
 
 # concurrency:
 #   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -21,7 +15,6 @@ on:
 
 jobs:
   build-web:
-    if: ${{ inputs.NEED_BUILD_WEB == true || github.event_name == 'push' || github.event_name == 'pull_request' }}
     name: Build Web Frontend
     uses: ./.github/workflows/core/web.yaml
 
