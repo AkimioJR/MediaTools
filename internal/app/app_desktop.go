@@ -102,16 +102,14 @@ func onReady() {
 	logrus.Debug("系统托盘启动成功")
 }
 
-func onExit() func() {
-	return func() {
-		logrus.Info("退出应用程序中...")
-		quitFlag = true
-		if globalView != nil {
-			// 确保在主线程中终止 webview
-			globalView.Dispatch(func() {
-				globalView.Terminate()
-			})
-		}
+func onExit() {
+	logrus.Info("退出应用程序中...")
+	quitFlag = true
+	if globalView != nil {
+		// 确保在主线程中终止 webview
+		globalView.Dispatch(func() {
+			globalView.Terminate()
+		})
 	}
 }
 
@@ -122,7 +120,7 @@ func runDesktop() {
 		systray.Quit()
 	}()
 
-	startFn, endFn := systray.RunWithExternalLoop(onReady, onExit())
+	startFn, endFn := systray.RunWithExternalLoop(onReady, onExit)
 	startFn()
 	defer endFn()
 
@@ -140,7 +138,6 @@ func runDesktop() {
 			if !quitFlag {
 				createWebView() // 创建新的 webview 实例
 				defer globalView.Destroy()
-				// showWindow() 已经在托盘处理中被调用
 			}
 		}
 
