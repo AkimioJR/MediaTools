@@ -64,8 +64,8 @@ jobs:
       - name: Show Information
         run: |
           echo "Docker镜像版本的标签号：${{ steps.build-info.outputs.version }}"
-          echo "Git提交版本号：${{ steps.build-info.outputs.git_commit }}"
-          echo "构建时间：${{ steps.build-info.outputs.built_at }}"
+          echo "Git提交版本号：${{ steps.build-info.outputs.git-commit }}"
+          echo "构建时间：${{ steps.build-info.outputs.built-at }}"
           echo "是否发布为Docker镜像最新版本：${{ env.IS_LATEST }}"
 
       - name: Build and Push Image
@@ -80,8 +80,8 @@ jobs:
           push: true
           build-args: |
             APP_VERSION=${{ steps.build-info.outputs.version }}
-            APP_GIT_COMMIT=${{ steps.build-info.outputs.git_commit }}
-            APP_BUILT_AT=${{ steps.build-info.outputs.built_at }}
+            APP_GIT_COMMIT=${{ steps.build-info.outputs.git-commit }}
+            APP_BUILT_AT=${{ steps.build-info.outputs.built-at }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha, scope=${{ github.workflow }}-docker
