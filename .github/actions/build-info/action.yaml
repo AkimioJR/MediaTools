@@ -1,32 +1,32 @@
-name: "Get Build Info"
-description: "Extract git commit, tag, build time and generate filename for builds"
+name: 获取构建信息
+description: 提取Git提交哈希、标签、构建时间戳，并生成适当的二进制文件名
 inputs:
   goos:
-    description: "Target operating system"
+    description: 目标操作系统
     required: true
   goarch:
-    description: "Target architecture"
+    description: 目标架构
     required: true
   extension:
-    description: "File extension for the binary"
+    description: 文件扩展名（例如，Windows上的.exe）
     required: false
     default: ""
   project-name:
-    description: "Project name for the binary filename"
+    description: 项目名称
     required: false
     default: "MediaTools"
 outputs:
   git-commit:
-    description: "Git commit hash"
+    description: Git commit 完整哈希值
     value: ${{ steps.build-info.outputs.git-commit }}
-  tag:
-    description: "Git tag or dev version"
-    value: ${{ steps.build-info.outputs.tag }}
+  version:
+    description: 版本标签
+    value: ${{ steps.build-info.outputs.version }}
   built-at:
-    description: "Build timestamp"
+    description: 构建时间
     value: ${{ steps.build-info.outputs.built-at }}
   filename:
-    description: "Generated filename for the binary"
+    description: 生成的二进制文件名
     value: ${{ steps.build-info.outputs.filename }}
 
 runs:
@@ -38,17 +38,17 @@ runs:
       run: |
         git_commit=$(git rev-parse HEAD)
         git_commit_short=$(git rev-parse --short HEAD)
-        tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-${git_commit_short}")
+        version=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-${git_commit_short}")
         built_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
         filename="${{ inputs.project-name }}-${{ inputs.goos }}-${{ inputs.goarch }}${{ inputs.extension }}"
 
         echo "git-commit=$git_commit" >> $GITHUB_OUTPUT
-        echo "tag=$tag" >> $GITHUB_OUTPUT
+        echo "version=$version" >> $GITHUB_OUTPUT
         echo "built-at=$built_at" >> $GITHUB_OUTPUT
         echo "filename=$filename" >> $GITHUB_OUTPUT
 
         echo "🔍 Build Information:"
         echo "  Git Commit: $git_commit"
-        echo "  Tag: $tag"
+        echo "  version: $version"
         echo "  Built At: $built_at"
         echo "  Filename: $filename"
