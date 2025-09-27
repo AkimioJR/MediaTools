@@ -54,6 +54,8 @@ jobs:
 
       - name: Setup Go
         uses: actions/setup-go@v5
+        with:
+          go-version: 1.23 # 使用低版本通过 GOTOOLCHAIN 自动下载更高版本
 
       - uses: pnpm/action-setup@v4
         with:
