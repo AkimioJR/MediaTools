@@ -126,24 +126,14 @@ func runDesktop() {
 	startFn()
 	defer endFn()
 
-	// 标记是否首次启动
 	firstLaunch := true
-
-	// 主循环：持续运行直到用户明确选择退出
-	for !quitFlag {
-		// 只在首次启动或用户主动请求时显示窗口
-		if firstLaunch {
-			// 首次启动，创建并显示窗口
+	for !quitFlag { // 只在首次启动或用户主动请求时显示窗口
+		if firstLaunch { // 首次启动，创建并显示窗口
 			createWebView()
 			defer globalView.Destroy()
 			showWindow()
 			firstLaunch = false
-
-			// 确保托盘菜单状态正确
-			select {
-			case updateTrayMenuChan <- struct{}{}:
-			default:
-			}
+			updateTrayMenuChan <- struct{}{} // 确保托盘菜单状态正确
 		} else {
 			logrus.Debug("等待用户通过系统托盘重新打开窗口")
 			<-showWindowChan // 等待用户通过系统托盘请求显示窗口
@@ -155,20 +145,12 @@ func runDesktop() {
 			}
 		}
 
-		// 如果没有退出，运行 webview
-		if !quitFlag {
+		if !quitFlag { // 如果没有退出，运行 webview
 			logrus.Debug("webview 运行中...")
 			globalView.Run()
 			logrus.Debug("webview 运行结束")
-
-			// 当 webview.Run() 退出时（用户关闭窗口），更新状态
-			isWindowVisible = false
-
-			// 通知系统托盘更新菜单状态
-			select {
-			case updateTrayMenuChan <- struct{}{}:
-			default:
-			}
+			isWindowVisible = false          // 当 webview.Run() 退出时（用户关闭窗口），更新状态
+			updateTrayMenuChan <- struct{}{} // 通知系统托盘更新菜单状态
 		}
 	}
 	logrus.Info("程序正常退出")
