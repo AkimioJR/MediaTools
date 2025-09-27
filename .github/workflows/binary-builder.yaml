@@ -7,13 +7,6 @@ on:
   pull_request:
     branches:
       - main
-  workflow_call:
-    inputs:
-      NEED_BUILD_WEB:
-        description: "是否需要构建前端"
-        default: true
-        required: true
-        type: boolean
   workflow_dispatch:
     inputs:
       NEED_BUILD_WEB:
@@ -30,7 +23,7 @@ jobs:
   build-web:
     if: ${{ inputs.NEED_BUILD_WEB == true || github.event_name == 'push' || github.event_name == 'pull_request' }}
     name: Build Web Frontend
-    uses: ./.github/workflows/web-builder.yaml
+    uses: ./.github/workflows/web-builder-core.yaml
 
   build-binary:
     needs: build-web

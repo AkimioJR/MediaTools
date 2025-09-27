@@ -1,22 +1,6 @@
 name: Docker Builder
 
 on:
-  workflow_call:
-    inputs:
-      IS_LATEST:
-        description: "是否发布为Docker镜像最新版本"
-        required: true
-        type: boolean
-      NEED_BUILD_WEB:
-        description: "是否需要构建前端"
-        default: true
-        required: true
-        type: boolean
-    secrets:
-      DOCKERHUB_USERNAME:
-        required: true
-      DOCKERHUB_TOKEN:
-        required: true
   workflow_dispatch:
     inputs:
       IS_LATEST:
@@ -37,7 +21,7 @@ jobs:
   build-web:
     if: ${{ inputs.NEED_BUILD_WEB == true }}
     name: Build Web Frontend
-    uses: ./.github/workflows/web-builder.yaml
+    uses: ./.github/workflows/web-builder-core.yaml
 
   build-docker:
     needs: build-web
