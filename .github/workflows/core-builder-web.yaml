@@ -1,4 +1,4 @@
-name: Web Builder Core
+name: Core Builder for Web
 
 on:
   workflow_call:

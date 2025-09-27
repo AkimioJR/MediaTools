@@ -1,4 +1,4 @@
-name: Binary Builder Core
+name: Core Builder for Binary
 
 on:
   workflow_call:

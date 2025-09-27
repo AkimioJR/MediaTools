@@ -16,9 +16,9 @@ on:
 jobs:
   build-web:
     name: Build Web Frontend
-    uses: ./.github/workflows/core/web.yaml
+    uses: ./.github/workflows/core-builder-web.yaml
 
   build-binary:
     needs: build-web
     name: Build Binary
-    uses: ./.github/workflows/core/binary.yaml
+    uses: ./.github/workflows/core-builder-binary.yaml
