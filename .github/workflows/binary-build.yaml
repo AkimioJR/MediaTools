@@ -81,6 +81,7 @@ jobs:
         env:
           GOTOOLCHAIN: auto
           CGO_ENABLED: 1
+          GO111MODULE: on
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
         run: |

@@ -19,6 +19,7 @@ WORKDIR /build
 
 # 设置环境变量以启用工具链自动下载
 ENV GOTOOLCHAIN=auto
+ENV GO111MODULE=on
 
 COPY go.mod go.sum ./
 RUN go mod download
