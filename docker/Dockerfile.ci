@@ -1,0 +1,50 @@
+# GitHub Actions 专用 Dockerfile
+FROM golang:1.23-alpine AS go-builder 
+
+ARG APP_VERSION="dev-docker"
+ARG APP_GIT_COMMIT=""
+ARG APP_BUILT_AT="unknown"
+
+WORKDIR /build
+
+RUN apk update && \
+    apk add git build-base
+
+# 设置环境变量以启用工具链自动下载
+ENV GOTOOLCHAIN=auto
+ENV GO111MODULE=on
+ENV CGO_ENABLED=1 
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+# 前端文件已经预构建，直接使用
+# 验证前端文件是否存在
+RUN ls -la web/dist/ && test -f web/dist/index.html
+
+RUN go build \
+    -tags=onlyServer \
+    -o MediaTools \
+    -ldflags="-s -w \
+              -X MediaTools/internal/version.appVersion=$APP_VERSION \
+              -X MediaTools/internal/version.commitHash=$APP_GIT_COMMIT \
+              -X MediaTools/internal/version.buildTime=$APP_BUILT_AT" \
+    .
+
+# 最终运行阶段
+FROM alpine:latest
+WORKDIR /app
+RUN apk add --no-cache tzdata
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+COPY --from=go-builder /build/MediaTools .
+RUN chmod +x ./MediaTools
+
+EXPOSE 5000
+VOLUME ["/app/data", "/app/logs"]
+
+ENTRYPOINT ["./MediaTools"]
+CMD ["-server"]
