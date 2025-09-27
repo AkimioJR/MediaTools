@@ -41,6 +41,7 @@ jobs:
 
   build-docker:
     needs: build-web
+    if: always() && (needs.build-web.result == 'success' || needs.build-web.result == 'skipped')
     runs-on: ubuntu-latest
     name: Build Docker Image
     steps:

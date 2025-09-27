@@ -33,7 +33,7 @@ jobs:
     uses: ./.github/workflows/web-builder.yaml
 
   build-binary:
-    needs: build-web
+    if: always() && (needs.build-web.result == 'success' || needs.build-web.result == 'skipped')
     strategy:
       matrix:
         include:
