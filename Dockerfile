@@ -17,9 +17,13 @@ ARG APP_BUILT_AT="unknown"
 
 WORKDIR /build
 
+RUN apk update && \
+    apk add git build-base
+
 # 设置环境变量以启用工具链自动下载
 ENV GOTOOLCHAIN=auto
 ENV GO111MODULE=on
+ENV CGO_ENABLED=1 
 
 COPY go.mod go.sum ./
 RUN go mod download
@@ -29,7 +33,7 @@ COPY . .
 # 复制前端构建产物
 COPY --from=web-builder /web/dist ./web/dist
 
-RUN CGO_ENABLED=0 go build \
+RUN go build \
     -tags=onlyServer \
     -o MediaTools \
     -ldflags="-s -w \
