@@ -55,6 +55,8 @@ var (
 	targetOS    string
 	targetArch  string
 	outputName  string
+
+	showVersion = false
 )
 
 func init() {
@@ -65,6 +67,9 @@ func init() {
 	flag.StringVar(&targetOS, "os", runtime.GOOS, "目标操作系统")
 	flag.StringVar(&targetArch, "arch", runtime.GOARCH, "目标架构")
 	flag.StringVar(&outputName, "output", getOutputName(), "输出文件名")
+
+	flag.BoolVar(&showVersion, "version-info", false, "显示版本信息并退出")
+
 	flag.Parse()
 }
 
@@ -130,6 +135,10 @@ func build() {
 }
 
 func main() {
+	if showVersion {
+		fmt.Println(appVersion)
+		return
+	}
 	showInfo()
 	build()
 }
