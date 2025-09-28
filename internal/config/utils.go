@@ -166,7 +166,7 @@ func getLogsPath() string {
 		if dir == "" {
 			dir = filepath.Join(os.Getenv("USERPROFILE"), "AppData", "Local")
 		}
-		return filepath.Join(dir, appName, "Logs")
+		return filepath.Join(dir, appName, "logs")
 	case "darwin":
 		dir = filepath.Join(os.Getenv("HOME"), "Library", "Logs")
 	case "linux":
