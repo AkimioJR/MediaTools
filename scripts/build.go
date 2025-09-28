@@ -104,7 +104,7 @@ func build() {
 
 	args := []string{"build", "-o", outputName}
 	if !desktopMode {
-		args = append(args, "-tags", "onlyServer")
+		args = append(args, "-tags=onlyServer")
 	}
 	ldFlags := []string{
 		"-s",
