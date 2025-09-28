@@ -73,8 +73,7 @@ func (ui *UIManager) onReady() {
 		hideTitle = "隐藏窗口"
 		hideTip   = "隐藏应用程序窗口"
 	)
-	// systray.SetTitle(AppName)
-	systray.SetIcon(web.IconData)
+	systray.SetIcon(web.GetIconData())
 	systray.SetTooltip(AppName + " - 工具栏")
 	switchWindowStatusItem := systray.AddMenuItem(hideTitle, hideTip)
 	quitItem := systray.AddMenuItem("退出", "退出应用程序")
