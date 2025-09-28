@@ -6,6 +6,7 @@ package app
 import (
 	"MediaTools/web"
 	_ "embed"
+	"runtime"
 
 	"fyne.io/systray"
 	"github.com/sirupsen/logrus"
@@ -73,7 +74,12 @@ func (ui *UIManager) onReady() {
 		hideTitle = "隐藏窗口"
 		hideTip   = "隐藏应用程序窗口"
 	)
-	systray.SetIcon(web.GetLogoSVGData())
+	switch runtime.GOOS {
+	case "darwin": // 支持 SVG 图标系统
+		systray.SetIcon(web.GetLogoSVGData())
+	default:
+		systray.SetIcon(web.GetIconData())
+	}
 	systray.SetTooltip(AppName + " - 工具栏")
 	switchWindowStatusItem := systray.AddMenuItem(hideTitle, hideTip)
 	quitItem := systray.AddMenuItem("退出", "退出应用程序")
