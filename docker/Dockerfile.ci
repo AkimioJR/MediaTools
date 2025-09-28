@@ -1,9 +1,9 @@
 # GitHub Actions 专用 Dockerfile
 FROM golang:1.23-alpine AS go-builder 
 
-ARG APP_VERSION="dev-docker"
-ARG APP_GIT_COMMIT=""
-ARG APP_BUILT_AT="unknown"
+# ARG APP_VERSION="dev-docker"
+# ARG APP_GIT_COMMIT=""
+# ARG APP_BUILT_AT="unknown"
 
 WORKDIR /build
 
@@ -24,14 +24,15 @@ COPY . .
 # 验证前端文件是否存在
 RUN ls -la web/dist/ && test -f web/dist/index.html
 
-RUN go build \
-    -tags=onlyServer \
-    -o MediaTools \
-    -ldflags="-s -w \
-              -X MediaTools/internal/version.appVersion=$APP_VERSION \
-              -X MediaTools/internal/version.commitHash=$APP_GIT_COMMIT \
-              -X MediaTools/internal/version.buildTime=$APP_BUILT_AT" \
-    .
+# RUN go build \
+#     -tags=onlyServer \
+#     -o MediaTools \
+#     -ldflags="-s -w \
+#               -X MediaTools/internal/version.appVersion=$APP_VERSION \
+#               -X MediaTools/internal/version.commitHash=$APP_GIT_COMMIT \
+#               -X MediaTools/internal/version.buildTime=$APP_BUILT_AT" \
+#     .
+RUN go run scripts/build.go -output MediaTools
 
 # 最终运行阶段
 FROM alpine:latest
