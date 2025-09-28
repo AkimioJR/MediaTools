@@ -58,14 +58,6 @@ jobs:
         with:
           go-version: 1.23 # 使用低版本通过 GOTOOLCHAIN 自动下载更高版本
 
-      - name: Get build information
-        id: build-info
-        uses: ./.github/actions/build-info
-        with:
-          goos: ${{ matrix.goos }}
-          goarch: ${{ matrix.goarch }}
-          extension: ${{ matrix.extension }}
-
       - name: Build
         shell: bash
         env:
@@ -75,17 +67,10 @@ jobs:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
         run: |
-          mkdir -p build
-
-          go build -o "build/${{ steps.build-info.outputs.filename }}" \
-            -ldflags="-s -w \
-                      -X MediaTools/internal/version.appVersion=${{ steps.build-info.outputs.version }} \
-                      -X MediaTools/internal/version.commitHash=${{ steps.build-info.outputs.git-commit }} \
-                      -X MediaTools/internal/version.buildTime=${{ steps.build-info.outputs.built-at }}" \
-            .
+          go run scripts/build.go -desktop -os ${{ matrix.goos }} -arch ${{ matrix.goarch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.build-info.outputs.filename }}
-          path: build/${{ steps.build-info.outputs.filename }}
+          name: MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: MediaTools-*

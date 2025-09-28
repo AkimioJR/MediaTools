@@ -10,7 +10,7 @@ on:
         type: boolean
 
 env:
-  IS_LATEST: ${{ inputs.IS_LATEST }}
+  IS_LATEST: ${{ inputs.IS_LATEST || false }}
 
 jobs:
   build-web:
