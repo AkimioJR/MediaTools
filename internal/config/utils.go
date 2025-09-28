@@ -1,9 +1,12 @@
 package config
 
 import (
+	"MediaTools/internal/version"
 	"fmt"
+	"runtime"
+
 	"os"
-	pathlib "path"
+	"path/filepath"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -41,7 +44,7 @@ func (c *Configuration) applyConfig() {
 }
 
 func (c *Configuration) writeConfig() error {
-	err := os.MkdirAll(pathlib.Dir(ConfigFile), 0755)
+	err := os.MkdirAll(filepath.Dir(ConfigFile), 0755)
 	if err != nil {
 		return fmt.Errorf("create config directory error: %w", err)
 	}
@@ -126,4 +129,50 @@ func (c *Configuration) check() {
 			logrus.Info("配置文件已更新")
 		}
 	}
+}
+
+const appName = "MediaTools"
+
+func getDataPath() string {
+	if !version.Version.SupportDesktopMode {
+		return "data"
+	}
+	var dir string
+	switch runtime.GOOS {
+	case "windows":
+		dir = os.Getenv("LOCALAPPDATA")
+		if dir == "" {
+			dir = filepath.Join(os.Getenv("USERPROFILE"), "AppData", "Local")
+		}
+	case "darwin":
+		dir = filepath.Join(os.Getenv("HOME"), "Library", "Application Support")
+	case "linux":
+		dir = filepath.Join(os.Getenv("HOME"), ".config")
+	default:
+		return "data"
+	}
+	return filepath.Join(dir, appName)
+}
+
+func getLogsPath() string {
+	if !version.Version.SupportDesktopMode {
+		return "logs"
+	}
+
+	var dir string
+	switch runtime.GOOS {
+	case "windows":
+		dir = os.Getenv("LOCALAPPDATA")
+		if dir == "" {
+			dir = filepath.Join(os.Getenv("USERPROFILE"), "AppData", "Local")
+		}
+		return filepath.Join(dir, appName, "Logs")
+	case "darwin":
+		dir = filepath.Join(os.Getenv("HOME"), "Library", "Logs")
+	case "linux":
+		dir = filepath.Join(os.Getenv("HOME"), ".local", "share")
+	default:
+		return "logs"
+	}
+	return filepath.Join(dir, appName)
 }

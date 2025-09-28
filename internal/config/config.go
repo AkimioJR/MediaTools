@@ -3,14 +3,15 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	RootDir      = "data"
-	ConfigFile   = RootDir + "/" + "config.yaml"
-	SQLiteDBFile = RootDir + "/" + "data.db"
+var (
+	RootDir      = getDataPath()
+	ConfigFile   = filepath.Join(RootDir, "config.yaml")
+	SQLiteDBFile = filepath.Join(RootDir, "data.db")
 )
 
 var (

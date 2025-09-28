@@ -12,7 +12,7 @@ var defaultConfig = Configuration{
 	Log: LogConfig{
 		ConsoleLevel: "info",
 		FileLevel:    "debug",
-		FileDir:      "logs",
+		FileDir:      getLogsPath(),
 	},
 	TMDB: TMDBConfig{
 		ApiKey:   "YOUR_TMDB_API_KEY", // 请替换为您的 TMDB API Key
