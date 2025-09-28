@@ -91,19 +91,22 @@ func showInfo() {
 }
 
 func build() {
-	err := exec.Command("go", "mod", "download").Run()
+	output, err := exec.Command("go", "mod", "download").CombinedOutput()
 	if err != nil {
-		panic("下载依赖失败: " + err.Error())
+		fmt.Println("下载依赖失败: \n" + string(output))
+		panic(err.Error())
 	}
 	fmt.Println("下载依赖成功🎉")
 
-	err = exec.Command("go", "env", "-w", "GOOS="+targetOS).Run()
+	output, err = exec.Command("go", "env", "-w", "GOOS="+targetOS).CombinedOutput()
 	if err != nil {
-		panic("设置 GOOS 失败: " + err.Error())
+		fmt.Println("设置 GOOS 失败: \n" + string(output))
+		panic(err.Error())
 	}
-	err = exec.Command("go", "env", "-w", "GOARCH="+targetArch).Run()
+	output, err = exec.Command("go", "env", "-w", "GOARCH="+targetArch).CombinedOutput()
 	if err != nil {
-		panic("设置 GOARCH 失败: " + err.Error())
+		fmt.Println("设置 GOARCH 失败: \n" + string(output))
+		panic(err.Error())
 	}
 	fmt.Println("设置 GOOS 和 GOARCH 成功🎉")
 
@@ -126,8 +129,10 @@ func build() {
 	fmt.Println("执行命令: go", strings.Join(args, " "))
 	print("\n\n")
 
-	err = exec.Command("go", args...).Run()
+	output, err = exec.Command("go", args...).CombinedOutput()
 	if err != nil {
+		fmt.Println("构建命令输出:")
+		fmt.Println(string(output))
 		panic("构建失败: " + err.Error())
 	} else {
 		fmt.Println("构建成功！🎉🎉🎉")
