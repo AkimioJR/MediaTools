@@ -1,4 +1,5 @@
-//go:build onlyServer
+//go:build !desktop
+// +build !desktop
 
 package app
 

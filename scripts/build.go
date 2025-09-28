@@ -108,8 +108,8 @@ func build() {
 	fmt.Println("设置 GOOS 和 GOARCH 成功🎉")
 
 	args := []string{"build", "-o", outputName}
-	if !desktopMode {
-		args = append(args, "-tags=onlyServer")
+	if desktopMode {
+		args = append(args, "-tags=desktop")
 	}
 	ldFlags := []string{
 		"-s",
@@ -123,7 +123,7 @@ func build() {
 	}
 
 	args = append(args, "-ldflags", strings.Join(ldFlags, " "), ".")
-	// fmt.Println("执行命令: go", strings.Join(args, " "))
+	fmt.Println("执行命令: go", strings.Join(args, " "))
 	print("\n\n")
 
 	err = exec.Command("go", args...).Run()
