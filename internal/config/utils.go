@@ -170,7 +170,11 @@ func getLogsPath() string {
 	case "darwin":
 		dir = filepath.Join(os.Getenv("HOME"), "Library", "Logs")
 	case "linux":
-		dir = filepath.Join(os.Getenv("HOME"), ".local", "share")
+		dir = os.Getenv("XDG_CACHE_HOME")
+		if dir == "" {
+			dir = filepath.Join(os.Getenv("HOME"), ".cache")
+		}
+		return filepath.Join(dir, appName, "logs")
 	default:
 		return "logs"
 	}
