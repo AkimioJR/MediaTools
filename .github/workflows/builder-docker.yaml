@@ -1,6 +1,9 @@
 name: Builder for Docker
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       IS_LATEST:
