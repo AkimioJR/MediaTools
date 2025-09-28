@@ -1,7 +1,7 @@
 package router
 
 import (
-	"embed"
+	"MediaTools/web"
 	"io/fs"
 	"net/http"
 	"strings"
@@ -9,8 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HandlerWebRouter(source *embed.FS) gin.HandlerFunc {
-	frontendFS, err := fs.Sub(source, "web/dist")
+func HandlerWebRouter() gin.HandlerFunc {
+	frontendFS, err := fs.Sub(web.WebDist, "dist")
 	if err != nil {
 		panic("无法加载前端资源: " + err.Error())
 	}

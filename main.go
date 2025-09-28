@@ -3,7 +3,6 @@ package main
 import (
 	"MediaTools/internal/app"
 	"MediaTools/internal/version"
-	"embed"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,9 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
-
-//go:embed web/dist
-var webDist embed.FS
 
 const LOGO = `
 ███╗   ███╗███████╗██████╗ ██╗ █████╗ ████████╗ ██████╗  ██████╗ ██╗     ███████╗
@@ -96,7 +92,7 @@ func main() {
 		port = uint(findAvailablePort())
 	}
 	logrus.Infof("启动参数: 开发者模式=%v, 服务器模式=%v, 端口=%d", isDev, isServer, port)
-	app.InitApp(isDev, isServer, port, &webDist)
+	app.InitApp(isDev, isServer, port)
 	defer logrus.Info("应用程序已退出")
 	app.Run()
 }

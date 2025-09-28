@@ -18,7 +18,7 @@ func waitSysSign() <-chan os.Signal {
 }
 
 func runServer() {
-	ginR := router.InitRouter(isDev, webDist)
+	ginR := router.InitRouter(isDev)
 	sysCh := waitSysSign()
 	errCh := make(chan error, 1)
 	go func() {

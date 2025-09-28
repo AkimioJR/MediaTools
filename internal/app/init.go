@@ -6,7 +6,6 @@ import (
 	"MediaTools/internal/database"
 	"MediaTools/internal/logging"
 	"MediaTools/internal/version"
-	"embed"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
@@ -20,16 +19,13 @@ var (
 	isDev    bool // 是否启用开发者模式
 	isServer bool // 是否启用 Web 服务器模式
 	port     uint // Web 服务器端口
-	webDist  *embed.FS
 )
 
-func InitApp(d bool, s bool, p uint, w *embed.FS) {
+func InitApp(d bool, s bool, p uint) {
 	// 初始化全局变量
 	isDev = d
 	isServer = s
 	port = p
-	webDist = w
-
 	logrus.Info("开始初始化配置...")
 	err := config.Init()
 	if err != nil {
