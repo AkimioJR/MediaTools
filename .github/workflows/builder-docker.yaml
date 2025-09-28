@@ -12,9 +12,6 @@ on:
         required: true
         type: boolean
 
-env:
-  IS_LATEST: ${{ inputs.IS_LATEST || false }}
-
 jobs:
   build-web:
     name: Build Web Frontend
@@ -25,7 +22,7 @@ jobs:
     name: Build Docker Image
     uses: ./.github/workflows/core-builder-docker.yaml
     with:
-      IS_LATEST: ${{ inputs.IS_LATEST }}
+      IS_LATEST: ${{ inputs.IS_LATEST || false }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
