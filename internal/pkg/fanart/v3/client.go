@@ -1,7 +1,7 @@
 package fanart
 
 import (
-	"MediaTools/pkg/limiter"
+	"MediaTools/internal/pkg/limiter"
 	"bytes"
 	"encoding/json"
 	"fmt"
