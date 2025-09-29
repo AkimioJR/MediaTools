@@ -34,6 +34,12 @@ func (w *Windows) destroyView() {
 	}
 }
 
+func (w *Windows) toSafe(fn func()) {
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
+	fn()
+}
+
 func NewWindows(title, url string, width, height int) *Windows {
 	w := Windows{
 		title:  title,
@@ -47,22 +53,21 @@ func NewWindows(title, url string, width, height int) *Windows {
 }
 
 func (w *Windows) Show() {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
-	if w.view == nil {
-		w.ch <- true
-		// fmt.Println("发送更新成功")
-	}
-
+	w.toSafe(func() {
+		if w.view == nil {
+			w.ch <- true
+			// fmt.Println("发送更新成功")
+		}
+	})
 }
 
 func (w *Windows) Hide() {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
-	if w.view != nil {
-		// fmt.Println("中断 view...")
-		w.view.Terminate()
-	}
+	w.toSafe(func() {
+		if w.view != nil {
+			// fmt.Println("中断 view...")
+			w.view.Terminate()
+		}
+	})
 }
 
 func (w *Windows) Quit() {
@@ -81,15 +86,15 @@ func (w *Windows) Run(fn func()) {
 	defer w.destroyView()
 
 	for {
-		w.mutex.Lock()
-		w.createView()
-		w.mutex.Unlock()
+		w.toSafe(func() {
+			w.createView()
+		})
 
 		w.view.Run()
 
-		w.mutex.Lock()
-		w.destroyView()
-		w.mutex.Unlock()
+		w.toSafe(func() {
+			w.destroyView()
+		})
 
 		fn()
 		// fmt.Println("view 运行停止，等待更新...")
