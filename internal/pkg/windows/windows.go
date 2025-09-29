@@ -70,7 +70,7 @@ func (w *Windows) Quit() {
 	w.ch <- false
 }
 
-func (w *Windows) Run() {
+func (w *Windows) Run(fn func()) {
 	defer close(w.ch)
 	defer w.destroyView()
 
@@ -78,7 +78,7 @@ func (w *Windows) Run() {
 		w.createView()
 		w.view.Run()
 		w.destroyView()
-
+		fn()
 		// fmt.Println("view 运行停止，等待更新...")
 		c := <-w.ch
 		// fmt.Println("接受到：", c)
