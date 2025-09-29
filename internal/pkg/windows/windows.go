@@ -96,7 +96,10 @@ func (w *Windows) Run(fn func()) {
 			w.destroyView()
 		})
 
-		fn()
+		if fn != nil {
+			fn()
+		}
+
 		// fmt.Println("view 运行停止，等待更新...")
 		c := <-w.ch
 		// fmt.Println("接受到：", c)
