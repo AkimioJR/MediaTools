@@ -81,6 +81,14 @@ func (w *Windows) IsHide() bool {
 	return w.view == nil
 }
 
+func (w *Windows) ToggleStatus() {
+	if w.IsHide() {
+		w.Show()
+	} else {
+		w.Hide()
+	}
+}
+
 func (w *Windows) Run(fn func()) {
 	defer close(w.ch)
 	defer w.destroyView()
