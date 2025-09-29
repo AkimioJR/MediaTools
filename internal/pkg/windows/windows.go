@@ -70,6 +70,12 @@ func (w *Windows) Quit() {
 	w.ch <- false
 }
 
+func (w *Windows) IsHide() bool {
+	w.mutex.RLock()
+	defer w.mutex.RUnlock()
+	return w.view == nil
+}
+
 func (w *Windows) Run(fn func()) {
 	defer close(w.ch)
 	defer w.destroyView()
