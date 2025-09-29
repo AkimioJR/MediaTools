@@ -17,8 +17,6 @@ type Windows struct {
 }
 
 func (w *Windows) createView() {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
 	if w.view == nil {
 		w.view = webview.New(false)
 		w.view.SetTitle(w.title)
@@ -30,8 +28,6 @@ func (w *Windows) createView() {
 }
 
 func (w *Windows) destroyView() {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
 	if w.view != nil {
 		w.view.Destroy()
 		w.view = nil
@@ -51,6 +47,8 @@ func NewWindows(title, url string, width, height int) *Windows {
 }
 
 func (w *Windows) Show() {
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
 	if w.view == nil {
 		w.ch <- true
 		// fmt.Println("发送更新成功")
@@ -59,6 +57,8 @@ func (w *Windows) Show() {
 }
 
 func (w *Windows) Hide() {
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
 	if w.view != nil {
 		// fmt.Println("中断 view...")
 		w.view.Terminate()
@@ -81,9 +81,16 @@ func (w *Windows) Run(fn func()) {
 	defer w.destroyView()
 
 	for {
+		w.mutex.Lock()
 		w.createView()
+		w.mutex.Unlock()
+
 		w.view.Run()
+
+		w.mutex.Lock()
 		w.destroyView()
+		w.mutex.Unlock()
+
 		fn()
 		// fmt.Println("view 运行停止，等待更新...")
 		c := <-w.ch
