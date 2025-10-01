@@ -30,7 +30,7 @@ func NewUIManager(url string) *UIManager {
 		view:               webview.New(false),
 		isVisible:          false,
 		showVisibleChan:    make(chan struct{}, 1),
-		updateTrayMenuChan: make(chan struct{}, 5),
+		updateTrayMenuChan: make(chan struct{}, 1),
 		quitFlag:           false,
 	}
 }
@@ -59,11 +59,7 @@ func (ui *UIManager) showWindow() {
 
 		ui.isVisible = true
 
-		// 通知等待线程窗口已显示
-		select {
-		case ui.showVisibleChan <- struct{}{}:
-		default:
-		}
+		ui.showVisibleChan <- struct{}{} // 通知等待线程窗口已显示
 	}
 }
 
@@ -82,6 +78,15 @@ func (ui *UIManager) onReady() {
 	}
 	systray.SetTooltip(AppName + " - 工具栏")
 	switchWindowStatusItem := systray.AddMenuItem(hideTitle, hideTip)
+	setTitle := func(isShown bool) {
+		if isShown {
+			switchWindowStatusItem.SetTitle(hideTitle)
+			switchWindowStatusItem.SetTooltip(hideTip)
+		} else {
+			switchWindowStatusItem.SetTitle(showTitle)
+			switchWindowStatusItem.SetTooltip(showTip)
+		}
+	}
 	quitItem := systray.AddMenuItem("退出", "退出应用程序")
 
 	go func() {
@@ -91,27 +96,18 @@ func (ui *UIManager) onReady() {
 				if ui.isVisible {
 					logrus.Debug("用户从托盘隐藏窗口")
 					ui.isVisible = false
-					// 安全地终止当前 webview
-					if ui.view != nil {
-						ui.view.Dispatch(func() {
-							ui.view.Terminate()
-						})
+					if ui.view != nil { // 安全地终止当前 webview
+						ui.view.Terminate()
 					}
+					setTitle(false)
 				} else {
 					logrus.Debug("用户从托盘显示窗口")
 					ui.showWindow()
+					setTitle(true)
 				}
-				ui.updateTrayMenuChan <- struct{}{}
 
 			case <-ui.updateTrayMenuChan:
-				// 根据当前窗口状态更新托盘菜单
-				if ui.isVisible {
-					switchWindowStatusItem.SetTitle(hideTitle)
-					switchWindowStatusItem.SetTooltip(hideTip)
-				} else {
-					switchWindowStatusItem.SetTitle(showTitle)
-					switchWindowStatusItem.SetTooltip(showTip)
-				}
+				setTitle(ui.isVisible)
 				logrus.Debug("已更新系统托盘菜单状态")
 
 			case <-quitItem.ClickedCh:
