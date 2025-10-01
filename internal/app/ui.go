@@ -19,9 +19,8 @@ type UIManager struct {
 	url                string
 	view               webview.WebView
 	isVisible          bool
-	showVisibleChan    chan struct{}
+	showVisibleChan    chan bool // true -> 继续显示 false -> 结束运行
 	updateTrayMenuChan chan struct{}
-	quitFlag           bool
 }
 
 func NewUIManager(url string) *UIManager {
@@ -29,9 +28,8 @@ func NewUIManager(url string) *UIManager {
 		url:                url,
 		view:               webview.New(false),
 		isVisible:          false,
-		showVisibleChan:    make(chan struct{}, 1),
+		showVisibleChan:    make(chan bool, 1),
 		updateTrayMenuChan: make(chan struct{}, 1),
-		quitFlag:           false,
 	}
 }
 
@@ -58,8 +56,7 @@ func (ui *UIManager) showWindow() {
 		})
 
 		ui.isVisible = true
-
-		ui.showVisibleChan <- struct{}{} // 通知等待线程窗口已显示
+		ui.showVisibleChan <- true // 通知等待线程窗口已显示
 	}
 }
 
@@ -120,7 +117,6 @@ func (ui *UIManager) onReady() {
 
 func (ui *UIManager) onExit() {
 	logrus.Info("退出应用程序中...")
-	ui.quitFlag = true
 	if ui.view != nil {
 		ui.view.Terminate()
 	}
@@ -132,7 +128,7 @@ func (ui *UIManager) Run() {
 	defer endFn()
 
 	firstLaunch := true
-	for !ui.quitFlag { // 只在首次启动或用户主动请求时显示窗口
+	for { // 只在首次启动或用户主动请求时显示窗口
 		if firstLaunch { // 首次启动，创建并显示窗口
 			ui.createWebView()
 			defer ui.view.Destroy()
@@ -140,9 +136,9 @@ func (ui *UIManager) Run() {
 			firstLaunch = false
 		} else {
 			logrus.Debug("等待用户通过系统托盘重新打开窗口")
-			<-ui.showVisibleChan // 等待用户通过系统托盘请求显示窗口
+			flag := <-ui.showVisibleChan // 等待用户通过系统托盘请求显示窗口
 
-			if ui.quitFlag {
+			if !flag {
 				break
 			}
 			ui.createWebView() // 创建新的 webview 实例
