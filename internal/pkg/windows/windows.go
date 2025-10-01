@@ -11,33 +11,9 @@ type Windows struct {
 	url    string
 	width  int
 	height int
-	view   webview.WebView
 	mutex  sync.RWMutex
+	view   webview.WebView
 	ch     chan bool // true -> 打开窗口 false -> 结束运行
-}
-
-func (w *Windows) createView() {
-	if w.view == nil {
-		w.view = webview.New(false)
-		w.view.SetTitle(w.title)
-		w.view.SetSize(w.width, w.height, webview.HintNone)
-		w.view.Navigate(w.url)
-		// fmt.Println("创建 view 成功")
-	}
-
-}
-
-func (w *Windows) destroyView() {
-	if w.view != nil {
-		w.view.Destroy()
-		w.view = nil
-	}
-}
-
-func (w *Windows) toSafe(fn func()) {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
-	fn()
 }
 
 func NewWindows(title, url string, width, height int) *Windows {
@@ -46,33 +22,13 @@ func NewWindows(title, url string, width, height int) *Windows {
 		url:    url,
 		width:  width,
 		height: height,
-
-		ch: make(chan bool),
+		ch:     make(chan bool),
 	}
 	return &w
 }
 
-func (w *Windows) Show() {
-	w.toSafe(func() {
-		if w.view == nil {
-			w.ch <- true
-			// fmt.Println("发送更新成功")
-		}
-	})
-}
-
-func (w *Windows) Hide() {
-	w.toSafe(func() {
-		if w.view != nil {
-			// fmt.Println("中断 view...")
-			w.view.Terminate()
-		}
-	})
-}
-
-func (w *Windows) Quit() {
-	w.Hide()
-	w.ch <- false
+func (w *Windows) Close() {
+	close(w.ch)
 }
 
 func (w *Windows) IsHide() bool {
@@ -81,28 +37,46 @@ func (w *Windows) IsHide() bool {
 	return w.view == nil
 }
 
-func (w *Windows) ToggleStatus() {
-	if w.IsHide() {
-		w.Show()
-	} else {
-		w.Hide()
+func (w *Windows) HideWindows() {
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
+	if w.view != nil {
+		w.view.Terminate()
 	}
 }
 
+func (w *Windows) ShowWindow() {
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
+	if w.view == nil {
+		w.ch <- true
+	}
+}
+
+func (w *Windows) Quit() {
+	w.HideWindows()
+	w.ch <- false
+}
+
+func (w *Windows) runWebView() {
+	w.view = webview.New(false)
+	w.view.SetTitle(w.title)
+	w.view.SetSize(w.width, w.height, webview.HintNone)
+	w.view.Navigate(w.url)
+	defer func() {
+		w.mutex.Lock()
+		defer w.mutex.Unlock()
+		w.view.Destroy()
+		w.view = nil
+	}()
+
+	w.view.Run()
+}
+
 func (w *Windows) Run(fn func()) {
-	defer close(w.ch)
-	defer w.destroyView()
 
 	for {
-		w.toSafe(func() {
-			w.createView()
-		})
-
-		w.view.Run()
-
-		w.toSafe(func() {
-			w.destroyView()
-		})
+		w.runWebView()
 
 		if fn != nil {
 			fn()
