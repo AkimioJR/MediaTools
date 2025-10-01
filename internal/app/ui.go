@@ -122,10 +122,7 @@ func (ui *UIManager) onExit() {
 	logrus.Info("退出应用程序中...")
 	ui.quitFlag = true
 	if ui.view != nil {
-		// 确保在主线程中终止 webview
-		ui.view.Dispatch(func() {
-			ui.view.Terminate()
-		})
+		ui.view.Terminate()
 	}
 }
 
