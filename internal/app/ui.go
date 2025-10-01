@@ -142,18 +142,17 @@ func (ui *UIManager) Run() {
 			logrus.Debug("等待用户通过系统托盘重新打开窗口")
 			<-ui.showVisibleChan // 等待用户通过系统托盘请求显示窗口
 
-			if !ui.quitFlag {
-				ui.createWebView() // 创建新的 webview 实例
-				defer ui.view.Destroy()
+			if ui.quitFlag {
+				break
 			}
+			ui.createWebView() // 创建新的 webview 实例
+			defer ui.view.Destroy()
 		}
 
-		if !ui.quitFlag { // 如果没有退出，运行 webview
-			logrus.Debug("webview 运行中...")
-			ui.view.Run()
-			logrus.Debug("webview 运行结束")
-			ui.isVisible = false                // 当 webview.Run() 退出时（用户关闭窗口），更新状态
-			ui.updateTrayMenuChan <- struct{}{} // 通知系统托盘更新菜单状态
-		}
+		logrus.Debug("webview 运行中...")
+		ui.view.Run()
+		logrus.Debug("webview 运行结束")
+		ui.isVisible = false                // 当 webview.Run() 退出时（用户关闭窗口），更新状态
+		ui.updateTrayMenuChan <- struct{}{} // 通知系统托盘更新菜单状态
 	}
 }
