@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -39,22 +41,33 @@ func getTimeStr() string {
 	return time.Now().Format(time.RFC3339)
 }
 
-func getOutputName() string {
+func getOutputName(isPackage bool) string {
 	baseName := "MediaTools-" + targetOS + "-" + targetArch
 	if runtime.GOOS == "windows" {
 		baseName += ".exe"
 	}
+	if desktopMode && isPackage && runtime.GOOS == "darwin" {
+		baseName += ".app"
+	}
 	return baseName
 }
 
+func needBuildFrontend() bool {
+	if _, err := os.Stat("web/dist/index.html"); err == nil {
+		return false
+	}
+	return true
+}
+
 var (
-	appVersion  string
-	buildTime   string
-	commitHash  string
-	desktopMode bool
-	targetOS    string
-	targetArch  string
-	outputName  string
+	appVersion    string
+	buildTime     string
+	commitHash    string
+	desktopMode   bool
+	buildFrontend bool
+	targetOS      string
+	targetArch    string
+	outputName    string
 
 	showVersion = false
 )
@@ -63,10 +76,11 @@ func init() {
 	flag.StringVar(&appVersion, "version", getVersion(true), "应用版本")
 	flag.StringVar(&buildTime, "build-time", getTimeStr(), "构建时间")
 	flag.StringVar(&commitHash, "commit-hash", getGitCommitHash(false), "Git 提交哈希值")
-	flag.BoolVar(&desktopMode, "desktop", false, "编译桌面模式")
+	flag.BoolVar(&desktopMode, "desktop", false, "编译桌面模式 (default false)")
+	flag.BoolVar(&buildFrontend, "web", needBuildFrontend(), fmt.Sprintf("是否构建前端 (default %v)", needBuildFrontend()))
 	flag.StringVar(&targetOS, "os", runtime.GOOS, "目标操作系统")
 	flag.StringVar(&targetArch, "arch", runtime.GOARCH, "目标架构")
-	flag.StringVar(&outputName, "output", getOutputName(), "输出文件名")
+	flag.StringVar(&outputName, "output", getOutputName(false), "输出文件名")
 
 	flag.BoolVar(&showVersion, "version-info", false, "显示版本信息并退出")
 
@@ -86,6 +100,7 @@ func showInfo() {
 	} else {
 		println("编译模式: 服务器模式")
 	}
+	println("是否构建前端:", strconv.FormatBool(buildFrontend))
 	println(strings.Repeat("=", 70))
 	print("\n\n")
 }
@@ -98,38 +113,50 @@ func build() {
 	}
 	fmt.Println("下载依赖成功🎉")
 
-	output, err = exec.Command("go", "env", "-w", "GOOS="+targetOS).CombinedOutput()
-	if err != nil {
-		fmt.Println("设置 GOOS 失败: \n" + string(output))
-		panic(err.Error())
-	}
-	output, err = exec.Command("go", "env", "-w", "GOARCH="+targetArch).CombinedOutput()
-	if err != nil {
-		fmt.Println("设置 GOARCH 失败: \n" + string(output))
-		panic(err.Error())
-	}
-	fmt.Println("设置 GOOS 和 GOARCH 成功🎉")
-
-	args := []string{"build", "-o", outputName}
-	if desktopMode {
-		args = append(args, "-tags=desktop")
-	}
-	ldFlags := []string{
-		"-s",
-		"-w",
+	infoFlags := []string{
 		"-X", "MediaTools/internal/version.appVersion=" + appVersion,
 		"-X", "MediaTools/internal/version.buildTime=" + buildTime,
 		"-X", "MediaTools/internal/version.commitHash=" + commitHash,
 	}
-	if targetOS == "windows" && desktopMode {
-		ldFlags = append(ldFlags, "-H", "windowsgui")
+	ldFlags := []string{
+		"-s",
+		"-w",
 	}
 
-	args = append(args, "-ldflags", strings.Join(ldFlags, " "), ".")
-	fmt.Println("执行命令: go", strings.Join(args, " "))
-	print("\n\n")
+	var cmd *exec.Cmd
+	if desktopMode {
+		platformArgs := []string{"-platform", targetOS + "/" + targetArch}
+		outputArgs := []string{"-o", outputName}
+		args := append([]string{"build", "-skipbindings"}, append(platformArgs, outputArgs...)...)
+		if !buildFrontend {
+			args = append(args, "-s")
+		}
+		args = append(args, ".")
+		fmt.Println("执行命令: wails", strings.Join(args, " "))
+		print("\n\n")
+		cmd = exec.Command("wails", args...)
 
-	output, err = exec.Command("go", args...).CombinedOutput()
+	} else {
+		output, err = exec.Command("go", "env", "-w", "GOOS="+targetOS).CombinedOutput()
+		if err != nil {
+			fmt.Println("设置 GOOS 失败: \n" + string(output))
+			panic(err.Error())
+		}
+		output, err = exec.Command("go", "env", "-w", "GOARCH="+targetArch).CombinedOutput()
+		if err != nil {
+			fmt.Println("设置 GOARCH 失败: \n" + string(output))
+			panic(err.Error())
+		}
+		fmt.Println("设置 GOOS 和 GOARCH 成功🎉")
+
+		args := []string{"build", "-o", outputName}
+		args = append(args, "-ldflags", strings.Join(append(ldFlags, infoFlags...), " "), ".")
+		fmt.Println("执行命令: go", strings.Join(args, " "))
+		print("\n\n")
+		cmd = exec.Command("go", args...)
+	}
+
+	output, err = cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("构建命令输出:")
 		fmt.Println(string(output))
