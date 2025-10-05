@@ -81,9 +81,10 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
         run: |
           go run scripts/build.go -desktop -os ${{ matrix.goos }} -arch ${{ matrix.goarch }}
+          ls -la build/bin/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: build/bin/MediaTools-*
+          path: build/bin/*
