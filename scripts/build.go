@@ -11,17 +11,18 @@ import (
 	"time"
 )
 
-func getVersion(isDev bool) string {
+func getVersion(isRelease bool) string {
 	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
 	out, err := cmd.Output()
 	if err != nil {
-		if !isDev {
+		if isRelease {
 			panic("获取版本号失败: " + err.Error())
 		}
-		return "dev-" + getGitCommitHash(true)
+		return strings.ReplaceAll(string(out), "\n", "")
 	}
-	return strings.ReplaceAll(string(out), "\n", "")
+	return "dev-" + getGitCommitHash(true)
 }
+
 func getGitCommitHash(isShort bool) string {
 	args := []string{"rev-parse"}
 	if isShort {
@@ -69,11 +70,14 @@ var (
 	targetArch    string
 	outputName    string
 
+	isRelease bool
+
 	showVersion = false
 )
 
 func init() {
-	flag.StringVar(&appVersion, "version", getVersion(true), "应用版本")
+	flag.BoolVar(&isRelease, "release", false, "是否为发布版本 (default false)")
+	flag.StringVar(&appVersion, "version", getVersion(false), "应用版本")
 	flag.StringVar(&buildTime, "build-time", getTimeStr(), "构建时间")
 	flag.StringVar(&commitHash, "commit-hash", getGitCommitHash(false), "Git 提交哈希值")
 	flag.BoolVar(&desktopMode, "desktop", false, "编译桌面模式 (default false)")
@@ -101,6 +105,8 @@ func showInfo() {
 		println("编译模式: 服务器模式")
 	}
 	println("是否构建前端:", strconv.FormatBool(buildFrontend))
+	println("是否为发布版本:", strconv.FormatBool(isRelease))
+
 	println(strings.Repeat("=", 70))
 	print("\n\n")
 }
