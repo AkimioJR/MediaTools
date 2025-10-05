@@ -114,15 +114,18 @@ func setGoEnv(k, v string) error {
 }
 
 func buildWeb() error {
-	output, err := exec.Command("cd", "web").CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("进入 web 目录失败: \n%s", string(output))
-	}
-	output, err = exec.Command("pnpm", "install").CombinedOutput()
+	// 安装前端依赖
+	cmd := exec.Command("pnpm", "install")
+	cmd.Dir = "web" // 设置工作目录
+	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("安装前端依赖失败: \n%s", string(output))
 	}
-	output, err = exec.Command("pnpm", "build").CombinedOutput()
+
+	// 构建前端
+	cmd = exec.Command("pnpm", "build")
+	cmd.Dir = "web" // 设置工作目录
+	output, err = cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("构建前端失败: \n%s", string(output))
 	}
