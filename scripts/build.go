@@ -154,7 +154,7 @@ func build() {
 	if desktopMode {
 		platformArgs := []string{"-platform", targetOS + "/" + targetArch}
 		outputArgs := []string{"-o", outputName}
-		args := append([]string{"build", "-skipbindings"}, append(platformArgs, outputArgs...)...)
+		args := append([]string{"build", "-skipbindings", "-ldflags", strings.Join(infoFlags, " ")}, append(platformArgs, outputArgs...)...)
 		if !buildFrontend {
 			args = append(args, "-s")
 		}
