@@ -25,15 +25,18 @@ jobs:
           - platform: macos-latest
             goos: darwin
             goarch: arm64
+          - platform: macos-latest
+            goos: darwin
+            goarch: universal
 
           - platform: windows-latest
             goos: windows
             goarch: amd64
             extension: .exe
-          # - platform: windows-11-arm
-          #   goos: windows
-          #   goarch: arm64
-          #   extension: .exe
+          - platform: windows-11-arm
+            goos: windows
+            goarch: arm64
+            extension: .exe
 
     name: Build ${{ matrix.goos }}(${{ matrix.goarch }}) Binary Core
     runs-on: ${{ matrix.platform }}
@@ -77,8 +80,6 @@ jobs:
           GOTOOLCHAIN: auto
           CGO_ENABLED: 1
           GO111MODULE: on
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
         run: |
           go run scripts/build.go -desktop -os ${{ matrix.goos }} -arch ${{ matrix.goarch }}
           ls -la build/bin/
