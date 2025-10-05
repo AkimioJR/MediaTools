@@ -32,9 +32,9 @@ jobs:
           - platform: windows-latest
             goos: windows
             goarch: amd64
-          - platform: windows-11-arm
-            goos: windows
-            goarch: arm64
+          # - platform: windows-11-arm
+          #   goos: windows
+          #   goarch: arm64
 
     name: Build ${{ matrix.goos }}(${{ matrix.goarch }}) Binary Core
     runs-on: ${{ matrix.platform }}
