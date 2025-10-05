@@ -32,11 +32,9 @@ jobs:
           - platform: windows-latest
             goos: windows
             goarch: amd64
-            extension: .exe
           - platform: windows-11-arm
             goos: windows
             goarch: arm64
-            extension: .exe
 
     name: Build ${{ matrix.goos }}(${{ matrix.goarch }}) Binary Core
     runs-on: ${{ matrix.platform }}
@@ -67,12 +65,6 @@ jobs:
         shell: bash
         run: |
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
-          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          echo $GITHUB_PATH
-          echo $PATH
-          # 验证 wails 是否可用
-          which wails
-          wails version
 
       - name: Build
         shell: bash
