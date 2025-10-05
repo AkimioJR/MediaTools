@@ -105,6 +105,14 @@ func showInfo() {
 	print("\n\n")
 }
 
+func setGoEnv(k, v string) error {
+	output, err := exec.Command("go", "env", "-w", k+"="+v).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("设置 %s 失败: \n%s", k, string(output))
+	}
+	return nil
+}
+
 func build() {
 	output, err := exec.Command("go", "mod", "download").CombinedOutput()
 	if err != nil {
@@ -137,16 +145,22 @@ func build() {
 		cmd = exec.Command("wails", args...)
 
 	} else {
-		output, err = exec.Command("go", "env", "-w", "GOOS="+targetOS).CombinedOutput()
+		err = setGoEnv("GOOS", targetOS)
 		if err != nil {
-			fmt.Println("设置 GOOS 失败: \n" + string(output))
 			panic(err.Error())
 		}
-		output, err = exec.Command("go", "env", "-w", "GOARCH="+targetArch).CombinedOutput()
+		defer func() {
+			_ = setGoEnv("GOOS", runtime.GOOS)
+		}()
+
+		err = setGoEnv("GOARCH", targetArch)
 		if err != nil {
-			fmt.Println("设置 GOARCH 失败: \n" + string(output))
 			panic(err.Error())
 		}
+		defer func() {
+			_ = setGoEnv("GOARCH", runtime.GOARCH)
+		}()
+
 		fmt.Println("设置 GOOS 和 GOARCH 成功🎉")
 
 		args := []string{"build", "-o", outputName}
