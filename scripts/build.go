@@ -113,6 +113,22 @@ func setGoEnv(k, v string) error {
 	return nil
 }
 
+func buildWeb() error {
+	output, err := exec.Command("cd", "web").CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("进入 web 目录失败: \n%s", string(output))
+	}
+	output, err = exec.Command("pnpm", "install").CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("安装前端依赖失败: \n%s", string(output))
+	}
+	output, err = exec.Command("pnpm", "build").CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("构建前端失败: \n%s", string(output))
+	}
+	return nil
+}
+
 func build() {
 	output, err := exec.Command("go", "mod", "download").CombinedOutput()
 	if err != nil {
@@ -160,6 +176,15 @@ func build() {
 		defer func() {
 			_ = setGoEnv("GOARCH", runtime.GOARCH)
 		}()
+
+		if buildFrontend {
+			fmt.Println("开始构建前端...")
+			err = buildWeb()
+			if err != nil {
+				panic("构建前端失败: \n" + err.Error())
+			}
+			fmt.Println("构建前端成功🎉")
+		}
 
 		fmt.Println("设置 GOOS 和 GOARCH 成功🎉")
 
