@@ -1,35 +1,16 @@
-package app
+package server
 
 import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/controller"
 	"MediaTools/internal/database"
 	"MediaTools/internal/logging"
-	"MediaTools/internal/version"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
 )
 
-func init() {
-	version.Version.SupportDesktopMode = SupportDesktopMode
-}
-
-const ProjectName = "MediaTools"
-
-var (
-	isDev    bool // 是否启用开发者模式
-	isServer bool // 是否启用 Web 服务器模式
-	port     uint // Web 服务器端口
-)
-
-func InitApp(d bool, s bool, p uint) {
-	// 初始化全局变量
-	isDev = d
-	isServer = s
-	port = p
-
-	// 初始化配置
+func InitApp(isDev bool, port uint16) {
 	logrus.Info("开始初始化配置...")
 	err := config.Init()
 	if err != nil {
