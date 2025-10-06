@@ -14,13 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     name: Cleanup Dev Images Older Than 1 Month
     steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Get Repository Tags
         id: get-tags
         run: |
           # 获取所有标签
-          TAGS=$(curl -s -H "Authorization: JWT ${{ secrets.DOCKERHUB_TOKEN }}" \
-            "https://hub.docker.com/v2/repositories/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}/tags/?page_size=100" | \
-            jq -r '.results[] | select(.name | startswith("dev")) | "\(.name):\(.last_updated)"')
+          TAGS=$(curl -s "https://hub.docker.com/v2/repositories/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}/tags/?page_size=100" | \
+                 jq -r '.results[] | select(.name | startswith("dev")) | "\(.name):\(.last_updated)"')
 
           echo "Found dev tags:"
           echo "$TAGS"
