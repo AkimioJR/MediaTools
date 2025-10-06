@@ -115,14 +115,6 @@ func showInfo() {
 	print("\n\n")
 }
 
-func setGoEnv(k, v string) error {
-	output, err := exec.Command("go", "env", "-w", k+"="+v).CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("设置 %s 失败: \n%s", k, string(output))
-	}
-	return nil
-}
-
 func buildWeb() error {
 	// 安装前端依赖
 	cmd := exec.Command("pnpm", "install")
@@ -174,22 +166,6 @@ func build() {
 		cmd = exec.Command("wails", args...)
 
 	} else {
-		err = setGoEnv("GOOS", targetOS)
-		if err != nil {
-			panic(err.Error())
-		}
-		defer func() {
-			_ = setGoEnv("GOOS", runtime.GOOS)
-		}()
-
-		err = setGoEnv("GOARCH", targetArch)
-		if err != nil {
-			panic(err.Error())
-		}
-		defer func() {
-			_ = setGoEnv("GOARCH", runtime.GOARCH)
-		}()
-
 		if buildFrontend {
 			fmt.Println("开始构建前端...")
 			err = buildWeb()
@@ -206,6 +182,7 @@ func build() {
 		fmt.Println("执行命令: go", strings.Join(args, " "))
 		print("\n\n")
 		cmd = exec.Command("go", args...)
+		cmd.Env = append(os.Environ(), "GOOS"+"="+targetOS, "GOARCH"+"="+targetArch)
 	}
 
 	output, err = cmd.CombinedOutput()
