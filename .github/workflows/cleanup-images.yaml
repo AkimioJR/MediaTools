@@ -1,0 +1,100 @@
+name: Cleanup Dev Docker Images
+
+on:
+  schedule:
+    - cron: "0 0 1 * *" # 每月1号运行一次
+  workflow_dispatch: # 允许手动触发
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: mediatools
+
+jobs:
+  cleanup-dev-images:
+    runs-on: ubuntu-latest
+    name: Cleanup Dev Images Older Than 1 Month
+    steps:
+      - name: Get Repository Tags
+        id: get-tags
+        run: |
+          # 获取所有标签
+          TAGS=$(curl -s -H "Authorization: JWT ${{ secrets.DOCKERHUB_TOKEN }}" \
+            "https://hub.docker.com/v2/repositories/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}/tags/?page_size=100" | \
+            jq -r '.results[] | select(.name | startswith("dev")) | "\(.name):\(.last_updated)"')
+
+          echo "Found dev tags:"
+          echo "$TAGS"
+
+          # 计算1个月前的日期
+          ONE_MONTH_AGO=$(date -d "1 month ago" +%Y-%m-%d)
+          echo "Cutoff date: $ONE_MONTH_AGO"
+
+          # 筛选出超过1个月的标签
+          OLD_TAGS=""
+          while IFS=: read -r tag_name last_updated; do
+            if [[ -n "$tag_name" && -n "$last_updated" ]]; then
+              # 提取日期部分（格式：2023-10-06T10:30:00.000000Z -> 2023-10-06）
+              tag_date=$(echo "$last_updated" | cut -d'T' -f1)
+              
+              # 比较日期
+              if [[ "$tag_date" < "$ONE_MONTH_AGO" ]]; then
+                echo "Tag $tag_name (updated: $tag_date) is older than $ONE_MONTH_AGO"
+                OLD_TAGS="$OLD_TAGS $tag_name"
+              else
+                echo "Tag $tag_name (updated: $tag_date) is newer than cutoff"
+              fi
+            fi
+          done <<< "$TAGS"
+
+          echo "old_tags=$OLD_TAGS" >> $GITHUB_OUTPUT
+          echo "Tags to delete: $OLD_TAGS"
+
+      - name: Delete Old Dev Tags
+        if: steps.get-tags.outputs.old_tags != ''
+        run: |
+          OLD_TAGS="${{ steps.get-tags.outputs.old_tags }}"
+
+          if [[ -z "$OLD_TAGS" ]]; then
+            echo "No old dev tags to delete"
+            exit 0
+          fi
+
+          for tag in $OLD_TAGS; do
+            echo "Deleting tag: $tag"
+            
+            # 删除标签
+            response=$(curl -s -w "%{http_code}" -X DELETE \
+              -H "Authorization: JWT ${{ steps.get-token.outputs.token }}" \
+              "https://hub.docker.com/v2/repositories/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}/tags/$tag/")
+            
+            http_code="${response: -3}"
+            
+            if [[ "$http_code" == "204" ]]; then
+              echo "✅ Successfully deleted tag: $tag"
+            else
+              echo "❌ Failed to delete tag: $tag (HTTP $http_code)"
+              echo "Response: ${response%???}"
+            fi
+            
+            # 添加延迟以避免API限制
+            sleep 2
+          done
+
+      - name: Summary
+        run: |
+          echo "## Cleanup Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          OLD_TAGS="${{ steps.get-tags.outputs.old_tags }}"
+          if [[ -n "$OLD_TAGS" ]]; then
+            echo "### Processed tags:" >> $GITHUB_STEP_SUMMARY
+            for tag in $OLD_TAGS; do
+              echo "- $tag" >> $GITHUB_STEP_SUMMARY
+            done
+          else
+            echo "### No old dev tags found to delete" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Cutoff date:** $(date -d '1 month ago' +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "**Job completed at:** $(date)" >> $GITHUB_STEP_SUMMARY
