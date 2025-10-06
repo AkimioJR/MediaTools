@@ -16,11 +16,11 @@ func getVersion(isRelease bool) string {
 	out, err := cmd.Output()
 	if err != nil {
 		if isRelease {
-			panic("获取版本号失败: " + err.Error())
+			panic("获取版本号失败: " + err.Error() + "\n" + string(out))
 		}
-		return strings.ReplaceAll(string(out), "\n", "")
+		return "dev-" + getGitCommitHash(true)
 	}
-	return "dev-" + getGitCommitHash(true)
+	return strings.ReplaceAll(string(out), "\n", "")
 }
 
 func getGitCommitHash(isShort bool) string {
@@ -72,7 +72,7 @@ var (
 
 	isRelease bool
 
-	showVersion = false
+	showVersion bool
 )
 
 func init() {
@@ -89,6 +89,10 @@ func init() {
 	flag.BoolVar(&showVersion, "version-info", false, "显示版本信息并退出")
 
 	flag.Parse()
+
+	if isRelease && strings.HasPrefix(appVersion, "dev-") {
+		appVersion = getVersion(isRelease)
+	}
 }
 
 func showInfo() {
