@@ -54,12 +54,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Get Build Information
-        id: build-info
-        uses: ./.github/actions/build-info
-        with:
-          goos: linux
-          goarch: ""
+      - name: Update Version Info
+        if: ${{ inputs.VERSION == '' }}
+        run: |
+          VERSION=$(go run scripts/build.go -version-info)
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: Docker Meta
         id: meta
