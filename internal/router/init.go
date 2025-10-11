@@ -7,6 +7,7 @@ import (
 	"MediaTools/internal/router/library"
 	"MediaTools/internal/router/log"
 	"MediaTools/internal/router/recognize"
+	"MediaTools/internal/router/runtime"
 	"MediaTools/internal/router/scrape"
 	"MediaTools/internal/router/storage"
 	"MediaTools/internal/router/task"
@@ -39,6 +40,7 @@ func InitRouter(isDev bool, noRouterHandler gin.HandlerFunc) *gin.Engine {
 		var resp schemas.Response[*info.VersionInfo]
 		resp.RespondSuccessJSON(ctx, &info.Version)
 	})
+	runtime.RegisterRuntimeRouter(apiRouter.Group("/runtime")) // 程序运行状态相关路由
 
 	config.RegisterConfigRouter(apiRouter.Group("/config"))         // 配置相关路由
 	log.RegisterLogRouter(apiRouter.Group("/log"))                  // 日志相关路由

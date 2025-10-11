@@ -4,6 +4,7 @@
 package app
 
 import (
+	"MediaTools/internal/info"
 	"MediaTools/internal/router"
 	"MediaTools/web"
 
@@ -94,6 +95,7 @@ func Run() {
 	if isServer { // 启动服务器模式
 		runServer()
 	} else { // 启动桌面模式
+		info.RuntimeAppStatus.DesktopMode = true
 		runDesktop()
 	}
 }

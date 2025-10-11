@@ -1,5 +1,7 @@
 package info
 
+import "time"
+
 type VersionInfo struct {
 	AppVersion         string `json:"app_version"`          // 程序版本号
 	SupportDesktopMode bool   `json:"support_desktop_mode"` // 是否支持桌面模式
@@ -8,4 +10,9 @@ type VersionInfo struct {
 	GoVersion          string `json:"go_version"`           // 编译 Golang 版本
 	OS                 string `json:"os"`                   // 操作系统
 	Arch               string `json:"arch"`                 // 架构
+}
+
+type RuntimeAppStatusInfo struct {
+	DesktopMode bool      `json:"desktop_mode"` // 是否桌面模式
+	BootTime    time.Time `json:"boot_time"`    // 启动时间
 }
