@@ -26,9 +26,7 @@ var SupportDesktopMode = true
 
 func newMenu(app *App) *menu.Menu {
 	appMenu := menu.NewMenu()
-	// if version.Version.OS == "" {
-	// 	appMenu.Append(menu.AppMenu())
-	// } else {
+
 	mainMenu := appMenu.AddSubmenu("MediaTools")
 	mainMenu.AddText("关于 "+ProjectName, nil, func(_ *menu.CallbackData) {
 		runtime.MessageDialog(app.ctx, runtime.MessageDialogOptions{
@@ -40,14 +38,12 @@ func newMenu(app *App) *menu.Menu {
 	mainMenu.AddText("隐藏窗口", nil, func(_ *menu.CallbackData) {
 		runtime.Hide(app.ctx)
 	})
-	// mainMenu.AddText("显示窗口", nil, func(_ *menu.CallbackData) {
-	// 	runtime.Show(app.ctx)
-	// })
+
 	mainMenu.AddSeparator()
 	mainMenu.AddText("退出", nil, func(_ *menu.CallbackData) {
 		runtime.Quit(app.ctx)
 	})
-	// }
+
 	return appMenu
 }
 

@@ -58,22 +58,6 @@ func init() {
 	gin.SetMode(gin.ReleaseMode)
 }
 
-// findAvailablePort 查找一个可用的高位端口
-// func findAvailablePort() int {
-// 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	l, err := net.ListenTCP("tcp", addr)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	defer l.Close()
-// 	return l.Addr().(*net.TCPAddr).Port
-// }
-
 // @title MediaTools API 文档
 // @version 1.0
 // @description 下一代媒体刮削&整理工具
@@ -87,9 +71,7 @@ func main() {
 		fmt.Println(string(str))
 		return
 	}
-	// if !isServer {
-	// 	port = uint(findAvailablePort())
-	// }
+
 	if isServer {
 		logrus.Infof("启动参数: 开发者模式=%v, 服务器模式=%v, 端口=%d", isDev, isServer, port)
 	} else {
