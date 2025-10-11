@@ -65,6 +65,7 @@ jobs:
         shell: bash
         run: |
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
+          go install github.com/go-swagger/go-swagger/cmd/swagger@latest
 
       - name: Build
         shell: bash

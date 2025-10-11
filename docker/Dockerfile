@@ -9,16 +9,13 @@ RUN pnpm run build
 
 # Go 后端构建阶段
 # 使用低版本通过 GOTOOLCHAIN 自动下载更高版本
-FROM golang:1.23-alpine AS go-builder 
+FROM golang:1.24.0-alpine AS go-builder 
 
-# ARG APP_VERSION="dev-docker"
-# ARG APP_GIT_COMMIT=""
-# ARG APP_BUILT_AT="unknown"
 
 WORKDIR /build
 
 RUN apk update && \
-    apk add git build-base
+    apk add git build-base gcc musl-dev binutils-gold
 
 # 设置环境变量以启用工具链自动下载
 ENV GOTOOLCHAIN=auto
@@ -29,18 +26,11 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 # 复制前端构建产物
 COPY --from=web-builder /web/dist ./web/dist
 
-# RUN go build \
-#     -tags=onlyServer \
-#     -o MediaTools \
-#     -ldflags="-s -w \
-#               -X MediaTools/internal/version.appVersion=$APP_VERSION \
-#               -X MediaTools/internal/version.commitHash=$APP_GIT_COMMIT \
-#               -X MediaTools/internal/version.buildTime=$APP_BUILT_AT" \
-#     .
 RUN go run scripts/build.go -output MediaTools
 
 # 最终运行阶段

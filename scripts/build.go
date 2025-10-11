@@ -142,6 +142,13 @@ func build() {
 	}
 	fmt.Println("下载依赖成功🎉")
 
+	output, err = exec.Command("swag", "init").CombinedOutput()
+	if err != nil {
+		fmt.Println("更新 Swagger 文档失败: \n" + string(output))
+		panic(err.Error())
+	}
+	fmt.Println("更新 Swagger 文档成功🎉")
+
 	infoFlags := []string{
 		"-X", "MediaTools/internal/info.appVersion=" + appVersion,
 		"-X", "MediaTools/internal/info.buildTime=" + buildTime,
