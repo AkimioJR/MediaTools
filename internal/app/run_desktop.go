@@ -52,7 +52,6 @@ func newMenu(app *App) *menu.Menu {
 }
 
 func runDesktop() {
-	logrus.Infof("桌面模式启动中，端口: %d", port)
 	app := NewApp()
 
 	// Create application with options
