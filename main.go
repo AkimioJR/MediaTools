@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"net"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -60,20 +59,20 @@ func init() {
 }
 
 // findAvailablePort 查找一个可用的高位端口
-func findAvailablePort() int {
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
-	if err != nil {
-		panic(err)
-	}
+// func findAvailablePort() int {
+// 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	l, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		panic(err)
-	}
+// 	l, err := net.ListenTCP("tcp", addr)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	defer l.Close()
-	return l.Addr().(*net.TCPAddr).Port
-}
+// 	defer l.Close()
+// 	return l.Addr().(*net.TCPAddr).Port
+// }
 
 // @title MediaTools API 文档
 // @version 1.0
@@ -88,10 +87,15 @@ func main() {
 		fmt.Println(string(str))
 		return
 	}
-	if !isServer {
-		port = uint(findAvailablePort())
+	// if !isServer {
+	// 	port = uint(findAvailablePort())
+	// }
+	if isServer {
+		logrus.Infof("启动参数: 开发者模式=%v, 服务器模式=%v, 端口=%d", isDev, isServer, port)
+	} else {
+		logrus.Infof("启动参数: 开发者模式=%v, 服务器模式=%v", isDev, isServer)
 	}
-	logrus.Infof("启动参数: 开发者模式=%v, 服务器模式=%v, 端口=%d", isDev, isServer, port)
+
 	app.InitApp(isDev, isServer, port)
 	defer logrus.Info("应用程序已退出")
 	app.Run()
