@@ -59,13 +59,13 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.23 # 使用低版本通过 GOTOOLCHAIN 自动下载更高版本
+          go-version: 1.24.0 # 使用低版本通过 GOTOOLCHAIN 自动下载更高版本
 
-      - name: Install Wails
+      - name: Install CLI Tools
         shell: bash
         run: |
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
-          go install github.com/go-swagger/go-swagger/cmd/swagger@latest
+          go install github.com/swaggo/swag/cmd/swag@latest
 
       - name: Build
         shell: bash
