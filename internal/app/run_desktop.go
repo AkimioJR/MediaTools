@@ -33,7 +33,11 @@ func runDesktop() {
 			Assets:  web.WebDist,
 			Handler: router.InitRouter(isDev, nil),
 		},
-		Windows: &windows.Options{},
+		Windows: &windows.Options{
+			WebviewIsTransparent: true,
+			BackdropType:         windows.Mica, // 使用Mica效果
+			Theme:                windows.SystemDefault,
+		},
 		Mac: &mac.Options{
 			TitleBar: mac.TitleBarHiddenInset(),
 			About: &mac.AboutInfo{
@@ -41,6 +45,8 @@ func runDesktop() {
 				Message: "Copyright © 2025 AKimioJR(akimio.jr@gmail.com)",
 				Icon:    web.GetLogoSVGData(),
 			},
+			WebviewIsTransparent: true,
+			WindowIsTranslucent:  true,
 		},
 	})
 
