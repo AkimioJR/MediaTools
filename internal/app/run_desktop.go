@@ -18,20 +18,16 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-const (
-	Copyright = "Copyright © 2025 AKimioJR(akimio.jr@gmail.com)"
-)
-
 var SupportDesktopMode = true
 
 func newMenu(app *App) *menu.Menu {
 	appMenu := menu.NewMenu()
 
 	mainMenu := appMenu.AddSubmenu("MediaTools")
-	mainMenu.AddText("关于 "+ProjectName, nil, func(_ *menu.CallbackData) {
+	mainMenu.AddText("关于 "+info.ProjectName, nil, func(_ *menu.CallbackData) {
 		runtime.MessageDialog(app.ctx, runtime.MessageDialogOptions{
-			Title:   "关于 " + ProjectName,
-			Message: "MediaTools 是一个用于媒体文件管理和处理的工具。\n" + Copyright,
+			Title:   "关于 " + info.ProjectName,
+			Message: "MediaTools 是一个用于媒体文件管理和处理的工具。\n" + info.Copyright,
 		})
 	})
 	mainMenu.AddSeparator()
@@ -52,7 +48,7 @@ func runDesktop() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:             ProjectName,
+		Title:             info.ProjectName,
 		Width:             1024,
 		Height:            768,
 		Menu:              newMenu(app),

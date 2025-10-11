@@ -15,8 +15,6 @@ func init() {
 	info.Version.SupportDesktopMode = SupportDesktopMode
 }
 
-const ProjectName = "MediaTools"
-
 var (
 	isDev    bool // 是否启用开发者模式
 	isServer bool // 是否启用 Web 服务器模式
