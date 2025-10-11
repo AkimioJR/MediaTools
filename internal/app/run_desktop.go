@@ -46,7 +46,6 @@ func newMenu(app *App) *menu.Menu {
 func runDesktop() {
 	app := NewApp()
 
-	// Create application with options
 	err := wails.Run(&options.App{
 		Title:             info.ProjectName,
 		Width:             1024,
@@ -57,7 +56,7 @@ func runDesktop() {
 		OnShutdown:        app.shutdown,
 		AssetServer: &assetserver.Options{
 			Assets:  web.WebDist,
-			Handler: router.InitRouter(isDev, nil),
+			Handler: router.InitRouter(info.RuntimeAppStatus.IsDev, nil),
 		},
 		Windows: &windows.Options{
 			WebviewIsTransparent: true,
@@ -65,12 +64,7 @@ func runDesktop() {
 			Theme:                windows.SystemDefault,
 		},
 		Mac: &mac.Options{
-			TitleBar: mac.TitleBarHiddenInset(),
-			// About: &mac.AboutInfo{
-			// 	Title:   ProjectName,
-			// 	Message: "Copyright © 2025 AKimioJR(akimio.jr@gmail.com)",
-			// 	Icon:    web.GetLogoSVGData(),
-			// },
+			TitleBar:             mac.TitleBarHiddenInset(),
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 		},
@@ -83,10 +77,9 @@ func runDesktop() {
 }
 
 func Run() {
-	if isServer { // 启动服务器模式
-		runServer()
-	} else { // 启动桌面模式
-		info.RuntimeAppStatus.DesktopMode = true
+	if info.RuntimeAppStatus.DesktopMode { // 启动桌面模式
 		runDesktop()
+	} else { // 启动服务器模式
+		runServer()
 	}
 }

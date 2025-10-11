@@ -15,17 +15,11 @@ func init() {
 	info.Version.SupportDesktopMode = SupportDesktopMode
 }
 
-var (
-	isDev    bool // 是否启用开发者模式
-	isServer bool // 是否启用 Web 服务器模式
-	port     uint // Web 服务器端口
-)
-
-func InitApp(d bool, s bool, p uint) {
+func InitApp(isDev bool, isServer bool, port uint) {
 	// 初始化全局变量
-	isDev = d
-	isServer = s
-	port = p
+	info.RuntimeAppStatus.IsDev = isDev
+	info.RuntimeAppStatus.Port = uint16(port)
+	info.RuntimeAppStatus.DesktopMode = !isServer
 
 	// 初始化配置
 	logrus.Info("开始初始化配置...")

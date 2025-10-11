@@ -14,5 +14,7 @@ type VersionInfo struct {
 
 type RuntimeAppStatusInfo struct {
 	DesktopMode bool      `json:"desktop_mode"` // 是否桌面模式
+	IsDev       bool      `json:"is_dev"`       // 是否开发者模式
+	Port        uint16    `json:"port"`         // 访问端口
 	BootTime    time.Time `json:"boot_time"`    // 启动时间
 }

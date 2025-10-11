@@ -1,6 +1,7 @@
 package app
 
 import (
+	"MediaTools/internal/info"
 	"MediaTools/internal/router"
 	"MediaTools/web"
 	"fmt"
@@ -66,11 +67,11 @@ func handlerWebRouter() gin.HandlerFunc {
 }
 
 func runServer() {
-	ginR := router.InitRouter(isDev, handlerWebRouter())
+	ginR := router.InitRouter(info.RuntimeAppStatus.IsDev, handlerWebRouter())
 	sysCh := waitSysSign()
 	errCh := make(chan error, 1)
 	go func() {
-		err := ginR.Run(":" + strconv.Itoa(int(port)))
+		err := ginR.Run(":" + strconv.Itoa(int(info.RuntimeAppStatus.Port)))
 		if err != nil {
 			errCh <- fmt.Errorf("启动服务器失败: %v", err)
 		}
