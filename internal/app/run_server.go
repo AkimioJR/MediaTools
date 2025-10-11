@@ -3,9 +3,11 @@
 
 package app
 
-var (
-	SupportDesktopMode = false
-)
+import "MediaTools/internal/info"
+
+func init() {
+	info.Version.SupportDesktopMode = false
+}
 
 func Run() {
 	runServer()

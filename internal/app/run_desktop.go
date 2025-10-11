@@ -18,7 +18,9 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-var SupportDesktopMode = true
+func init() {
+	info.Version.SupportDesktopMode = true
+}
 
 func newMenu(app *App) *menu.Menu {
 	appMenu := menu.NewMenu()

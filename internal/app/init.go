@@ -11,10 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func init() {
-	info.Version.SupportDesktopMode = SupportDesktopMode
-}
-
 func InitApp(isDev bool, isServer bool, port uint) {
 	// 初始化全局变量
 	info.RuntimeAppStatus.IsDev = isDev
