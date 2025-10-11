@@ -143,9 +143,9 @@ func build() {
 	fmt.Println("下载依赖成功🎉")
 
 	infoFlags := []string{
-		"-X", "MediaTools/internal/version.appVersion=" + appVersion,
-		"-X", "MediaTools/internal/version.buildTime=" + buildTime,
-		"-X", "MediaTools/internal/version.commitHash=" + commitHash,
+		"-X", "MediaTools/internal/info.appVersion=" + appVersion,
+		"-X", "MediaTools/internal/info.buildTime=" + buildTime,
+		"-X", "MediaTools/internal/info.commitHash=" + commitHash,
 	}
 	ldFlags := []string{
 		"-s",
