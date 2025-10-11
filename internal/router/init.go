@@ -1,6 +1,7 @@
 package router
 
 import (
+	"MediaTools/internal/info"
 	"MediaTools/internal/router/config"
 	"MediaTools/internal/router/history"
 	"MediaTools/internal/router/library"
@@ -11,7 +12,6 @@ import (
 	"MediaTools/internal/router/task"
 	"MediaTools/internal/router/tmdb"
 	"MediaTools/internal/schemas"
-	"MediaTools/internal/version"
 	"net/http"
 
 	_ "MediaTools/docs"
@@ -36,8 +36,8 @@ func InitRouter(isDev bool, noRouterHandler gin.HandlerFunc) *gin.Engine {
 	}
 
 	apiRouter.GET("/version", func(ctx *gin.Context) {
-		var resp schemas.Response[*version.VersionInfo]
-		resp.RespondSuccessJSON(ctx, &version.Version)
+		var resp schemas.Response[*info.VersionInfo]
+		resp.RespondSuccessJSON(ctx, &info.Version)
 	})
 
 	config.RegisterConfigRouter(apiRouter.Group("/config"))         // 配置相关路由

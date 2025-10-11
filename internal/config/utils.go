@@ -1,7 +1,7 @@
 package config
 
 import (
-	"MediaTools/internal/version"
+	"MediaTools/internal/info"
 	"fmt"
 	"runtime"
 
@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/sirupsen/logrus"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -134,7 +135,7 @@ func (c *Configuration) check() {
 const appName = "MediaTools"
 
 func getDataPath() string {
-	if !version.Version.SupportDesktopMode {
+	if !info.Version.SupportDesktopMode {
 		return "data"
 	}
 	var dir string
@@ -155,7 +156,7 @@ func getDataPath() string {
 }
 
 func getLogsPath() string {
-	if !version.Version.SupportDesktopMode {
+	if !info.Version.SupportDesktopMode {
 		return "logs"
 	}
 

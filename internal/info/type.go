@@ -1,4 +1,4 @@
-package version
+package info
 
 type VersionInfo struct {
 	AppVersion         string `json:"app_version"`          // 程序版本号

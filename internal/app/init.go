@@ -4,15 +4,15 @@ import (
 	"MediaTools/internal/config"
 	"MediaTools/internal/controller"
 	"MediaTools/internal/database"
+	"MediaTools/internal/info"
 	"MediaTools/internal/logging"
-	"MediaTools/internal/version"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
 )
 
 func init() {
-	version.Version.SupportDesktopMode = SupportDesktopMode
+	info.Version.SupportDesktopMode = SupportDesktopMode
 }
 
 const ProjectName = "MediaTools"
