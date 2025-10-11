@@ -67,6 +67,7 @@ func main() {
 	if isServer {
 		logrus.Infof("启动参数: 开发者模式=%v, 服务器模式=%v, 端口=%d", isDev, isServer, port)
 	} else {
+		port = 0 // 桌面模式下端口无效
 		logrus.Infof("启动参数: 开发者模式=%v, 服务器模式=%v", isDev, isServer)
 	}
 
