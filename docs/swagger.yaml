@@ -173,6 +173,15 @@ definitions:
     - src_file
     - transfer_type
     type: object
+  schemas.DeleteMediaTransferHistoryRequest:
+    properties:
+      delete_dst:
+        description: 删除目标文件
+        type: boolean
+      delete_src:
+        description: 删除源文件
+        type: boolean
+    type: object
   schemas.FileInfoRequest:
     properties:
       path:
@@ -442,6 +451,8 @@ paths:
       - 历史记录
   /history/media/{id}:
     delete:
+      consumes:
+      - application/json
       description: 根据 ID 删除媒体转移历史记录
       parameters:
       - description: 媒体转移历史记录 ID
@@ -450,6 +461,14 @@ paths:
         name: id
         required: true
         type: integer
+      - description: 请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.DeleteMediaTransferHistoryRequest'
+      produces:
+      - application/json
       responses: {}
       summary: 删除媒体转移历史记录
     get:
@@ -542,6 +561,15 @@ paths:
       summary: 获取媒体海报图片
       tags:
       - TMDB
+  /runtime/status:
+    get:
+      description: 获取程序运行状态信息
+      produces:
+      - application/json
+      responses: {}
+      summary: 获取程序运行状态
+      tags:
+      - App
   /scrape/video:
     post:
       consumes:

@@ -324,6 +324,12 @@ const docTemplate = `{
             },
             "delete": {
                 "description": "根据 ID 删除媒体转移历史记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "summary": "删除媒体转移历史记录",
                 "parameters": [
                     {
@@ -333,6 +339,15 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.DeleteMediaTransferHistoryRequest"
+                        }
                     }
                 ],
                 "responses": {}
@@ -447,6 +462,19 @@ const docTemplate = `{
                         "required": true
                     }
                 ],
+                "responses": {}
+            }
+        },
+        "/runtime/status": {
+            "get": {
+                "description": "获取程序运行状态信息",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "App"
+                ],
+                "summary": "获取程序运行状态",
                 "responses": {}
             }
         },
@@ -780,6 +808,19 @@ const docTemplate = `{
                             "$ref": "#/definitions/storage.TransferType"
                         }
                     ]
+                }
+            }
+        },
+        "schemas.DeleteMediaTransferHistoryRequest": {
+            "type": "object",
+            "properties": {
+                "delete_dst": {
+                    "description": "删除目标文件",
+                    "type": "boolean"
+                },
+                "delete_src": {
+                    "description": "删除源文件",
+                    "type": "boolean"
                 }
             }
         },
