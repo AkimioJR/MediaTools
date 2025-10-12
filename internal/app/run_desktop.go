@@ -23,6 +23,10 @@ func init() {
 }
 
 func newMenu(app *App) *menu.Menu {
+	if info.Version.OS != "darwin" { // 非 Mac 系统不创建菜单
+		return nil
+	}
+
 	appMenu := menu.NewMenu()
 
 	mainMenu := appMenu.AddSubmenu("MediaTools")
@@ -53,6 +57,7 @@ func runDesktop() {
 		Width:             1024,
 		Height:            768,
 		Menu:              newMenu(app),
+		Frameless:         true, // 无边框窗口
 		HideWindowOnClose: true, // 关闭窗口时隐藏应用
 		OnStartup:         app.startup,
 		OnShutdown:        app.shutdown,
