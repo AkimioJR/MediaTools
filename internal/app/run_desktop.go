@@ -29,7 +29,7 @@ func newMenu(app *App) *menu.Menu {
 	mainMenu.AddText("关于 "+info.ProjectName, nil, func(_ *menu.CallbackData) {
 		runtime.MessageDialog(app.ctx, runtime.MessageDialogOptions{
 			Title:   "关于 " + info.ProjectName,
-			Message: "MediaTools 是一个用于媒体文件管理和处理的工具。\n" + info.Copyright,
+			Message: "一个用于媒体文件管理和处理的工具。\n\n" + info.Copyright + "\n\n" + info.Version.String(),
 		})
 	})
 	mainMenu.AddSeparator()
