@@ -12,31 +12,40 @@ import (
 	"time"
 )
 
-func parseVersion(versionStr string) (int, int, int) {
-	parts := strings.Split(strings.Replace(versionStr, "v", "", 1), ".")
-	major := 0
-	minor := 0
-	patch := 0
-	if len(parts) >= 3 {
-		fmt.Sscanf(parts[0], "%d", &major)
-		fmt.Sscanf(parts[1], "%d", &minor)
-		fmt.Sscanf(parts[2], "%d", &patch)
-	}
-	return major, minor, patch
+type Version struct {
+	major     uint
+	minor     uint
+	patch     uint
+	isRelease bool
 }
 
-func getVersion(isRelease bool) string {
-	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
-	out, err := cmd.Output()
-	if err != nil {
-		return "PreRelease-0.0.0-" + getGitCommitHash(true)
-	}
-	major, minor, patch := parseVersion(strings.TrimSpace(string(out)))
-	if isRelease {
-		return fmt.Sprintf("%d.%d.%d", major, minor, patch)
+func (v Version) String() string {
+	if v.isRelease {
+		return fmt.Sprintf("%d.%d.%d", v.major, v.minor, v.patch)
 	} else {
-		return fmt.Sprintf("PreRelease-%d.%d.%d-%s", major, minor, patch+1, getGitCommitHash(true))
+		return fmt.Sprintf("PreRelease-%d.%d.%d-%s", v.major, v.minor, v.patch+1, getGitCommitHash(true))
 	}
+}
+
+func ParseVersion(isRelease bool) *Version {
+	var v Version
+
+	v.isRelease = isRelease
+
+	out, err := exec.Command("git", "describe", "--tags", "--abbrev=0").Output()
+	if err != nil {
+		return &v
+	}
+
+	parts := strings.Split(strings.Replace(string(out), "v", "", 1), ".")
+	if len(parts) != 3 {
+		return &v
+	}
+	fmt.Sscanf(parts[0], "%d", &v.major)
+	fmt.Sscanf(parts[1], "%d", &v.minor)
+	fmt.Sscanf(parts[2], "%d", &v.patch)
+
+	return &v
 }
 
 func getGitCommitHash(isShort bool) string {
@@ -114,7 +123,7 @@ func build() {
 	fmt.Println("更新 Swagger 文档成功🎉")
 
 	infoFlags := []string{
-		"-X", "MediaTools/internal/info.appVersion=" + getVersion(*isRelease),
+		"-X", "MediaTools/internal/info.appVersion=" + ParseVersion(*isRelease).String(),
 		"-X", "MediaTools/internal/info.buildTime=" + time.Now().Format(time.RFC3339),
 		"-X", "MediaTools/internal/info.commitHash=" + getGitCommitHash(false),
 	}
@@ -195,7 +204,7 @@ func init() {
 
 func main() {
 	if *showVersionFlag {
-		fmt.Println(getVersion(*isRelease))
+		fmt.Println(ParseVersion(*isRelease).String())
 		return
 	}
 	build()
