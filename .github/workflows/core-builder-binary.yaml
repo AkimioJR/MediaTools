@@ -78,6 +78,7 @@ jobs:
 
       - name: Get Version
         id: get-version
+        shell: bash
         run: |
           VERSION=$(go run scripts/build.go -version)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
