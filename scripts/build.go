@@ -6,21 +6,35 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 )
+
+func parseVersion(versionStr string) (int, int, int) {
+	parts := strings.Split(strings.Replace(versionStr, "v", "", 1), ".")
+	major := 0
+	minor := 0
+	patch := 0
+	if len(parts) >= 3 {
+		fmt.Sscanf(parts[0], "%d", &major)
+		fmt.Sscanf(parts[1], "%d", &minor)
+		fmt.Sscanf(parts[2], "%d", &patch)
+	}
+	return major, minor, patch
+}
 
 func getVersion(isRelease bool) string {
 	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
 	out, err := cmd.Output()
 	if err != nil {
-		if isRelease {
-			panic("获取版本号失败: " + err.Error() + "\n" + string(out))
-		}
-		return "dev-" + getGitCommitHash(true)
+		return "PreRelease-0.0.0-" + getGitCommitHash(true)
 	}
-	return strings.ReplaceAll(string(out), "\n", "")
+	major, minor, patch := parseVersion(strings.TrimSpace(string(out)))
+	if isRelease {
+		return fmt.Sprintf("%d.%d.%d", major, minor, patch)
+	} else {
+		return fmt.Sprintf("PreRelease-%d.%d.%d-%s", major, minor, patch+1, getGitCommitHash(true))
+	}
 }
 
 func getGitCommitHash(isShort bool) string {
@@ -30,27 +44,26 @@ func getGitCommitHash(isShort bool) string {
 	}
 	args = append(args, "HEAD")
 
-	cmd := exec.Command("git", args...)
-	out, err := cmd.Output()
+	out, err := exec.Command("git", args...).CombinedOutput()
 	if err != nil {
-		panic("获取 git commit 失败: " + err.Error())
+		panic("获取 git commit 失败: " + err.Error() + "\n" + string(out))
 	}
 	return strings.ReplaceAll(string(out), "\n", "")
 }
 
-func getTimeStr() string {
-	return time.Now().Format(time.RFC3339)
-}
+func getOutputName(isdesktopMode bool) string {
+	if *outputName != "" {
+		return *outputName
+	}
 
-func getOutputName(isPackage bool) string {
-	baseName := "MediaTools-" + targetOS + "-" + targetArch
-	if runtime.GOOS == "windows" {
-		baseName += ".exe"
+	name := "MediaTools-" + *targetOS + "-" + *targetArch
+	if *targetOS == "windows" {
+		name += ".exe"
 	}
-	if desktopMode && isPackage && runtime.GOOS == "darwin" {
-		baseName += ".app"
+	if isdesktopMode && *targetOS == "darwin" {
+		name += ".app"
 	}
-	return baseName
+	return name
 }
 
 func needBuildFrontend() bool {
@@ -58,61 +71,6 @@ func needBuildFrontend() bool {
 		return false
 	}
 	return true
-}
-
-var (
-	appVersion    string
-	buildTime     string
-	commitHash    string
-	desktopMode   bool
-	buildFrontend bool
-	targetOS      string
-	targetArch    string
-	outputName    string
-
-	isRelease bool
-
-	showVersion bool
-)
-
-func init() {
-	flag.BoolVar(&isRelease, "release", false, "是否为发布版本 (default false)")
-	flag.StringVar(&appVersion, "version", getVersion(false), "应用版本")
-	flag.StringVar(&buildTime, "build-time", getTimeStr(), "构建时间")
-	flag.StringVar(&commitHash, "commit-hash", getGitCommitHash(false), "Git 提交哈希值")
-	flag.BoolVar(&desktopMode, "desktop", false, "编译桌面模式 (default false)")
-	flag.BoolVar(&buildFrontend, "web", needBuildFrontend(), fmt.Sprintf("是否构建前端 (default %v)", needBuildFrontend()))
-	flag.StringVar(&targetOS, "os", runtime.GOOS, "目标操作系统")
-	flag.StringVar(&targetArch, "arch", runtime.GOARCH, "目标架构")
-	flag.StringVar(&outputName, "output", getOutputName(false), "输出文件名")
-
-	flag.BoolVar(&showVersion, "version-info", false, "显示版本信息并退出")
-
-	flag.Parse()
-
-	if isRelease && strings.HasPrefix(appVersion, "dev-") {
-		appVersion = getVersion(isRelease)
-	}
-}
-
-func showInfo() {
-	println(strings.Repeat("=", 70))
-	println("应用版本:", appVersion)
-	println("构建时间:", buildTime)
-	println("Git 提交哈希值:", commitHash)
-	println("目标操作系统:", targetOS)
-	println("目标架构:", targetArch)
-	println("输出文件名:", outputName)
-	if desktopMode {
-		println("编译模式: 桌面模式")
-	} else {
-		println("编译模式: 服务器模式")
-	}
-	println("是否构建前端:", strconv.FormatBool(buildFrontend))
-	println("是否为发布版本:", strconv.FormatBool(isRelease))
-
-	println(strings.Repeat("=", 70))
-	print("\n\n")
 }
 
 func buildWeb() error {
@@ -150,9 +108,9 @@ func build() {
 	fmt.Println("更新 Swagger 文档成功🎉")
 
 	infoFlags := []string{
-		"-X", "MediaTools/internal/info.appVersion=" + appVersion,
-		"-X", "MediaTools/internal/info.buildTime=" + buildTime,
-		"-X", "MediaTools/internal/info.commitHash=" + commitHash,
+		"-X", "MediaTools/internal/info.appVersion=" + getVersion(*isRelease),
+		"-X", "MediaTools/internal/info.buildTime=" + time.Now().Format(time.RFC3339),
+		"-X", "MediaTools/internal/info.commitHash=" + getGitCommitHash(false),
 	}
 	ldFlags := []string{
 		"-s",
@@ -160,11 +118,10 @@ func build() {
 	}
 
 	var cmd *exec.Cmd
-	if desktopMode {
-		platformArgs := []string{"-platform", targetOS + "/" + targetArch}
-		outputArgs := []string{"-o", outputName}
-		args := append([]string{"build", "-skipbindings", "-ldflags", strings.Join(infoFlags, " ")}, append(platformArgs, outputArgs...)...)
-		if !buildFrontend {
+	if *desktopMode {
+		platformArgs := []string{"-platform", *targetOS + "/" + *targetArch}
+		args := append([]string{"build", "-skipbindings", "-ldflags", strings.Join(infoFlags, " ")}, platformArgs...)
+		if !*buildFrontend {
 			args = append(args, "-s")
 		}
 		args = append(args, ".")
@@ -173,7 +130,7 @@ func build() {
 		cmd = exec.Command("wails", args...)
 
 	} else {
-		if buildFrontend {
+		if *buildFrontend {
 			fmt.Println("开始构建前端...")
 			err = buildWeb()
 			if err != nil {
@@ -184,12 +141,12 @@ func build() {
 
 		fmt.Println("设置 GOOS 和 GOARCH 成功🎉")
 
-		args := []string{"build", "-o", outputName}
+		args := []string{"build", "-o", getOutputName(*desktopMode)}
 		args = append(args, "-ldflags", strings.Join(append(ldFlags, infoFlags...), " "), ".")
 		fmt.Println("执行命令: go", strings.Join(args, " "))
 		print("\n\n")
 		cmd = exec.Command("go", args...)
-		cmd.Env = append(os.Environ(), "GOOS"+"="+targetOS, "GOARCH"+"="+targetArch)
+		cmd.Env = append(os.Environ(), "GOOS"+"="+*targetOS, "GOARCH"+"="+*targetArch)
 	}
 
 	output, err = cmd.CombinedOutput()
@@ -202,11 +159,25 @@ func build() {
 	}
 }
 
+var (
+	targetOS      = flag.String("os", runtime.GOOS, "目标操作系统\nTarget operating system")
+	targetArch    = flag.String("arch", runtime.GOARCH, "目标架构\nTarget architecture")
+	desktopMode   = flag.Bool("desktop", false, "桌面模式\nDesktop mode")
+	buildFrontend = flag.Bool("build-frontend", needBuildFrontend(), fmt.Sprintf("强制构建前端(默认: %v)\nForce build frontend(Defaults: %v)", needBuildFrontend(), needBuildFrontend()))
+	outputName    = flag.String("output", "", "输出文件名(默认: 根据 os/arch 和 desktop 自动生成)\nOutput file name(Defaults: auto generate by os/arch and desktop)")
+	isRelease     = flag.Bool("release", false, "发布模式\nRelease mode")
+
+	showVersionFlag = flag.Bool("version", false, "显示版本信息\nShow version information")
+)
+
+func init() {
+	flag.Parse()
+}
+
 func main() {
-	if showVersion {
-		fmt.Println(appVersion)
+	if *showVersionFlag {
+		fmt.Println(getVersion(*isRelease))
 		return
 	}
-	showInfo()
 	build()
 }
