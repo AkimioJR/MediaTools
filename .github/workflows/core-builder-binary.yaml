@@ -75,10 +75,15 @@ jobs:
           GO111MODULE: on
         run: |
           go run scripts/build.go -desktop -os ${{ matrix.goos }} -arch ${{ matrix.goarch }}
-          ls -la build/bin/
+
+      - name: Get Version
+        id: get-version
+        run: |
+          VERSION=$(go run scripts/build.go -version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}
+          name: MediaTools-${{ matrix.goos }}-${{ matrix.goarch }}-${{ steps.get-version.outputs.version }}
           path: build/bin/*
