@@ -1,6 +1,7 @@
 package info
 
 import (
+	"fmt"
 	"runtime"
 	"time"
 )
