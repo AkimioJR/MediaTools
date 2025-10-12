@@ -1,10 +1,12 @@
 package main
 
 import (
+	"MediaTools/internal/info"
 	"flag"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -51,16 +53,20 @@ func getGitCommitHash(isShort bool) string {
 	return strings.ReplaceAll(string(out), "\n", "")
 }
 
-func getOutputName(isdesktopMode bool) string {
-	if *outputName != "" {
-		return *outputName
-	}
-
-	name := "MediaTools-" + *targetOS + "-" + *targetArch
+func getServerName() string {
+	name := info.ProjectName + "-" + *targetOS + "-" + *targetArch
 	if *targetOS == "windows" {
 		name += ".exe"
 	}
-	if isdesktopMode && *targetOS == "darwin" {
+	return name
+}
+
+func getDesktopName() string {
+	name := filepath.Join("build", "bin", info.ProjectName)
+	switch *targetOS {
+	case "windows":
+		name += ".exe"
+	case "darwin":
 		name += ".app"
 	}
 	return name
@@ -141,7 +147,7 @@ func build() {
 
 		fmt.Println("设置 GOOS 和 GOARCH 成功🎉")
 
-		args := []string{"build", "-o", getOutputName(*desktopMode)}
+		args := []string{"build", "-o", getServerName()}
 		args = append(args, "-ldflags", strings.Join(append(ldFlags, infoFlags...), " "), ".")
 		fmt.Println("执行命令: go", strings.Join(args, " "))
 		print("\n\n")
@@ -156,6 +162,19 @@ func build() {
 		panic("构建失败: " + err.Error())
 	} else {
 		fmt.Println("构建成功！🎉🎉🎉")
+	}
+
+	if *outputName != "" {
+		if *desktopMode {
+			err = os.Rename(getDesktopName(), *outputName)
+		} else {
+			err = os.Rename(getServerName(), *outputName)
+		}
+		if err != nil {
+			fmt.Println("重命名输出文件失败: " + err.Error())
+		} else {
+			fmt.Println("重命名输出文件成功！🎉🎉🎉 输出文件: " + *outputName)
+		}
 	}
 }
 
