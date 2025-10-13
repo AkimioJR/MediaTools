@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/menu"
+	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
@@ -35,12 +36,12 @@ func newMenu(app *App) *menu.Menu {
 			})
 		})
 		mainMenu.AddSeparator()
-		mainMenu.AddText("隐藏窗口", nil, func(_ *menu.CallbackData) {
+		mainMenu.AddText("隐藏窗口", keys.CmdOrCtrl("h"), func(_ *menu.CallbackData) {
 			runtime.Hide(app.ctx)
 		})
 
 		mainMenu.AddSeparator()
-		mainMenu.AddText("退出", nil, func(_ *menu.CallbackData) {
+		mainMenu.AddText("退出", keys.CmdOrCtrl("q"), func(_ *menu.CallbackData) {
 			runtime.Quit(app.ctx)
 		})
 	}
