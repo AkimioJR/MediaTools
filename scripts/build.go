@@ -164,6 +164,11 @@ func build() {
 		cmd.Env = append(os.Environ(), "GOOS"+"="+*targetOS, "GOARCH"+"="+*targetArch)
 	}
 
+	if *targetOS == "windows" && *targetArch == "arm64" {
+		cmd.Env = append(os.Environ(), `CC=zig cc`)
+	}
+
+
 	output, err = cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("构建命令输出:")
