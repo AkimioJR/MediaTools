@@ -23,28 +23,27 @@ func init() {
 }
 
 func newMenu(app *App) *menu.Menu {
-	if info.Version.OS != "darwin" { // 非 Mac 系统不创建菜单
-		return nil
-	}
-
 	appMenu := menu.NewMenu()
+	switch info.Version.OS {
+	case "darwin":
 
-	mainMenu := appMenu.AddSubmenu("MediaTools")
-	mainMenu.AddText("关于 "+info.ProjectName, nil, func(_ *menu.CallbackData) {
-		runtime.MessageDialog(app.ctx, runtime.MessageDialogOptions{
-			Title:   "关于 " + info.ProjectName,
-			Message: "一个用于媒体文件管理和处理的工具。\n\n" + info.Copyright + "\n\n" + info.Version.String(),
+		mainMenu := appMenu.AddSubmenu("MediaTools")
+		mainMenu.AddText("关于 "+info.ProjectName, nil, func(_ *menu.CallbackData) {
+			runtime.MessageDialog(app.ctx, runtime.MessageDialogOptions{
+				Title:   "关于 " + info.ProjectName,
+				Message: "一个用于媒体文件管理和处理的工具。\n\n" + info.Copyright + "\n\n" + info.Version.String(),
+			})
 		})
-	})
-	mainMenu.AddSeparator()
-	mainMenu.AddText("隐藏窗口", nil, func(_ *menu.CallbackData) {
-		runtime.Hide(app.ctx)
-	})
+		mainMenu.AddSeparator()
+		mainMenu.AddText("隐藏窗口", nil, func(_ *menu.CallbackData) {
+			runtime.Hide(app.ctx)
+		})
 
-	mainMenu.AddSeparator()
-	mainMenu.AddText("退出", nil, func(_ *menu.CallbackData) {
-		runtime.Quit(app.ctx)
-	})
+		mainMenu.AddSeparator()
+		mainMenu.AddText("退出", nil, func(_ *menu.CallbackData) {
+			runtime.Quit(app.ctx)
+		})
+	}
 
 	return appMenu
 }
