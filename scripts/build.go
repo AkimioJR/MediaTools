@@ -2,6 +2,7 @@ package main
 
 import (
 	"MediaTools/internal/info"
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -81,6 +82,45 @@ func getDesktopName() string {
 	return name
 }
 
+func useWebkit2_41() bool {
+	file, err := os.Open("/etc/os-release")
+	if err != nil {
+		return false
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	var id, version string
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "ID=") {
+			id = strings.Trim(strings.TrimPrefix(line, "ID="), "\"")
+		} else if strings.HasPrefix(line, "VERSION_ID=") {
+			version = strings.Trim(strings.TrimPrefix(line, "VERSION_ID="), "\"")
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return false
+	}
+
+	if id != "ubuntu" {
+		return false
+	}
+
+	// 解析版本号，提取主版本号
+	parts := strings.Split(version, ".")
+	if len(parts) == 0 {
+		return false
+	}
+	var major int
+	_, err = fmt.Sscanf(parts[0], "%d", &major)
+	if err != nil {
+		return false
+	}
+
+	return major >= 24
+}
+
 func needBuildFrontend() bool {
 	if _, err := os.Stat("web/dist/index.html"); err == nil {
 		return false
@@ -139,6 +179,11 @@ func build() {
 		if !*buildFrontend {
 			args = append(args, "-s")
 		}
+
+		if *targetOS == "linux" && useWebkit2_41() {
+			args = append(args, "-tags", "webkit2_41")
+		}
+
 		args = append(args, ".")
 		fmt.Println("执行命令: wails", strings.Join(args, " "))
 		print("\n\n")
