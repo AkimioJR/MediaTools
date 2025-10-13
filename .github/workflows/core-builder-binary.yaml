@@ -12,10 +12,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - platform: ubuntu-22.04
+          - platform: ubuntu-24.04
             goos: linux
             goarch: amd64
-          - platform: ubuntu-22.04-arm
+          - platform: ubuntu-24.04-arm
             goos: linux
             goarch: arm64
 
@@ -45,10 +45,13 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Dependency
+      - name: Setup Dependency for Linux
         if: matrix.goos == 'linux'
         run: |
-          sudo bash scripts/linux.sh
+          sudo apt update
+          sudo apt install -y \
+            libgtk-4-dev \
+            libwebkit2gtk-4.1-dev
 
       - name: Setup Dependency for Windows ARM64
         if: matrix.goos == 'windows' && matrix.goarch == 'arm64'
