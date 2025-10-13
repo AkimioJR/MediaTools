@@ -50,7 +50,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y \
-            libgtk-4-dev \
+            libgtk-3-dev \
             libwebkit2gtk-4.1-dev
 
       - name: Setup Dependency for Windows ARM64
