@@ -32,9 +32,9 @@ jobs:
           - platform: windows-latest
             goos: windows
             goarch: amd64
-          # - platform: windows-11-arm
-          #   goos: windows
-          #   goarch: arm64
+          - platform: windows-11-arm
+            goos: windows
+            goarch: arm64
 
     name: Build ${{ matrix.goos }}(${{ matrix.goarch }}) Binary Core
     runs-on: ${{ matrix.platform }}
@@ -49,6 +49,10 @@ jobs:
         if: matrix.goos == 'linux'
         run: |
           sudo bash scripts/linux.sh
+
+      - name: Setup Dependency for Windows ARM64
+        if: matrix.goos == 'windows' && matrix.goarch == 'arm64'
+        uses: mlugg/setup-zig@v2
 
       - name: Download web build artifacts
         uses: actions/download-artifact@v4
