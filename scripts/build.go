@@ -168,12 +168,10 @@ func build() {
 		cmd.Env = append(os.Environ(), `CC=zig cc`)
 	}
 
-
+	fmt.Printf("构建命令: %s\n", cmd.String())
 	output, err = cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println("构建命令输出:")
-		fmt.Println(string(output))
-		panic("构建失败: " + err.Error())
+		panic("构建失败: " + err.Error() + "\n" + "\n\n" + string(output))
 	} else {
 		fmt.Println("构建成功！🎉🎉🎉")
 	}
