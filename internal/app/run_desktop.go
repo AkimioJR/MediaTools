@@ -42,7 +42,7 @@ func runDesktop() {
 			Theme:                windows.SystemDefault,
 		},
 		Mac: &mac.Options{
-			TitleBar:             mac.TitleBarHiddenInset(),
+			TitleBar:             mac.TitleBarHidden(),
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 		},
