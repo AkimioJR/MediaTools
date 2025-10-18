@@ -37,7 +37,7 @@ func init() {
 	} else { // 服务器模式下强制启用服务器模式
 		isServer = true
 	}
-	flag.UintVar(&port, "port", 5000, "Web 服务器端口（默认 5000）\nWeb server port (default 5000)")
+	flag.UintVar(&port, "port", 5000, "Web 服务器端口\nWeb server port\n")
 	flag.Parse()
 
 	fmt.Print("\033[2J") // 清屏
