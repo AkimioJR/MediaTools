@@ -27,6 +27,8 @@ func runDesktop() {
 		Title:             info.ProjectName,
 		Width:             1024,
 		Height:            768,
+		MinHeight:         667, // iPhone SE Size
+		MinWidth:          375,
 		Menu:              app.newMenu(),
 		Frameless:         info.Version.OS == "windows", // Windows下使用无边框窗口
 		HideWindowOnClose: true,                         // 关闭窗口时隐藏应用
