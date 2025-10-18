@@ -185,8 +185,6 @@ func build() {
 		}
 
 		args = append(args, ".")
-		fmt.Println("执行命令: wails", strings.Join(args, " "))
-		print("\n\n")
 		cmd = exec.Command("wails", args...)
 
 	} else {
@@ -203,8 +201,7 @@ func build() {
 
 		args := []string{"build", "-o", getServerName()}
 		args = append(args, "-ldflags", strings.Join(append(ldFlags, infoFlags...), " "), ".")
-		fmt.Println("执行命令: go", strings.Join(args, " "))
-		print("\n\n")
+		
 		cmd = exec.Command("go", args...)
 		cmd.Env = append(os.Environ(), "GOOS"+"="+*targetOS, "GOARCH"+"="+*targetArch)
 	}
