@@ -10,43 +10,14 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/wailsapp/wails/v2"
-	"github.com/wailsapp/wails/v2/pkg/menu"
-	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 func init() {
 	info.Version.SupportDesktopMode = true
-}
-
-func newMenu(app *App) *menu.Menu {
-	appMenu := menu.NewMenu()
-	switch info.Version.OS {
-	case "darwin":
-
-		mainMenu := appMenu.AddSubmenu("MediaTools")
-		mainMenu.AddText("关于 "+info.ProjectName, nil, func(_ *menu.CallbackData) {
-			runtime.MessageDialog(app.ctx, runtime.MessageDialogOptions{
-				Title:   "关于 " + info.ProjectName,
-				Message: "一个用于媒体文件管理和处理的工具。\n\n" + info.Copyright + "\n\n" + info.Version.String(),
-			})
-		})
-		mainMenu.AddSeparator()
-		mainMenu.AddText("隐藏窗口", keys.CmdOrCtrl("h"), func(_ *menu.CallbackData) {
-			runtime.Hide(app.ctx)
-		})
-
-		mainMenu.AddSeparator()
-		mainMenu.AddText("退出", keys.CmdOrCtrl("q"), func(_ *menu.CallbackData) {
-			runtime.Quit(app.ctx)
-		})
-	}
-
-	return appMenu
 }
 
 func runDesktop() {
@@ -56,7 +27,7 @@ func runDesktop() {
 		Title:             info.ProjectName,
 		Width:             1024,
 		Height:            768,
-		Menu:              newMenu(app),
+		Menu:              app.newMenu(),
 		Frameless:         info.Version.OS == "windows", // Windows下使用无边框窗口
 		HideWindowOnClose: true,                         // 关闭窗口时隐藏应用
 		OnStartup:         app.startup,

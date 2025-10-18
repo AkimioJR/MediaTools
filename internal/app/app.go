@@ -4,7 +4,12 @@
 package app
 
 import (
+	"MediaTools/internal/info"
 	"context"
+
+	"github.com/wailsapp/wails/v2/pkg/menu"
+	"github.com/wailsapp/wails/v2/pkg/menu/keys"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type App struct {
@@ -61,4 +66,30 @@ func (a *App) shutdown(ctx context.Context) {
 	// if a.systrayEndfunc != nil {
 	// 	a.systrayEndfunc()
 	// }
+}
+
+func (app *App) newMenu() *menu.Menu {
+	appMenu := menu.NewMenu()
+	switch info.Version.OS {
+	case "darwin":
+
+		mainMenu := appMenu.AddSubmenu("MediaTools")
+		mainMenu.AddText("关于 "+info.ProjectName, nil, func(_ *menu.CallbackData) {
+			runtime.MessageDialog(app.ctx, runtime.MessageDialogOptions{
+				Title:   "关于 " + info.ProjectName,
+				Message: "一个用于媒体文件管理和处理的工具。\n\n" + info.Copyright + "\n\n" + info.Version.String(),
+			})
+		})
+		mainMenu.AddSeparator()
+		mainMenu.AddText("隐藏窗口", keys.CmdOrCtrl("h"), func(_ *menu.CallbackData) {
+			runtime.Hide(app.ctx)
+		})
+
+		mainMenu.AddSeparator()
+		mainMenu.AddText("退出", keys.CmdOrCtrl("q"), func(_ *menu.CallbackData) {
+			runtime.Quit(app.ctx)
+		})
+	}
+
+	return appMenu
 }
