@@ -57,8 +57,8 @@ func runDesktop() {
 		Width:             1024,
 		Height:            768,
 		Menu:              newMenu(app),
-		Frameless:         true, // 无边框窗口
-		HideWindowOnClose: true, // 关闭窗口时隐藏应用
+		Frameless:         info.Version.OS == "windows", // Windows下使用无边框窗口
+		HideWindowOnClose: true,                         // 关闭窗口时隐藏应用
 		OnStartup:         app.startup,
 		OnShutdown:        app.shutdown,
 		AssetServer: &assetserver.Options{
