@@ -171,6 +171,15 @@ func buildWeb() error {
 }
 
 func build() {
+	if *buildFrontend {
+		fmt.Println("开始构建前端...")
+		err := buildWeb()
+		if err != nil {
+			panic("构建前端失败: \n" + err.Error())
+		}
+		fmt.Println("构建前端成功🎉")
+	}
+
 	output, err := exec.Command("go", "mod", "download").CombinedOutput()
 	if err != nil {
 		fmt.Println("下载依赖失败: \n" + string(output))
@@ -211,17 +220,6 @@ func build() {
 		cmd = exec.Command("wails", args...)
 
 	} else {
-		if *buildFrontend {
-			fmt.Println("开始构建前端...")
-			err = buildWeb()
-			if err != nil {
-				panic("构建前端失败: \n" + err.Error())
-			}
-			fmt.Println("构建前端成功🎉")
-		}
-
-		fmt.Println("设置 GOOS 和 GOARCH 成功🎉")
-
 		args := []string{"build", "-o", getServerName()}
 		args = append(args, "-ldflags", strings.Join(append(ldFlags, infoFlags...), " "), ".")
 
