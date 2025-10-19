@@ -3,7 +3,6 @@ package config
 import (
 	"MediaTools/internal/info"
 	"fmt"
-	"runtime"
 
 	"os"
 	"path/filepath"
@@ -132,52 +131,26 @@ func (c *Configuration) check() {
 	}
 }
 
-const appName = "MediaTools"
+func getExecDir() string {
+	execPath, err := os.Executable()
+	if err != nil {
+		panic(fmt.Sprintf("无法获取可执行文件路径: %v", err))
+	}
+	return filepath.Dir(execPath)
+}
 
 func getDataPath() string {
-	if !info.Version.SupportDesktopMode {
+	if info.Version.SupportDesktopMode {
+		return filepath.Join(getExecDir(), "data")
+	} else {
 		return "data"
 	}
-	var dir string
-	switch runtime.GOOS {
-	case "windows":
-		dir = os.Getenv("LOCALAPPDATA")
-		if dir == "" {
-			dir = filepath.Join(os.Getenv("USERPROFILE"), "AppData", "Local")
-		}
-	case "darwin":
-		dir = filepath.Join(os.Getenv("HOME"), "Library", "Application Support")
-	case "linux":
-		dir = filepath.Join(os.Getenv("HOME"), ".config")
-	default:
-		return "data"
-	}
-	return filepath.Join(dir, appName)
 }
 
 func getLogsPath() string {
-	if !info.Version.SupportDesktopMode {
+	if info.Version.SupportDesktopMode {
+		return filepath.Join(getExecDir(), "logs")
+	} else {
 		return "logs"
 	}
-
-	var dir string
-	switch runtime.GOOS {
-	case "windows":
-		dir = os.Getenv("LOCALAPPDATA")
-		if dir == "" {
-			dir = filepath.Join(os.Getenv("USERPROFILE"), "AppData", "Local")
-		}
-		return filepath.Join(dir, appName, "logs")
-	case "darwin":
-		dir = filepath.Join(os.Getenv("HOME"), "Library", "Logs")
-	case "linux":
-		dir = os.Getenv("XDG_CACHE_HOME")
-		if dir == "" {
-			dir = filepath.Join(os.Getenv("HOME"), ".cache")
-		}
-		return filepath.Join(dir, appName, "logs")
-	default:
-		return "logs"
-	}
-	return filepath.Join(dir, appName)
 }
