@@ -1,3 +1,6 @@
 [submodule "web"]
 	path = web
 	url = https://github.com/Akimio521/MediaTools-Web.git
+[submodule "wails"]
+	path = wails
+	url = https://github.com/AkimioJR/wails.git
