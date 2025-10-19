@@ -83,3 +83,5 @@ require (
 	google.golang.org/protobuf v1.36.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
+
+replace github.com/wailsapp/wails/v2 => ./wails/v2
