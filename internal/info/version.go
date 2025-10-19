@@ -12,14 +12,18 @@ var (
 	buildTime  string = "Unkown"
 )
 
+var p = PlatformInfo{
+	OS:   runtime.GOOS,
+	Arch: runtime.GOARCH,
+}
+
 var Version = VersionInfo{
 	AppVersion:         appVersion,
 	SupportDesktopMode: true,
 	CommitHash:         commitHash,
 	BuildTime:          parseBuildTime(buildTime),
 	GoVersion:          runtime.Version(),
-	OS:                 runtime.GOOS,
-	Arch:               runtime.GOARCH,
+	PlatformInfo:       p,
 }
 
 func (v VersionInfo) String() string {
