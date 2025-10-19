@@ -175,7 +175,7 @@ func build() {
 	var cmd *exec.Cmd
 	if *desktopMode {
 		platformArgs := []string{"-platform", *targetOS + "/" + *targetArch}
-		args := append([]string{"build", "-skipbindings", "-ldflags", strings.Join(infoFlags, " ")}, platformArgs...)
+		args := append([]string{"build", "-clean", "-skipbindings", "-ldflags", strings.Join(infoFlags, " ")}, platformArgs...)
 		if !*buildFrontend {
 			args = append(args, "-s")
 		}
@@ -201,7 +201,7 @@ func build() {
 
 		args := []string{"build", "-o", getServerName()}
 		args = append(args, "-ldflags", strings.Join(append(ldFlags, infoFlags...), " "), ".")
-		
+
 		cmd = exec.Command("go", args...)
 		cmd.Env = append(os.Environ(), "GOOS"+"="+*targetOS, "GOARCH"+"="+*targetArch)
 	}
