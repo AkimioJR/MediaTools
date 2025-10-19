@@ -121,11 +121,34 @@ func useWebkit2_41() bool {
 	return major >= 24
 }
 
+// isNewerThanTarget 检查目录下是否有文件比目标文件更新
+func isNewerThanTarget(dirPath string, targetTime time.Time) bool {
+	var hasNewerFile bool
+
+	filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() { // 只检查文件，跳过目录
+			if info.ModTime().After(targetTime) {
+				hasNewerFile = true
+				return filepath.SkipAll // 找到更新的文件，立即停止遍历
+			}
+		}
+		return nil
+	})
+
+	return hasNewerFile
+}
+
 func needBuildFrontend() bool {
-	if _, err := os.Stat("web/dist/index.html"); err == nil {
-		return false
+	distInfo, err := os.Stat("web/dist/index.html")
+	if err != nil {
+		return true // 目标文件不存在，需要构建
 	}
-	return true
+
+	return isNewerThanTarget("web/src", distInfo.ModTime())
 }
 
 func buildWeb() error {
