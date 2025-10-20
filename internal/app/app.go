@@ -94,14 +94,26 @@ func (app *App) newMenu() *menu.Menu {
 		})
 		mainMenu.AddSeparator()
 		mainMenu.AddText("隐藏窗口", keys.CmdOrCtrl("h"), func(_ *menu.CallbackData) {
-			runtime.Hide(app.ctx)
+			app.Hide()
 		})
 
 		mainMenu.AddSeparator()
 		mainMenu.AddText("退出", keys.CmdOrCtrl("q"), func(_ *menu.CallbackData) {
-			runtime.Quit(app.ctx)
+			app.Quit()
 		})
 	}
 
 	return appMenu
+}
+
+func (app *App) Quit() {
+	runtime.Quit(app.ctx)
+}
+
+func (app *App) Hide() {
+	runtime.Hide(app.ctx)
+}
+
+func (app *App) Show() {
+	runtime.Show(app.ctx)
 }
