@@ -72,26 +72,12 @@ func (app *App) newMenu() *menu.Menu {
 	appMenu := menu.NewMenu()
 	switch info.Version.OS {
 	case "darwin":
-		closeBtn := "关闭"
-		jumpBtn := "跳转至项目主页"
 
 		mainMenu := appMenu.AddSubmenu(info.ProjectName)
 		mainMenu.AddText("关于", nil, func(_ *menu.CallbackData) {
-			btn, err := runtime.MessageDialog(app.ctx, runtime.MessageDialogOptions{
-				Type:          runtime.InfoDialog,
-				Title:         "关于 " + info.ProjectName,
-				Message:       "一个用于媒体文件管理和处理的工具。\n\n" + info.Copyright + "\n\n" + info.Version.String(),
-				Buttons:       []string{closeBtn, jumpBtn},
-				CancelButton:  closeBtn,
-				DefaultButton: jumpBtn,
-			})
-			if err != nil {
-				return
-			}
-			if btn == jumpBtn {
-				runtime.BrowserOpenURL(app.ctx, info.ProjectURL)
-			}
+			app.OpenAboutDialog()
 		})
+
 		mainMenu.AddSeparator()
 		mainMenu.AddText("隐藏窗口", keys.CmdOrCtrl("h"), func(_ *menu.CallbackData) {
 			app.Hide()
@@ -116,4 +102,26 @@ func (app *App) Hide() {
 
 func (app *App) Show() {
 	runtime.Show(app.ctx)
+}
+
+const (
+	closeBtnText = "关闭"
+	jumpBtnText  = "跳转至项目主页"
+)
+
+func (app *App) OpenAboutDialog() {
+	btnText, err := runtime.MessageDialog(app.ctx, runtime.MessageDialogOptions{
+		Type:          runtime.InfoDialog,
+		Title:         "关于 " + info.ProjectName,
+		Message:       "一个用于媒体文件管理和处理的工具。\n\n" + info.Copyright + "\n\n" + info.Version.String(),
+		Buttons:       []string{closeBtnText, jumpBtnText},
+		CancelButton:  closeBtnText,
+		DefaultButton: jumpBtnText,
+	})
+	if err != nil {
+		return
+	}
+	if btnText == jumpBtnText {
+		runtime.BrowserOpenURL(app.ctx, info.ProjectURL)
+	}
 }
