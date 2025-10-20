@@ -3,6 +3,7 @@ module MediaTools
 go 1.24.1
 
 require (
+	fyne.io/systray v1.11.0
 	github.com/allegro/bigcache v1.2.1
 	github.com/gin-gonic/gin v1.10.1
 	github.com/google/uuid v1.6.0

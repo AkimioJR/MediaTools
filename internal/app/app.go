@@ -32,40 +32,13 @@ const (
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-
-	// switch version.Version.OS { // 设置托盘图标
-	// case "darwin": // 支持 SVG 格式的系统
-	// 	systray.SetIcon(web.GetLogoSVGData())
-	// default:
-	// 	systray.SetIcon(web.GetIconData())
-	// }
-
-	// mQuit := systray.AddMenuItem(QuitString, QuitTip)
-	// mShowWindow := systray.AddMenuItem(ShowWindowsString, ShowWindowsTip)
-	// mHideWindow := systray.AddMenuItem(HideWindowsString, HideWindowsTip)
-
-	// go func() {
-	// 	for {
-	// 		select {
-	// 		case <-mQuit.ClickedCh:
-	// 			runtime.Quit(a.ctx)
-	// 		case <-mShowWindow.ClickedCh:
-	// 			runtime.Show(a.ctx)
-	// 		case <-mHideWindow.ClickedCh:
-	// 			runtime.Hide(a.ctx)
-	// 		}
-	// 	}
-	// }()
-
-	// startFunc, endFunc := systray.RunWithExternalLoop(nil, nil)
-	// a.systrayEndfunc = endFunc
-	// startFunc()
+	a.createSystray()
 }
 
 func (a *App) shutdown(ctx context.Context) {
-	// if a.systrayEndfunc != nil {
-	// 	a.systrayEndfunc()
-	// }
+	if a.systrayEndfunc != nil {
+		a.systrayEndfunc()
+	}
 }
 
 func (app *App) newMenu() *menu.Menu {
