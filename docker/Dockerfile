@@ -22,11 +22,12 @@ ENV GOTOOLCHAIN=auto
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1 
 
-COPY go.mod go.sum ./
-RUN go mod download
+
+
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 COPY . .
-RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN go mod download
 
 # 复制前端构建产物
 COPY --from=web-builder /web/dist ./web/dist
