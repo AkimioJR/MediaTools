@@ -153,9 +153,11 @@ func ArchiveMediaAdvanced(ctx context.Context, srcFile storage.StoragePath, dstD
 		return nil, fmt.Errorf("媒体文件 %s 已经转移到 %s，不能重复转移", srcFile, history.DstPath)
 	}
 
-	history.TransferType = transferType
-	history.SrcPath = srcFile.GetPath()
-	history.SrcType = srcFile.GetStorageType()
+	history = &models.MediaTransferHistory{
+		TransferType: transferType,
+		SrcPath:      srcFile.GetPath(),
+		SrcType:      srcFile.GetStorageType(),
+	}
 
 	videoMeta, rule1, rule2 := recognize_controller.ParseVideoMeta(srcFile.GetName())
 	switch {
